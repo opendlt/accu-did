@@ -133,7 +133,12 @@ func TestEnvelopeHashVectors(t *testing.T) {
 
 	for _, vector := range vectors.DocumentVectors {
 		t.Run(vector.Description, func(t *testing.T) {
-			envelope, err := BuildEnvelope(vector.Document, "acc://test/book/1", "")
+			// Type assert the interface{} to map[string]interface{}
+			doc, ok := vector.Document.(map[string]interface{})
+			if !ok {
+				t.Fatalf("Document is not a map[string]interface{}")
+			}
+			envelope, err := BuildEnvelope(doc, "acc://test/book/1", "")
 			require.NoError(t, err)
 
 			actualHash := envelope.GetContentHash()
