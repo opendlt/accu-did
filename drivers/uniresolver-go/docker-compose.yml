@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  resolver:
+    build:
+      context: ../..
+      dockerfile: resolver-go/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - ACCUMULATE_URL=https://mainnet.accumulate.defidevs.io/v2
+    networks:
+      - did-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  driver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - RESOLVER_URL=http://resolver:8080
+      - PORT=8081
+    depends_on:
+      resolver:
+        condition: service_healthy
+    networks:
+      - did-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  did-network:
+    driver: bridge

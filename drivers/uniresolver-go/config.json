@@ -1,0 +1,21 @@
+{
+  "driver": {
+    "id": "did-acc",
+    "type": "Universal Resolver Driver",
+    "version": "1.0.0",
+    "description": "Universal Resolver driver for Accumulate DID method",
+    "sourceRepository": "https://github.com/opendlt/accu-did",
+    "methods": ["acc"],
+    "endpoints": {
+      "resolve": "/1.0/identifiers/{did}"
+    },
+    "testDids": [
+      "did:acc:alice",
+      "did:acc:beastmode.acme"
+    ],
+    "maintainer": {
+      "name": "Your Organization",
+      "email": "support@yourorg.com"
+    }
+  }
+}
