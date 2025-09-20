@@ -1,0 +1,24 @@
+{
+  "driver": {
+    "id": "did-acc",
+    "type": "Universal Registrar Driver",
+    "version": "1.0.0",
+    "description": "Universal Registrar driver for Accumulate DID method",
+    "sourceRepository": "https://github.com/opendlt/accu-did",
+    "methods": ["acc"],
+    "operations": ["create", "update", "deactivate"],
+    "endpoints": {
+      "create": "/1.0/create?method=acc",
+      "update": "/1.0/update?method=acc",
+      "deactivate": "/1.0/deactivate?method=acc"
+    },
+    "testDids": [
+      "did:acc:alice",
+      "did:acc:beastmode.acme"
+    ],
+    "maintainer": {
+      "name": "Your Organization",
+      "email": "support@yourorg.com"
+    }
+  }
+}

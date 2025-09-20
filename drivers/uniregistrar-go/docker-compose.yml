@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  registrar:
+    build:
+      context: ../..
+      dockerfile: registrar-go/Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - PORT=8082
+      - ACCUMULATE_URL=https://mainnet.accumulate.defidevs.io/v2
+    networks:
+      - did-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  driver:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - REGISTRAR_URL=http://registrar:8082
+      - PORT=8083
+    depends_on:
+      registrar:
+        condition: service_healthy
+    networks:
+      - did-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  did-network:
+    driver: bridge
