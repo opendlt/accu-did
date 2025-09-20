@@ -1,0 +1,24 @@
+﻿@'
+# OS / editors
+.DS_Store
+.vscode/
+.idea/
+.vs/
+
+# builds & artifacts
+bin/
+*.exe
+*.out
+coverage.*
+dist/
+build/
+
+# env & local-only
+.env
+.env.*
+.claude/
+claude.log
+
+# Go
+vendor/
+'@ | Set-Content .gitignore -Encoding utf8
