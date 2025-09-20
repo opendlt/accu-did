@@ -22,14 +22,6 @@ type URLNormalizationVectors struct {
 	Vectors     []URLNormalizationVector `json:"vectors"`
 }
 
-type NormalizedDIDURL struct {
-	Scheme           string            `json:"scheme"`
-	Method           string            `json:"method"`
-	MethodSpecificID string            `json:"methodSpecificId"`
-	Path             string            `json:"path"`
-	Query            map[string]string `json:"query"`
-	Fragment         string            `json:"fragment"`
-}
 
 func TestURLNormalizationVectors(t *testing.T) {
 	// Load test vectors

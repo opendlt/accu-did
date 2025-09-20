@@ -2,8 +2,19 @@ package normalize
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 )
+
+// NormalizedDIDURL represents a parsed and normalized DID URL
+type NormalizedDIDURL struct {
+	Scheme           string            `json:"scheme"`
+	Method           string            `json:"method"`
+	MethodSpecificID string            `json:"methodSpecificId"`
+	Path             string            `json:"path"`
+	Query            map[string]string `json:"query"`
+	Fragment         string            `json:"fragment"`
+}
 
 // NormalizeDID normalizes a DID URL according to did:acc method rules
 func NormalizeDID(did string) (normalizedDID, adi string, err error) {
@@ -92,4 +103,91 @@ func isValidADIChar(r rune) bool {
 		(r >= 'A' && r <= 'Z') ||
 		(r >= '0' && r <= '9') ||
 		r == '-' || r == '_' || r == '.'
+}
+
+// NormalizeDIDURL parses and normalizes a DID URL into structured components
+func NormalizeDIDURL(didURL string) (NormalizedDIDURL, error) {
+	result := NormalizedDIDURL{
+		Query: make(map[string]string),
+	}
+
+	// Parse the URL
+	u, err := url.Parse(didURL)
+	if err != nil {
+		return result, fmt.Errorf("invalid URL: %w", err)
+	}
+
+	// Validate scheme
+	if u.Scheme != "did" {
+		return result, fmt.Errorf("invalid scheme: expected 'did', got '%s'", u.Scheme)
+	}
+	result.Scheme = u.Scheme
+
+	// Extract method and method-specific ID from opaque part
+	// DID URLs have the form: did:method:method-specific-id
+	parts := strings.SplitN(u.Opaque, ":", 2)
+	if len(parts) < 2 {
+		return result, fmt.Errorf("invalid DID format: missing method or method-specific-id")
+	}
+
+	method := parts[0]
+	methodSpecificPart := parts[1]
+
+	// Validate method
+	if method != "acc" {
+		return result, fmt.Errorf("invalid method: expected 'acc', got '%s'", method)
+	}
+	result.Method = method
+
+	// Split method-specific part on first path/query/fragment separator
+	methodSpecificID := methodSpecificPart
+	pathQueryFragment := ""
+
+	for _, sep := range []string{"/", "?", "#", ";"} {
+		if idx := strings.Index(methodSpecificPart, sep); idx != -1 {
+			methodSpecificID = methodSpecificPart[:idx]
+			pathQueryFragment = methodSpecificPart[idx:]
+			break
+		}
+	}
+
+	// Validate method-specific ID is not empty
+	if methodSpecificID == "" {
+		return result, fmt.Errorf("empty method-specific-id")
+	}
+
+	// Normalize the ADI name
+	normalizedADI := normalizeADI(methodSpecificID)
+	if err := ValidateADIName(normalizedADI); err != nil {
+		return result, fmt.Errorf("invalid method-specific-id: %w", err)
+	}
+	result.MethodSpecificID = normalizedADI
+
+	// Parse path, query, and fragment from the remaining part
+	if pathQueryFragment != "" {
+		// Create a temporary URL to parse the path/query/fragment
+		tempURL, err := url.Parse("did:acc:temp" + pathQueryFragment)
+		if err != nil {
+			return result, fmt.Errorf("invalid path/query/fragment: %w", err)
+		}
+
+		result.Path = tempURL.Path
+		result.Fragment = tempURL.Fragment
+
+		// Parse query parameters
+		if tempURL.RawQuery != "" {
+			queryParams, err := url.ParseQuery(tempURL.RawQuery)
+			if err != nil {
+				return result, fmt.Errorf("invalid query parameters: %w", err)
+			}
+
+			for key, values := range queryParams {
+				if len(values) > 0 {
+					result.Query[key] = values[0] // Take first value if multiple
+				}
+			}
+		}
+	}
+
+	return result, nil
 }

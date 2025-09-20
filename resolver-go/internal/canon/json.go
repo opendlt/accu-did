@@ -81,3 +81,19 @@ func SHA256(data []byte) string {
 	hash := sha256.Sum256(data)
 	return fmt.Sprintf("sha256:%x", hash)
 }
+
+// CanonicalizeJSON is an alias for Canonicalize for test compatibility
+func CanonicalizeJSON(v interface{}) ([]byte, error) {
+	return Canonicalize(v)
+}
+
+// ComputeContentHash computes the SHA-256 hash of the canonical JSON representation
+func ComputeContentHash(v interface{}) (string, error) {
+	canonical, err := Canonicalize(v)
+	if err != nil {
+		return "", fmt.Errorf("failed to canonicalize: %w", err)
+	}
+
+	hash := sha256.Sum256(canonical)
+	return fmt.Sprintf("%x", hash), nil
+}
