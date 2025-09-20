@@ -1,0 +1,9 @@
+go 1.25.0
+
+use (
+	./drivers/uniregistrar-go
+	./drivers/uniresolver-go
+	./registrar-go
+	./resolver-go
+	./sdks/go/accdid
+)
