@@ -1,0 +1,238 @@
+{
+  "description": "Test vectors for authorization validation",
+  "version": "1.0",
+  "policy": "v1",
+  "vectors": [
+    {
+      "name": "valid_authorization",
+      "description": "Valid authorization with matching ADI and book/1",
+      "input": {
+        "did": "did:acc:alice",
+        "authorKeyPage": "acc://alice/book/1",
+        "operation": "create"
+      },
+      "expected": {
+        "valid": true,
+        "error": null
+      }
+    },
+    {
+      "name": "valid_complex_adi",
+      "description": "Valid authorization with multi-level ADI",
+      "input": {
+        "did": "did:acc:beastmode.acme",
+        "authorKeyPage": "acc://beastmode.acme/book/1",
+        "operation": "update"
+      },
+      "expected": {
+        "valid": true,
+        "error": null
+      }
+    },
+    {
+      "name": "wrong_book_number",
+      "description": "Invalid authorization with wrong book number",
+      "input": {
+        "did": "did:acc:alice",
+        "authorKeyPage": "acc://alice/book/2",
+        "operation": "create"
+      },
+      "expected": {
+        "valid": false,
+        "error": "unauthorized",
+        "message": "unauthorized: expected acc://alice/book/1, got acc://alice/book/2"
+      }
+    },
+    {
+      "name": "wrong_adi",
+      "description": "Invalid authorization with different ADI",
+      "input": {
+        "did": "did:acc:alice",
+        "authorKeyPage": "acc://bob/book/1",
+        "operation": "update"
+      },
+      "expected": {
+        "valid": false,
+        "error": "unauthorized",
+        "message": "unauthorized: expected acc://alice/book/1, got acc://bob/book/1"
+      }
+    },
+    {
+      "name": "wrong_account_type",
+      "description": "Invalid authorization with wrong account type",
+      "input": {
+        "did": "did:acc:alice",
+        "authorKeyPage": "acc://alice/page/1",
+        "operation": "deactivate"
+      },
+      "expected": {
+        "valid": false,
+        "error": "unauthorized",
+        "message": "unauthorized: expected acc://alice/book/1, got acc://alice/page/1"
+      }
+    },
+    {
+      "name": "invalid_protocol",
+      "description": "Invalid authorization with wrong protocol",
+      "input": {
+        "did": "did:acc:alice",
+        "authorKeyPage": "https://alice/book/1",
+        "operation": "create"
+      },
+      "expected": {
+        "valid": false,
+        "error": "unauthorized",
+        "message": "unauthorized: expected acc://alice/book/1, got https://alice/book/1"
+      }
+    },
+    {
+      "name": "case_sensitivity",
+      "description": "Authorization should be case-insensitive for ADI names",
+      "input": {
+        "did": "did:acc:ALICE",
+        "authorKeyPage": "acc://alice/book/1",
+        "operation": "update"
+      },
+      "expected": {
+        "valid": true,
+        "error": null,
+        "note": "DID should be normalized to lowercase before comparison"
+      }
+    },
+    {
+      "name": "trailing_dot_normalization",
+      "description": "ADI names with trailing dots should be normalized",
+      "input": {
+        "did": "did:acc:alice.",
+        "authorKeyPage": "acc://alice/book/1",
+        "operation": "create"
+      },
+      "expected": {
+        "valid": true,
+        "error": null,
+        "note": "Trailing dot should be removed during normalization"
+      }
+    },
+    {
+      "name": "threshold_validation",
+      "description": "Valid threshold check for signature verification",
+      "input": {
+        "did": "did:acc:alice",
+        "authorKeyPage": "acc://alice/book/1",
+        "operation": "update",
+        "keyPageThreshold": 2,
+        "providedSignatures": 3,
+        "validSignatures": 2
+      },
+      "expected": {
+        "valid": true,
+        "error": null,
+        "note": "Threshold of 2 met with 2 valid signatures"
+      }
+    },
+    {
+      "name": "threshold_not_met",
+      "description": "Invalid when signature threshold not met",
+      "input": {
+        "did": "did:acc:alice",
+        "authorKeyPage": "acc://alice/book/1",
+        "operation": "deactivate",
+        "keyPageThreshold": 3,
+        "providedSignatures": 2,
+        "validSignatures": 1
+      },
+      "expected": {
+        "valid": false,
+        "error": "threshold_not_met",
+        "message": "insufficient signatures: 1 < 3"
+      }
+    },
+    {
+      "name": "signature_validation_error",
+      "description": "Invalid signatures fail verification",
+      "input": {
+        "did": "did:acc:alice",
+        "authorKeyPage": "acc://alice/book/1",
+        "operation": "update",
+        "keyPageThreshold": 1,
+        "providedSignatures": 2,
+        "validSignatures": 0
+      },
+      "expected": {
+        "valid": false,
+        "error": "threshold_not_met",
+        "message": "insufficient signatures: 0 < 1"
+      }
+    },
+    {
+      "name": "empty_key_page_url",
+      "description": "Empty or missing key page URL",
+      "input": {
+        "did": "did:acc:alice",
+        "authorKeyPage": "",
+        "operation": "create"
+      },
+      "expected": {
+        "valid": false,
+        "error": "unauthorized",
+        "message": "unauthorized: expected acc://alice/book/1, got "
+      }
+    },
+    {
+      "name": "malformed_did",
+      "description": "Malformed DID should be rejected",
+      "input": {
+        "did": "did:acc:",
+        "authorKeyPage": "acc://alice/book/1",
+        "operation": "create"
+      },
+      "expected": {
+        "valid": false,
+        "error": "invalid_did",
+        "message": "invalid DID format"
+      }
+    },
+    {
+      "name": "non_acc_did",
+      "description": "Non-acc DID method should be rejected",
+      "input": {
+        "did": "did:key:z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
+        "authorKeyPage": "acc://alice/book/1",
+        "operation": "create"
+      },
+      "expected": {
+        "valid": false,
+        "error": "invalid_did",
+        "message": "not an acc DID method"
+      }
+    },
+    {
+      "name": "complex_adi_hierarchy",
+      "description": "Multi-level ADI with proper authorization",
+      "input": {
+        "did": "did:acc:corp.division.team.alice",
+        "authorKeyPage": "acc://corp.division.team.alice/book/1",
+        "operation": "update"
+      },
+      "expected": {
+        "valid": true,
+        "error": null
+      }
+    }
+  ],
+  "validation_rules": [
+    "Extract ADI name from DID by removing 'did:acc:' prefix",
+    "Normalize ADI name to lowercase",
+    "Remove trailing dots from ADI name",
+    "Expected key page format: 'acc://<normalized-adi>/book/1'",
+    "Compare expected vs provided key page URL exactly",
+    "For signature verification, check threshold requirements",
+    "Count only valid signatures against key page threshold"
+  ],
+  "error_codes": {
+    "unauthorized": "Key page URL does not match expected format",
+    "threshold_not_met": "Signature threshold requirements not satisfied",
+    "invalid_did": "DID format is invalid or not acc method",
+    "invalid_key_page": "Key page URL format is invalid"
+  }
+}

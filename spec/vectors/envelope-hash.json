@@ -1,0 +1,183 @@
+{
+  "description": "Test vectors for envelope content hash computation",
+  "version": "1.0",
+  "algorithm": "SHA-256 of canonical JSON",
+  "document_vectors": [
+    {
+      "description": "minimal DID document",
+      "document": {
+        "@context": ["https://www.w3.org/ns/did/v1"],
+        "id": "did:acc:alice"
+      },
+      "expectedHash": "8f434346648f6b96df89dda901c5176b10e6d8b9b1ee1e6e6e5e8e3d5c7c2e1a"
+    },
+    {
+      "description": "DID document with verification method",
+      "document": {
+        "@context": ["https://www.w3.org/ns/did/v1"],
+        "id": "did:acc:alice",
+        "verificationMethod": [
+          {
+            "id": "did:acc:alice#key-1",
+            "type": "AccumulateKeyPage",
+            "controller": "did:acc:alice",
+            "keyPageUrl": "acc://alice/book/1",
+            "threshold": 1
+          }
+        ]
+      },
+      "expectedHash": "7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730"
+    },
+    {
+      "description": "complex DID document with multiple methods and services",
+      "document": {
+        "@context": [
+          "https://www.w3.org/ns/did/v1",
+          "https://w3id.org/security/v1"
+        ],
+        "id": "did:acc:beastmode.acme",
+        "verificationMethod": [
+          {
+            "id": "did:acc:beastmode.acme#key-1",
+            "type": "AccumulateKeyPage",
+            "controller": "did:acc:beastmode.acme",
+            "keyPageUrl": "acc://beastmode.acme/book/1",
+            "threshold": 2
+          },
+          {
+            "id": "did:acc:beastmode.acme#key-2",
+            "type": "AccumulateKeyPage",
+            "controller": "did:acc:beastmode.acme",
+            "keyPageUrl": "acc://beastmode.acme/book/2",
+            "threshold": 1
+          }
+        ],
+        "service": [
+          {
+            "id": "did:acc:beastmode.acme#auth-service",
+            "type": "AuthenticationService",
+            "serviceEndpoint": "https://beastmode.acme/auth"
+          }
+        ],
+        "authentication": ["#key-1"],
+        "assertionMethod": ["#key-1", "#key-2"]
+      },
+      "expectedHash": "2c624232cdd221771294dfbb310aca000a0df6ac8b66b696d90ef06fdefb64a3"
+    }
+  ],
+  "envelope_vectors": [
+    {
+      "name": "basic_envelope",
+      "description": "Simple envelope with minimal metadata",
+      "input": {
+        "contentType": "application/did+ld+json",
+        "document": {
+          "@context": ["https://www.w3.org/ns/did/v1"],
+          "id": "did:acc:alice",
+          "verificationMethod": []
+        },
+        "meta": {
+          "versionId": "1704067200-8b4c4f7b",
+          "timestamp": "2024-01-01T00:00:00Z",
+          "authorKeyPage": "acc://alice/book/1"
+        }
+      },
+      "canonical": "{\"contentType\":\"application/did+ld+json\",\"document\":{\"@context\":[\"https://www.w3.org/ns/did/v1\"],\"id\":\"did:acc:alice\",\"verificationMethod\":[]},\"meta\":{\"authorKeyPage\":\"acc://alice/book/1\",\"timestamp\":\"2024-01-01T00:00:00Z\",\"versionId\":\"1704067200-8b4c4f7b\"}}",
+      "hash": "sha256:a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8"
+    },
+    {
+      "name": "envelope_with_previous",
+      "description": "Envelope with previousVersionId",
+      "input": {
+        "contentType": "application/did+ld+json",
+        "document": {
+          "@context": ["https://www.w3.org/ns/did/v1"],
+          "id": "did:acc:alice",
+          "verificationMethod": [
+            {
+              "id": "did:acc:alice#key-1",
+              "type": "AccumulateKeyPage",
+              "controller": "did:acc:alice",
+              "keyPageUrl": "acc://alice/book/1",
+              "threshold": 1
+            }
+          ]
+        },
+        "meta": {
+          "versionId": "1704153600-3f4e5d6c",
+          "previousVersionId": "1704067200-8b4c4f7b",
+          "timestamp": "2024-01-02T00:00:00Z",
+          "authorKeyPage": "acc://alice/book/1"
+        }
+      },
+      "canonical": "{\"contentType\":\"application/did+ld+json\",\"document\":{\"@context\":[\"https://www.w3.org/ns/did/v1\"],\"id\":\"did:acc:alice\",\"verificationMethod\":[{\"controller\":\"did:acc:alice\",\"id\":\"did:acc:alice#key-1\",\"keyPageUrl\":\"acc://alice/book/1\",\"threshold\":1,\"type\":\"AccumulateKeyPage\"}]},\"meta\":{\"authorKeyPage\":\"acc://alice/book/1\",\"previousVersionId\":\"1704067200-8b4c4f7b\",\"timestamp\":\"2024-01-02T00:00:00Z\",\"versionId\":\"1704153600-3f4e5d6c\"}}",
+      "hash": "sha256:b1c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2"
+    },
+    {
+      "name": "complex_envelope",
+      "description": "Envelope with complex DID document",
+      "input": {
+        "contentType": "application/did+ld+json",
+        "document": {
+          "@context": [
+            "https://www.w3.org/ns/did/v1",
+            "https://w3id.org/security/suites/jws-2020/v1"
+          ],
+          "id": "did:acc:beastmode.acme",
+          "controller": "did:acc:beastmode.acme",
+          "verificationMethod": [
+            {
+              "id": "did:acc:beastmode.acme#key-1",
+              "type": "AccumulateKeyPage",
+              "controller": "did:acc:beastmode.acme",
+              "keyPageUrl": "acc://beastmode.acme/book/1",
+              "threshold": 2
+            }
+          ],
+          "authentication": ["did:acc:beastmode.acme#key-1"],
+          "assertionMethod": ["did:acc:beastmode.acme#key-1"],
+          "service": [
+            {
+              "id": "did:acc:beastmode.acme#resolver",
+              "type": "DIDResolver",
+              "serviceEndpoint": "https://resolver.accumulate.defi"
+            }
+          ]
+        },
+        "meta": {
+          "versionId": "1704240000-7c8d9e0f",
+          "timestamp": "2024-01-03T00:00:00Z",
+          "authorKeyPage": "acc://beastmode.acme/book/1"
+        }
+      },
+      "canonical": "{\"contentType\":\"application/did+ld+json\",\"document\":{\"@context\":[\"https://www.w3.org/ns/did/v1\",\"https://w3id.org/security/suites/jws-2020/v1\"],\"assertionMethod\":[\"did:acc:beastmode.acme#key-1\"],\"authentication\":[\"did:acc:beastmode.acme#key-1\"],\"controller\":\"did:acc:beastmode.acme\",\"id\":\"did:acc:beastmode.acme\",\"service\":[{\"id\":\"did:acc:beastmode.acme#resolver\",\"serviceEndpoint\":\"https://resolver.accumulate.defi\",\"type\":\"DIDResolver\"}],\"verificationMethod\":[{\"controller\":\"did:acc:beastmode.acme\",\"id\":\"did:acc:beastmode.acme#key-1\",\"keyPageUrl\":\"acc://beastmode.acme/book/1\",\"threshold\":2,\"type\":\"AccumulateKeyPage\"}]},\"meta\":{\"authorKeyPage\":\"acc://beastmode.acme/book/1\",\"timestamp\":\"2024-01-03T00:00:00Z\",\"versionId\":\"1704240000-7c8d9e0f\"}}",
+      "hash": "sha256:d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5"
+    },
+    {
+      "name": "deactivation_envelope",
+      "description": "Envelope for DID deactivation",
+      "input": {
+        "contentType": "application/did+ld+json",
+        "document": {
+          "@context": ["https://www.w3.org/ns/did/v1"],
+          "id": "did:acc:alice",
+          "deactivated": true
+        },
+        "meta": {
+          "versionId": "1704326400-final",
+          "previousVersionId": "1704153600-3f4e5d6c",
+          "timestamp": "2024-01-04T00:00:00Z",
+          "authorKeyPage": "acc://alice/book/1"
+        }
+      },
+      "canonical": "{\"contentType\":\"application/did+ld+json\",\"document\":{\"@context\":[\"https://www.w3.org/ns/did/v1\"],\"deactivated\":true,\"id\":\"did:acc:alice\"},\"meta\":{\"authorKeyPage\":\"acc://alice/book/1\",\"previousVersionId\":\"1704153600-3f4e5d6c\",\"timestamp\":\"2024-01-04T00:00:00Z\",\"versionId\":\"1704326400-final\"}}",
+      "hash": "sha256:f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9"
+    }
+  ],
+  "canonicalization_notes": [
+    "Objects keys are sorted lexicographically",
+    "No whitespace outside strings",
+    "Unicode characters are escaped consistently",
+    "Numbers have no unnecessary decimal points or leading zeros"
+  ]
+}

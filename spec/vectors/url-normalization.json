@@ -1,0 +1,164 @@
+{
+  "description": "Test vectors for DID URL normalization",
+  "version": "1.0",
+  "vectors": [
+    {
+      "description": "simple ADI",
+      "input": "did:acc:alice",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "alice",
+        "path": "",
+        "query": {},
+        "fragment": ""
+      }
+    },
+    {
+      "description": "complex ADI with dots",
+      "input": "did:acc:beastmode.acme",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "beastmode.acme",
+        "path": "",
+        "query": {},
+        "fragment": ""
+      }
+    },
+    {
+      "description": "uppercase ADI normalization",
+      "input": "did:acc:ALICE",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "alice",
+        "path": "",
+        "query": {},
+        "fragment": ""
+      }
+    },
+    {
+      "description": "trailing dot removal",
+      "input": "did:acc:alice.",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "alice",
+        "path": "",
+        "query": {},
+        "fragment": ""
+      }
+    },
+    {
+      "description": "DID with fragment",
+      "input": "did:acc:alice#key-1",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "alice",
+        "path": "",
+        "query": {},
+        "fragment": "key-1"
+      }
+    },
+    {
+      "description": "DID with path component",
+      "input": "did:acc:alice/path/to/resource",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "alice",
+        "path": "/path/to/resource",
+        "query": {},
+        "fragment": ""
+      }
+    },
+    {
+      "description": "DID with single query parameter",
+      "input": "did:acc:alice?versionTime=123456789",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "alice",
+        "path": "",
+        "query": {
+          "versionTime": "123456789"
+        },
+        "fragment": ""
+      }
+    },
+    {
+      "description": "DID with multiple query parameters",
+      "input": "did:acc:alice?versionTime=123456789&transform=jsonld",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "alice",
+        "path": "",
+        "query": {
+          "versionTime": "123456789",
+          "transform": "jsonld"
+        },
+        "fragment": ""
+      }
+    },
+    {
+      "description": "DID with path, query, and fragment",
+      "input": "did:acc:beastmode.acme/services/auth?version=latest&format=json#endpoint-1",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "beastmode.acme",
+        "path": "/services/auth",
+        "query": {
+          "version": "latest",
+          "format": "json"
+        },
+        "fragment": "endpoint-1"
+      }
+    },
+    {
+      "description": "complex ADI with mixed case and trailing dot",
+      "input": "did:acc:MyCompany.Example.Com.?service=login&method=oauth#token",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "mycompany.example.com",
+        "path": "",
+        "query": {
+          "service": "login",
+          "method": "oauth"
+        },
+        "fragment": "token"
+      }
+    },
+    {
+      "description": "DID with encoded characters in path",
+      "input": "did:acc:alice/path%20with%20spaces/resource",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "alice",
+        "path": "/path%20with%20spaces/resource",
+        "query": {},
+        "fragment": ""
+      }
+    },
+    {
+      "description": "DID with empty query parameter value",
+      "input": "did:acc:alice?transform=&versionTime=123",
+      "expected": {
+        "scheme": "did",
+        "method": "acc",
+        "methodSpecificId": "alice",
+        "path": "",
+        "query": {
+          "transform": "",
+          "versionTime": "123"
+        },
+        "fragment": ""
+      }
+    }
+  ]
+}
