@@ -1,0 +1,70 @@
+{
+  "@context": [
+    "https://www.w3.org/ns/did/v1",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
+  "id": "did:acc:alice",
+  "controller": "did:acc:alice",
+  "verificationMethod": [
+    {
+      "id": "did:acc:alice#key-1",
+      "type": "AccumulateKeyPage",
+      "controller": "did:acc:alice",
+      "keyPageUrl": "acc://alice/book/1",
+      "threshold": 1
+    },
+    {
+      "id": "did:acc:alice#key-2",
+      "type": "AccumulateKeyPage",
+      "controller": "did:acc:alice",
+      "keyPageUrl": "acc://alice/book/2",
+      "threshold": 2
+    }
+  ],
+  "authentication": [
+    "did:acc:alice#key-1"
+  ],
+  "assertionMethod": [
+    "did:acc:alice#key-1",
+    "did:acc:alice#key-2"
+  ],
+  "keyAgreement": [
+    "did:acc:alice#key-2"
+  ],
+  "capabilityInvocation": [
+    "did:acc:alice#key-1"
+  ],
+  "capabilityDelegation": [
+    "did:acc:alice#key-2"
+  ],
+  "service": [
+    {
+      "id": "did:acc:alice#resolver",
+      "type": "DIDResolver",
+      "serviceEndpoint": "https://resolver.accumulate.defi"
+    },
+    {
+      "id": "did:acc:alice#messaging",
+      "type": "MessagingService",
+      "serviceEndpoint": "https://messaging.alice.example.com"
+    },
+    {
+      "id": "did:acc:alice#vault",
+      "type": "CredentialVault",
+      "serviceEndpoint": {
+        "uri": "https://vault.alice.example.com",
+        "accept": ["VerifiableCredential"],
+        "routingKeys": ["did:acc:alice#key-2"]
+      }
+    },
+    {
+      "id": "did:acc:alice#didcomm",
+      "type": "DIDCommMessaging",
+      "serviceEndpoint": {
+        "uri": "https://didcomm.alice.example.com",
+        "accept": ["didcomm/v2"],
+        "routingKeys": ["did:acc:alice#key-1"]
+      }
+    }
+  ]
+}

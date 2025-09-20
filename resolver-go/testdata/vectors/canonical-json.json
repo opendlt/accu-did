@@ -1,0 +1,195 @@
+{
+  "description": "Test vectors for canonical JSON encoding",
+  "specification": "RFC8785-style canonicalization with lexicographic key ordering",
+  "vectors": [
+    {
+      "name": "simple_object",
+      "description": "Basic object with key reordering",
+      "input": {
+        "z": "last",
+        "a": "first",
+        "m": "middle"
+      },
+      "canonical": "{\"a\":\"first\",\"m\":\"middle\",\"z\":\"last\"}"
+    },
+    {
+      "name": "nested_object",
+      "description": "Nested objects with recursive key ordering",
+      "input": {
+        "outer": {
+          "z": "nested_last",
+          "a": "nested_first"
+        },
+        "first": "value"
+      },
+      "canonical": "{\"first\":\"value\",\"outer\":{\"a\":\"nested_first\",\"z\":\"nested_last\"}}"
+    },
+    {
+      "name": "array_preservation",
+      "description": "Arrays maintain original order",
+      "input": {
+        "array": [3, 1, 2],
+        "key": "value"
+      },
+      "canonical": "{\"array\":[3,1,2],\"key\":\"value\"}"
+    },
+    {
+      "name": "number_formatting",
+      "description": "Numbers without trailing zeros or unnecessary signs",
+      "input": {
+        "integer": 42,
+        "zero": 0,
+        "negative": -17,
+        "decimal": 3.14,
+        "scientific": 1.23e10
+      },
+      "canonical": "{\"decimal\":3.14,\"integer\":42,\"negative\":-17,\"scientific\":12300000000,\"zero\":0}"
+    },
+    {
+      "name": "string_escaping",
+      "description": "Minimal string escaping",
+      "input": {
+        "quote": "He said \"hello\"",
+        "backslash": "path\\to\\file",
+        "newline": "line1\nline2",
+        "unicode": "café",
+        "control": "\u0001\u0002"
+      },
+      "canonical": "{\"backslash\":\"path\\\\to\\\\file\",\"control\":\"\\u0001\\u0002\",\"newline\":\"line1\\nline2\",\"quote\":\"He said \\\"hello\\\"\",\"unicode\":\"café\"}"
+    },
+    {
+      "name": "did_document_basic",
+      "description": "Basic DID document canonicalization",
+      "input": {
+        "verificationMethod": [],
+        "id": "did:acc:alice",
+        "@context": ["https://www.w3.org/ns/did/v1"]
+      },
+      "canonical": "{\"@context\":[\"https://www.w3.org/ns/did/v1\"],\"id\":\"did:acc:alice\",\"verificationMethod\":[]}"
+    },
+    {
+      "name": "did_document_complex",
+      "description": "Complex DID document with multiple fields",
+      "input": {
+        "service": [
+          {
+            "serviceEndpoint": "https://resolver.accumulate.defi",
+            "type": "DIDResolver",
+            "id": "did:acc:alice#resolver"
+          }
+        ],
+        "verificationMethod": [
+          {
+            "threshold": 1,
+            "type": "AccumulateKeyPage",
+            "keyPageUrl": "acc://alice/book/1",
+            "id": "did:acc:alice#key-1",
+            "controller": "did:acc:alice"
+          }
+        ],
+        "authentication": ["did:acc:alice#key-1"],
+        "id": "did:acc:alice",
+        "@context": [
+          "https://w3id.org/security/suites/jws-2020/v1",
+          "https://www.w3.org/ns/did/v1"
+        ]
+      },
+      "canonical": "{\"@context\":[\"https://w3id.org/security/suites/jws-2020/v1\",\"https://www.w3.org/ns/did/v1\"],\"authentication\":[\"did:acc:alice#key-1\"],\"id\":\"did:acc:alice\",\"service\":[{\"id\":\"did:acc:alice#resolver\",\"serviceEndpoint\":\"https://resolver.accumulate.defi\",\"type\":\"DIDResolver\"}],\"verificationMethod\":[{\"controller\":\"did:acc:alice\",\"id\":\"did:acc:alice#key-1\",\"keyPageUrl\":\"acc://alice/book/1\",\"threshold\":1,\"type\":\"AccumulateKeyPage\"}]}"
+    },
+    {
+      "name": "envelope_metadata",
+      "description": "Envelope metadata structure",
+      "input": {
+        "meta": {
+          "timestamp": "2024-01-01T00:00:00Z",
+          "versionId": "1704067200-8b4c4f7b",
+          "authorKeyPage": "acc://alice/book/1"
+        },
+        "document": {
+          "id": "did:acc:alice"
+        },
+        "contentType": "application/did+ld+json"
+      },
+      "canonical": "{\"contentType\":\"application/did+ld+json\",\"document\":{\"id\":\"did:acc:alice\"},\"meta\":{\"authorKeyPage\":\"acc://alice/book/1\",\"timestamp\":\"2024-01-01T00:00:00Z\",\"versionId\":\"1704067200-8b4c4f7b\"}}"
+    },
+    {
+      "name": "empty_values",
+      "description": "Handling of empty and null values",
+      "input": {
+        "null_value": null,
+        "empty_string": "",
+        "empty_array": [],
+        "empty_object": {},
+        "zero": 0,
+        "false_value": false
+      },
+      "canonical": "{\"empty_array\":[],\"empty_object\":{},\"empty_string\":\"\",\"false_value\":false,\"null_value\":null,\"zero\":0}"
+    },
+    {
+      "name": "unicode_handling",
+      "description": "Unicode characters and normalization",
+      "input": {
+        "emoji": "🔐",
+        "accents": "résumé",
+        "chinese": "你好",
+        "mixed": "Hello 世界! 🌍"
+      },
+      "canonical": "{\"accents\":\"résumé\",\"chinese\":\"你好\",\"emoji\":\"🔐\",\"mixed\":\"Hello 世界! 🌍\"}"
+    },
+    {
+      "name": "special_characters",
+      "description": "Special characters requiring escaping",
+      "input": {
+        "quotes": "\"quoted\"",
+        "backslashes": "\\path\\",
+        "tabs": "\ttabbed",
+        "returns": "\r\nwindows",
+        "form_feed": "\f",
+        "backspace": "\b"
+      },
+      "canonical": "{\"backslashes\":\"\\\\path\\\\\",\"backspace\":\"\\b\",\"form_feed\":\"\\f\",\"quotes\":\"\\\"quoted\\\"\",\"returns\":\"\\r\\nwindows\",\"tabs\":\"\\ttabbed\"}"
+    },
+    {
+      "name": "large_numbers",
+      "description": "Large number handling",
+      "input": {
+        "large_int": 9007199254740991,
+        "large_negative": -9007199254740991,
+        "scientific": 1.23456789e20,
+        "small_decimal": 0.000000001
+      },
+      "canonical": "{\"large_int\":9007199254740991,\"large_negative\":-9007199254740991,\"scientific\":123456789000000000000,\"small_decimal\":1e-9}"
+    },
+    {
+      "name": "boolean_and_null",
+      "description": "Boolean and null value handling",
+      "input": {
+        "true_value": true,
+        "false_value": false,
+        "null_value": null,
+        "string_true": "true",
+        "string_false": "false",
+        "string_null": "null"
+      },
+      "canonical": "{\"false_value\":false,\"null_value\":null,\"string_false\":\"false\",\"string_null\":\"null\",\"string_true\":\"true\",\"true_value\":true}"
+    }
+  ],
+  "canonicalization_rules": [
+    "Object keys sorted lexicographically (Unicode code point order)",
+    "No insignificant whitespace",
+    "Numbers in minimal form (no trailing zeros, no positive sign)",
+    "Strings with minimal escaping (only required characters)",
+    "Arrays preserve original element order",
+    "Nested objects recursively canonicalized",
+    "UTF-8 encoding",
+    "No HTML escaping for Unicode characters"
+  ],
+  "implementation_notes": [
+    "Use json.Marshal followed by custom canonicalization in Go",
+    "Sort object keys at each level",
+    "Preserve array ordering",
+    "Handle special float values (NaN, Infinity) by rejecting them",
+    "Use compact form (no pretty printing)",
+    "Consistent number formatting across implementations"
+  ]
+}

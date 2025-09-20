@@ -1,0 +1,55 @@
+{
+  "description": "Test vectors for DID URL normalization",
+  "vectors": [
+    {
+      "name": "basic_lowercase",
+      "input": "did:acc:alice",
+      "expected": "did:acc:alice"
+    },
+    {
+      "name": "uppercase_adi",
+      "input": "did:acc:ALICE",
+      "expected": "did:acc:alice"
+    },
+    {
+      "name": "mixed_case",
+      "input": "did:acc:Alice",
+      "expected": "did:acc:alice"
+    },
+    {
+      "name": "complex_adi_mixed_case",
+      "input": "did:acc:BeastMode.ACME",
+      "expected": "did:acc:beastmode.acme"
+    },
+    {
+      "name": "trailing_dot",
+      "input": "did:acc:alice.",
+      "expected": "did:acc:alice"
+    },
+    {
+      "name": "complex_trailing_dot",
+      "input": "did:acc:beastmode.acme.",
+      "expected": "did:acc:beastmode.acme"
+    },
+    {
+      "name": "with_fragment",
+      "input": "did:acc:ALICE#key-1",
+      "expected": "did:acc:alice#key-1"
+    },
+    {
+      "name": "with_query",
+      "input": "did:acc:ALICE?versionTime=2024-01-01T00:00:00Z",
+      "expected": "did:acc:alice?versionTime=2024-01-01T00:00:00Z"
+    },
+    {
+      "name": "with_path",
+      "input": "did:acc:ALICE/documents/123",
+      "expected": "did:acc:alice/documents/123"
+    },
+    {
+      "name": "complex_url",
+      "input": "did:acc:BeastMode.ACME./path?query=value#fragment",
+      "expected": "did:acc:beastmode.acme/path?query=value#fragment"
+    }
+  ]
+}
