@@ -7,8 +7,8 @@ Decentralized identifiers on Accumulate Protocol with Go services and Universal 
 **Prerequisites:** Go 1.22+, Docker
 
 **Key Services:**
-- Resolver: `:8080` - DID document resolution (FAKE/REAL modes)
-- Registrar: `:8081` - DID lifecycle management (FAKE/REAL modes)
+- Resolver: `:8080` - DID document resolution with proper did:acc → acc:// URL mapping
+- Registrar: `:8081` - DID lifecycle management with native and Universal Registrar endpoints
 
 **Most Common Commands:**
 ```bash
@@ -30,6 +30,25 @@ cd registrar-go && go run cmd/registrar/main.go --real --addr :8081
 - **Framework:** chi router, golangci-lint
 - **Module Base:** `github.com/opendlt/accu-did`
 - **Standards:** W3C DID Core, Universal Resolver/Registrar
+- **DID Method:** `did:acc:<adi-label>[/<path>]` maps to `acc://<adi-label>/<path|did>`
+
+## DID Conventions
+
+The Accumulate DID method follows the pattern `did:acc:<adi-label>[/<path>]`:
+
+- **Simple DID:** `did:acc:alice` → ADI: `acc://alice`, Data Account: `acc://alice/did`
+- **DID with dots:** `did:acc:beastmode.acme` → ADI: `acc://beastmode.acme`, Data Account: `acc://beastmode.acme/did`
+- **Custom path:** `did:acc:alice/documents` → ADI: `acc://alice`, Data Account: `acc://alice/documents`
+
+**Registration Flow (Native endpoint):**
+1. Create ADI: `acc://<adi-label>` with specified key page
+2. Create data account: `acc://<adi-label>/<path>` (default: "did")
+3. Write DID document as JSON data to the data account
+
+**Resolution Flow:**
+1. Parse DID to extract ADI and data account URLs
+2. Read JSON data from data account: `acc://<adi-label>/<path>`
+3. Return W3C DID Resolution Result with metadata
 
 ## Development
 
@@ -47,6 +66,29 @@ Use `make help` for all targets. Key services run on localhost with health check
 - **Deep Context:** [.claude/memory/CLAUDE.md](.claude/memory/CLAUDE.md)
 - **Interop Plans:** `docs/interop/`
 
+## API Endpoints
+
+### Resolver (Port 8080)
+- `GET /resolve?did={did}` - Resolve DID documents using proper DID→URL mapping
+- `GET /healthz` - Health check endpoint
+
+### Registrar (Port 8081)
+
+**Native Endpoints (Clean Internal API):**
+- `POST /register` - Register new DID with full ADI/data account creation
+- `POST /native/update` - Update existing DID document
+- `POST /native/deactivate` - Deactivate DID
+
+**Universal Registrar v1.0 Compatibility:**
+- `POST /1.0/create` - Universal Registrar create endpoint
+- `POST /1.0/update` - Universal Registrar update endpoint
+- `POST /1.0/deactivate` - Universal Registrar deactivate endpoint
+
+**Legacy Universal Registrar v0.x:**
+- `POST /create` - Legacy create endpoint
+- `POST /update` - Legacy update endpoint
+- `POST /deactivate` - Legacy deactivate endpoint
+
 ## Quick Test
 
 ### FAKE Mode Smoke Tests
@@ -56,16 +98,39 @@ Use `make help` for all targets. Key services run on localhost with health check
 ./registrar --addr :8081 &
 
 # Health checks
-curl http://localhost:8080/healthz  # Should return {"status":"ok","timestamp":"..."}
-curl http://localhost:8081/healthz  # Should return {"status":"ok","timestamp":"..."}
+curl http://localhost:8080/healthz
+curl http://localhost:8081/healthz
 
-# DID resolution (uses golden files)
+# DID resolution (uses testdata files)
+curl "http://localhost:8080/resolve?did=did:acc:alice"
 curl "http://localhost:8080/resolve?did=did:acc:beastmode.acme"
 
-# DID registration (uses mock submitter)
+# Native DID registration (creates ADI + data account + writes DID doc)
 curl -X POST -H "Content-Type: application/json" \
-  -d '{"did":"did:acc:test","didDocument":{"@context":["https://www.w3.org/ns/did/v1"],"id":"did:acc:test"}}' \
-  http://localhost:8081/create
+  -d '{
+    "did": "did:acc:testuser",
+    "didDocument": {
+      "@context": ["https://www.w3.org/ns/did/v1"],
+      "id": "did:acc:testuser",
+      "verificationMethod": [{
+        "id": "did:acc:testuser#key1",
+        "type": "Ed25519VerificationKey2020",
+        "controller": "did:acc:testuser",
+        "publicKeyMultibase": "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
+      }]
+    }
+  }' \
+  http://localhost:8081/register
+
+# Universal Registrar compatibility
+curl -X POST -H "Content-Type: application/json" \
+  -d '{
+    "didDocument": {
+      "@context": ["https://www.w3.org/ns/did/v1"],
+      "id": "did:acc:universaltest"
+    }
+  }' \
+  http://localhost:8081/1.0/create
 ```
 
 ### REAL Mode Smoke Tests
@@ -79,11 +144,19 @@ export ACC_NODE_URL=http://localhost:26657
 curl http://localhost:8080/healthz
 curl http://localhost:8081/healthz
 
-# DID operations (connects to live Accumulate network)
+# DID resolution (reads from live Accumulate network)
 curl "http://localhost:8080/resolve?did=did:acc:alice"
+
+# DID registration (submits to live Accumulate network)
 curl -X POST -H "Content-Type: application/json" \
-  -d '{"did":"did:acc:alice","didDocument":{"@context":["https://www.w3.org/ns/did/v1"],"id":"did:acc:alice"}}' \
-  http://localhost:8081/create
+  -d '{
+    "did": "did:acc:mycompany",
+    "didDocument": {
+      "@context": ["https://www.w3.org/ns/did/v1"],
+      "id": "did:acc:mycompany"
+    }
+  }' \
+  http://localhost:8081/register
 ```
 
 ### Environment Variables

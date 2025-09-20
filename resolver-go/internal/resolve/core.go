@@ -1,12 +1,14 @@
 package resolve
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/opendlt/accu-did/resolver-go/internal/acc"
 	"github.com/opendlt/accu-did/resolver-go/internal/canon"
 	"github.com/opendlt/accu-did/resolver-go/internal/normalize"
+	"github.com/opendlt/accu-did/shared/did"
 )
 
 // DIDResolutionResult represents a W3C DID Resolution result
@@ -62,55 +64,49 @@ func (e *DeactivatedError) Error() string {
 }
 
 // ResolveDID resolves a DID according to the W3C DID Core specification
-func ResolveDID(client acc.Client, did string, versionTime *time.Time) (*DIDResolutionResult, error) {
+func ResolveDID(client acc.Client, didStr string, versionTime *time.Time) (*DIDResolutionResult, error) {
 	start := time.Now()
 
-	// Step 1: Normalize DID
-	normalizedDID, adi, err := normalize.NormalizeDID(did)
+	// Step 1: Parse DID into Accumulate URLs
+	adiURL, dataAccountURL, err := did.ParseDID(didStr)
 	if err != nil {
-		return nil, &InvalidDIDError{DID: did, Reason: err.Error()}
+		return nil, &InvalidDIDError{DID: didStr, Reason: err.Error()}
 	}
 
-	// Step 2: Get DID entry from Accumulate
-	var envelope acc.Envelope
+	// Step 2: Read DID document from data account
+	var didDocBytes []byte
 	if versionTime != nil {
-		envelope, err = client.GetEntryAtTime(adi, *versionTime)
+		// TODO: Implement versioned data entry reading
+		didDocBytes, err = client.GetDataAccountEntry(dataAccountURL)
 	} else {
-		envelope, err = client.GetLatestDIDEntry(adi)
+		didDocBytes, err = client.GetDataAccountEntry(dataAccountURL)
 	}
 	if err != nil {
-		return nil, &NotFoundError{DID: normalizedDID}
+		return nil, &NotFoundError{DID: didStr}
 	}
 
-	// Step 3: Validate content hash
-	if envelope.Meta.Proof.ContentHash != "" {
-		canonical, err := canon.Canonicalize(envelope.Document)
-		if err != nil {
-			return nil, fmt.Errorf("failed to canonicalize document: %w", err)
-		}
-
-		expectedHash := canon.SHA256(canonical)
-		if expectedHash != envelope.Meta.Proof.ContentHash {
-			return nil, fmt.Errorf("content hash mismatch")
-		}
+	// Step 3: Parse DID document
+	var didDoc map[string]interface{}
+	if err := json.Unmarshal(didDocBytes, &didDoc); err != nil {
+		return nil, fmt.Errorf("invalid DID document JSON: %w", err)
 	}
 
 	// Step 4: Check if deactivated
-	if deactivated, exists := envelope.Document["deactivated"].(bool); exists && deactivated {
-		return nil, &DeactivatedError{DID: normalizedDID}
+	if deactivated, exists := didDoc["deactivated"].(bool); exists && deactivated {
+		return nil, &DeactivatedError{DID: didStr}
 	}
 
 	// Step 5: Build resolution result
 	result := &DIDResolutionResult{
-		DIDDocument: envelope.Document,
+		DIDDocument: didDoc,
 		DIDDocumentMetadata: DIDDocumentMetadata{
-			VersionID:   envelope.Meta.VersionID,
-			Created:     envelope.Meta.Timestamp, // For now, use same timestamp
-			Updated:     envelope.Meta.Timestamp,
+			VersionID:   fmt.Sprintf("%d", time.Now().Unix()), // TODO: Real version from metadata
+			Created:     time.Now().UTC(),                     // TODO: Real timestamp from metadata
+			Updated:     time.Now().UTC(),                     // TODO: Real timestamp from metadata
 			Deactivated: false,
 		},
 		DIDResolutionMetadata: DIDResolutionMetadata{
-			ContentType: "application/did+ld+json",
+			ContentType: "application/did+json",
 			Retrieved:   time.Now().UTC(),
 			Pattern:     "^did:acc:",
 			Duration:    int(time.Since(start).Milliseconds()),

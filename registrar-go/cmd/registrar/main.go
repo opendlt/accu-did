@@ -59,7 +59,7 @@ func main() {
 	// Health check
 	r.Get("/healthz", handlers.Healthz)
 
-	// DID registration endpoints
+	// Legacy DID registration endpoints (Universal Registrar v0.x compatibility)
 	createHandler := handlers.NewCreateHandler(accSubmitter, authPolicy)
 	updateHandler := handlers.NewUpdateHandler(accSubmitter, authPolicy)
 	deactivateHandler := handlers.NewDeactivateHandler(accSubmitter, authPolicy)
@@ -67,6 +67,18 @@ func main() {
 	r.Post("/create", createHandler.Create)
 	r.Post("/update", updateHandler.Update)
 	r.Post("/deactivate", deactivateHandler.Deactivate)
+
+	// Native DID registration endpoints (clean internal API)
+	nativeHandler := handlers.NewNativeHandler(accSubmitter)
+	r.Post("/register", nativeHandler.Register)
+	r.Post("/native/update", nativeHandler.Update)
+	r.Post("/native/deactivate", nativeHandler.Deactivate)
+
+	// Universal Registrar v1.0 compatibility endpoints
+	universalHandler := handlers.NewUniversalHandler(accSubmitter, authPolicy)
+	r.Post("/1.0/create", universalHandler.UniversalCreate)
+	r.Post("/1.0/update", universalHandler.UniversalUpdate)
+	r.Post("/1.0/deactivate", universalHandler.UniversalDeactivate)
 
 	// Create server
 	srv := &http.Server{

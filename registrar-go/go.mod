@@ -57,6 +57,7 @@ require (
 	github.com/multiformats/go-multistream v0.5.0 // indirect
 	github.com/multiformats/go-varint v0.0.7 // indirect
 	github.com/oasisprotocol/curve25519-voi v0.0.0-20220708102147-0a8a51822cae // indirect
+	github.com/opendlt/accu-did/shared v0.0.0
 	github.com/petermattis/goid v0.0.0-20180202154549-b0b1615b78e5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -81,3 +82,5 @@ require (
 )
 
 replace gitlab.com/accumulatenetwork/accumulate => ../../accumulate
+
+replace github.com/opendlt/accu-did/shared => ../shared

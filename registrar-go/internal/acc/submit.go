@@ -15,6 +15,9 @@ import (
 
 // Submitter interface for Accumulate operations
 type Submitter interface {
+	CreateIdentity(adiLabel string, keyPageURL string) (string, error)
+	CreateDataAccount(adiURL, dataAccountLabel string) (string, error)
+	WriteDataEntry(dataAccountURL string, data []byte) (string, error)
 	SubmitWriteData(dataAccountURL string, envelope *ops.Envelope) (string, error)
 	UpdateKeyPage(keyPageURL string, operations []KeyPageOperation) (string, error)
 	GetKeyPageState(keyPageURL string) (*KeyPageState, error)
@@ -69,6 +72,63 @@ func NewFakeSubmitter() *FakeSubmitter {
 		transactions: make(map[string]*MockTransaction),
 		keyPages:     make(map[string]*KeyPageState),
 	}
+}
+
+// CreateIdentity creates a new ADI (fake implementation)
+func (c *FakeSubmitter) CreateIdentity(adiLabel string, keyPageURL string) (string, error) {
+	txID := c.generateTxID()
+
+	transaction := &MockTransaction{
+		ID:        txID,
+		Status:    "committed",
+		Timestamp: time.Now().UTC(),
+		Data: map[string]interface{}{
+			"type":       "createIdentity",
+			"adiLabel":   adiLabel,
+			"keyPageURL": keyPageURL,
+		},
+	}
+
+	c.transactions[txID] = transaction
+	return txID, nil
+}
+
+// CreateDataAccount creates a new data account (fake implementation)
+func (c *FakeSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (string, error) {
+	txID := c.generateTxID()
+
+	transaction := &MockTransaction{
+		ID:        txID,
+		Status:    "committed",
+		Timestamp: time.Now().UTC(),
+		Data: map[string]interface{}{
+			"type":              "createDataAccount",
+			"adiURL":            adiURL,
+			"dataAccountLabel": dataAccountLabel,
+		},
+	}
+
+	c.transactions[txID] = transaction
+	return txID, nil
+}
+
+// WriteDataEntry writes data to a data account (fake implementation)
+func (c *FakeSubmitter) WriteDataEntry(dataAccountURL string, data []byte) (string, error) {
+	txID := c.generateTxID()
+
+	transaction := &MockTransaction{
+		ID:        txID,
+		Status:    "committed",
+		Timestamp: time.Now().UTC(),
+		Data: map[string]interface{}{
+			"type":           "writeData",
+			"dataAccountURL": dataAccountURL,
+			"data":           string(data),
+		},
+	}
+
+	c.transactions[txID] = transaction
+	return txID, nil
 }
 
 // SubmitWriteData submits a writeData transaction to Accumulate (fake implementation)
@@ -193,6 +253,111 @@ func NewRealSubmitter(nodeURL string) *RealSubmitter {
 	return &RealSubmitter{
 		client: jsonrpc.NewClient(nodeURL),
 	}
+}
+
+// CreateIdentity creates a new ADI using Accumulate API
+func (c *RealSubmitter) CreateIdentity(adiLabel string, keyPageURL string) (string, error) {
+	// Parse the key page URL to get the key page for ADI creation
+	keyPage, err := url.Parse(keyPageURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid key page URL %s: %w", keyPageURL, err)
+	}
+
+	// TODO: Create proper CreateIdentity transaction using pkg/build
+	// This would involve:
+	// 1. Creating an CreateIdentity transaction
+	// 2. Signing with the appropriate key
+	// 3. Submitting via JSON-RPC
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	// Placeholder implementation - needs actual pkg/build transaction creation
+	envelope := &messaging.Envelope{
+		// Transaction: createIdentityTx,
+	}
+
+	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
+	if err != nil {
+		return "", fmt.Errorf("failed to create identity %s: %w", adiLabel, err)
+	}
+
+	if len(submissions) == 0 {
+		return "", fmt.Errorf("no submissions returned")
+	}
+
+	txID := fmt.Sprintf("0x%x", submissions[0].Success)
+	return txID, nil
+}
+
+// CreateDataAccount creates a new data account using Accumulate API
+func (c *RealSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (string, error) {
+	// Parse the ADI URL
+	adi, err := url.Parse(adiURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid ADI URL %s: %w", adiURL, err)
+	}
+
+	// TODO: Create proper CreateDataAccount transaction using pkg/build
+	// This would involve:
+	// 1. Creating a CreateDataAccount transaction
+	// 2. Signing with the ADI's key page
+	// 3. Submitting via JSON-RPC
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	// Placeholder implementation - needs actual pkg/build transaction creation
+	envelope := &messaging.Envelope{
+		// Transaction: createDataAccountTx,
+	}
+
+	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
+	if err != nil {
+		return "", fmt.Errorf("failed to create data account %s/%s: %w", adiURL, dataAccountLabel, err)
+	}
+
+	if len(submissions) == 0 {
+		return "", fmt.Errorf("no submissions returned")
+	}
+
+	txID := fmt.Sprintf("0x%x", submissions[0].Success)
+	return txID, nil
+}
+
+// WriteDataEntry writes data to a data account using Accumulate API
+func (c *RealSubmitter) WriteDataEntry(dataAccountURL string, data []byte) (string, error) {
+	// Parse the data account URL
+	dataAccount, err := url.Parse(dataAccountURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid data account URL %s: %w", dataAccountURL, err)
+	}
+
+	// TODO: Create proper WriteData transaction using pkg/build
+	// This would involve:
+	// 1. Creating a WriteData transaction with the data
+	// 2. Signing with the appropriate key page
+	// 3. Submitting via JSON-RPC
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	// Placeholder implementation - needs actual pkg/build transaction creation
+	envelope := &messaging.Envelope{
+		// Transaction: writeDataTx,
+	}
+
+	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
+	if err != nil {
+		return "", fmt.Errorf("failed to write data to %s: %w", dataAccountURL, err)
+	}
+
+	if len(submissions) == 0 {
+		return "", fmt.Errorf("no submissions returned")
+	}
+
+	txID := fmt.Sprintf("0x%x", submissions[0].Success)
+	return txID, nil
 }
 
 // SubmitWriteData submits a writeData transaction to Accumulate

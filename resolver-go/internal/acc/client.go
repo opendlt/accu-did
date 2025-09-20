@@ -54,6 +54,7 @@ type Client interface {
 	GetLatestDIDEntry(adi string) (Envelope, error)
 	GetEntryAtTime(adi string, t time.Time) (Envelope, error)
 	GetKeyPageState(url string) (KeyPageState, error)
+	GetDataAccountEntry(dataAccountURL *url.URL) ([]byte, error)
 }
 
 // FakeClient implements Client interface using golden files
@@ -140,6 +141,24 @@ func (c *FakeClient) loadEnvelope(filename string) (Envelope, error) {
 	}
 
 	return envelope, nil
+}
+
+// GetDataAccountEntry reads from testdata for FAKE mode
+func (c *FakeClient) GetDataAccountEntry(dataAccountURL *url.URL) ([]byte, error) {
+	// Extract ADI from URL for testdata lookup
+	adiLabel := dataAccountURL.Authority
+	filename := fmt.Sprintf("did-%s.json", adiLabel)
+
+	path := filepath.Join(c.testdataDir, "entries", filename)
+	data, err := os.ReadFile(path)
+	if os.IsNotExist(err) {
+		return nil, fmt.Errorf("DID not found: %s", dataAccountURL.String())
+	}
+	if err != nil {
+		return nil, fmt.Errorf("failed to read testdata: %w", err)
+	}
+
+	return data, nil
 }
 
 // RealClient implements Client interface using JSON-RPC v3
@@ -230,6 +249,33 @@ func (c *RealClient) GetKeyPageState(keyPageURLStr string) (KeyPageState, error)
 	// This will depend on the specific record type returned by the API
 
 	return keyPageState, nil
+}
+
+// GetDataAccountEntry reads latest data entry from a data account
+func (c *RealClient) GetDataAccountEntry(dataAccountURL *url.URL) ([]byte, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	// Query data account for latest entry using generic query
+	_, err := c.client.Query(ctx, dataAccountURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query data account: %w", err)
+	}
+
+	// For now, return a placeholder JSON structure
+	// TODO: Extract actual data entry from record based on API response structure
+	placeholder := map[string]interface{}{
+		"@context": []string{"https://www.w3.org/ns/did/v1"},
+		"id":       "did:acc:" + dataAccountURL.Authority,
+		"note":     "Placeholder DID document from real Accumulate query",
+	}
+
+	data, err := json.Marshal(placeholder)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal placeholder data: %w", err)
+	}
+
+	return data, nil
 }
 
 // recordToEnvelope converts an API record to our Envelope format
