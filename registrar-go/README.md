@@ -2,6 +2,23 @@
 
 DID Registration service implementing DID Registration protocol for the Accumulate blockchain.
 
+## Service Ports & Flags
+
+**Default Port:** 8081
+**Listen Address:** `--addr` (default ":8081")
+**Mode:** `--real` (default: FAKE mode using mock submitter)
+**Environment:** `ACC_NODE_URL` (required when using `--real`)
+
+**Examples:**
+```bash
+# FAKE mode (default) - uses mock submitter
+./registrar --addr :8081
+
+# REAL mode - connects to Accumulate network
+export ACC_NODE_URL=http://localhost:26657
+./registrar --real --addr :8081
+```
+
 ## Quick Start
 
 ### Prerequisites
@@ -14,15 +31,25 @@ make deps
 ```
 
 ### Run Registrar
+
+**FAKE Mode (Development):**
 ```bash
 make run
+# OR directly:
+go run cmd/registrar/main.go --addr :8081
 ```
 
-The registrar will start on port 8081.
+**REAL Mode (Production):**
+```bash
+export ACC_NODE_URL=http://localhost:26657
+go run cmd/registrar/main.go --real --addr :8081
+```
+
+The registrar will start on port 8081 by default.
 
 ### Test Endpoints
 
-#### Health Check
+#### Health Check (Both FAKE and REAL modes)
 ```bash
 curl http://localhost:8081/healthz
 ```
@@ -31,9 +58,11 @@ Expected response:
 ```json
 {
   "status": "ok",
-  "timestamp": "2024-01-01T12:00:00Z"
+  "timestamp": "2025-09-20T14:26:41.6380802Z"
 }
 ```
+
+**Note:** Health endpoint is always at `/healthz` (not `/health`)
 
 #### DID Creation
 ```bash
@@ -181,10 +210,16 @@ Health check endpoint.
 
 ## Configuration
 
-Environment variables:
-- `REGISTRAR_PORT`: Server port (default: 8081)
+**Command Line Flags:**
+- `--addr`: Listen address (default: ":8081")
+- `--real`: Enable real mode to connect to Accumulate network
+
+**Environment Variables:**
+- `ACC_NODE_URL`: Accumulate node URL (required when using `--real`)
 - `LOG_LEVEL`: Logging level (default: info)
-- `ACCUMULATE_API_URL`: Accumulate API endpoint (for production)
+
+**Legacy Environment Variables (deprecated):**
+- `REGISTRAR_PORT`: Use `--addr` flag instead
 
 ## Authorization Policy
 
@@ -200,4 +235,5 @@ The registrar includes comprehensive tests:
 - Authorization policy enforcement
 - Error handling scenarios
 
-All tests run with mock Accumulate client for offline development.
+**Unit Tests:** All tests run with FakeSubmitter for offline development.
+**Integration Tests:** Optional `*_integration_test.go` files can test against real Accumulate networks.

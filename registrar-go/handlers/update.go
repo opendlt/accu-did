@@ -13,7 +13,7 @@ import (
 
 // UpdateHandler handles DID update requests
 type UpdateHandler struct {
-	accClient  acc.Client
+	accClient  acc.Submitter
 	authPolicy policy.AuthPolicy
 }
 
@@ -34,7 +34,7 @@ type UpdateResponse struct {
 }
 
 // NewUpdateHandler creates a new update handler
-func NewUpdateHandler(accClient acc.Client, authPolicy policy.AuthPolicy) *UpdateHandler {
+func NewUpdateHandler(accClient acc.Submitter, authPolicy policy.AuthPolicy) *UpdateHandler {
 	return &UpdateHandler{
 		accClient:  accClient,
 		authPolicy: authPolicy,

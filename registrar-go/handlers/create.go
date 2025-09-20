@@ -13,7 +13,7 @@ import (
 
 // CreateHandler handles DID creation requests
 type CreateHandler struct {
-	accClient  acc.Client
+	accClient  acc.Submitter
 	authPolicy policy.AuthPolicy
 }
 
@@ -55,7 +55,7 @@ type DIDDocumentMetadata struct {
 }
 
 // NewCreateHandler creates a new create handler
-func NewCreateHandler(accClient acc.Client, authPolicy policy.AuthPolicy) *CreateHandler {
+func NewCreateHandler(accClient acc.Submitter, authPolicy policy.AuthPolicy) *CreateHandler {
 	return &CreateHandler{
 		accClient:  accClient,
 		authPolicy: authPolicy,

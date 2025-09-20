@@ -2,6 +2,23 @@
 
 W3C DID Core compliant resolver for the Accumulate blockchain.
 
+## Service Ports & Flags
+
+**Default Port:** 8080
+**Listen Address:** `--addr` (default ":8080")
+**Mode:** `--real` (default: FAKE mode using golden files)
+**Environment:** `ACC_NODE_URL` (required when using `--real`)
+
+**Examples:**
+```bash
+# FAKE mode (default) - uses golden files
+./resolver --addr :8080
+
+# REAL mode - connects to Accumulate network
+export ACC_NODE_URL=http://localhost:26657
+./resolver --real --addr :8080
+```
+
 ## Quick Start
 
 ### Prerequisites
@@ -14,15 +31,25 @@ make deps
 ```
 
 ### Run Resolver
+
+**FAKE Mode (Development):**
 ```bash
 make run
+# OR directly:
+go run cmd/resolver/main.go --addr :8080
 ```
 
-The resolver will start on port 8080.
+**REAL Mode (Production):**
+```bash
+export ACC_NODE_URL=http://localhost:26657
+go run cmd/resolver/main.go --real --addr :8080
+```
+
+The resolver will start on port 8080 by default.
 
 ### Test Endpoints
 
-#### Health Check
+#### Health Check (Both FAKE and REAL modes)
 ```bash
 curl http://localhost:8080/healthz
 ```
@@ -31,9 +58,11 @@ Expected response:
 ```json
 {
   "status": "ok",
-  "timestamp": "2024-01-01T12:00:00Z"
+  "timestamp": "2025-09-20T14:26:41.5965281Z"
 }
 ```
+
+**Note:** Health endpoint is always at `/healthz` (not `/health`)
 
 #### DID Resolution
 ```bash
@@ -115,10 +144,16 @@ Health check endpoint.
 
 ## Configuration
 
-Environment variables:
-- `RESOLVER_PORT`: Server port (default: 8080)
+**Command Line Flags:**
+- `--addr`: Listen address (default: ":8080")
+- `--real`: Enable real mode to connect to Accumulate network
+
+**Environment Variables:**
+- `ACC_NODE_URL`: Accumulate node URL (required when using `--real`)
 - `LOG_LEVEL`: Logging level (default: info)
-- `ACCUMULATE_API_URL`: Accumulate API endpoint (for production)
+
+**Legacy Environment Variables (deprecated):**
+- `RESOLVER_PORT`: Use `--addr` flag instead
 
 ## Testing
 

@@ -2,6 +2,7 @@
 
 import (
 	"context"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -18,14 +19,30 @@ import (
 )
 
 func main() {
-	// Get port from environment
-	port := os.Getenv("RESOLVER_PORT")
-	if port == "" {
-		port = "8080"
+	// Parse command line flags
+	var (
+		addr = flag.String("addr", ":8080", "listen address")
+		real = flag.Bool("real", false, "enable real mode (connect to Accumulate network)")
+	)
+	flag.Parse()
+
+	// Get Accumulate node URL from environment if in real mode
+	var nodeURL string
+	if *real {
+		nodeURL = os.Getenv("ACC_NODE_URL")
+		if nodeURL == "" {
+			log.Fatal("ACC_NODE_URL environment variable is required when using --real mode")
+		}
 	}
 
-	// Create Accumulate client (fake for now)
-	accClient := acc.NewFakeClient("testdata")
+	// Determine mode for logging
+	mode := "FAKE"
+	if *real {
+		mode = "REAL"
+	}
+
+	// Create Accumulate client
+	accClient := acc.NewClient(*real, nodeURL)
 
 	// Setup router
 	r := chi.NewRouter()
@@ -45,7 +62,7 @@ func main() {
 
 	// Create server
 	srv := &http.Server{
-		Addr:         ":" + port,
+		Addr:         *addr,
 		Handler:      r,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
@@ -54,7 +71,7 @@ func main() {
 
 	// Start server in goroutine
 	go func() {
-		log.Printf("Starting resolver on port %s", port)
+		log.Printf("Starting DID resolver on %s (mode: %s)", *addr, mode)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
 		}

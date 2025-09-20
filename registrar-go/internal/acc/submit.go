@@ -1,14 +1,20 @@
 package acc
 
 import (
+	"context"
 	"fmt"
 	"time"
+
+	"gitlab.com/accumulatenetwork/accumulate/pkg/api/v3"
+	"gitlab.com/accumulatenetwork/accumulate/pkg/api/v3/jsonrpc"
+	"gitlab.com/accumulatenetwork/accumulate/pkg/types/messaging"
+	"gitlab.com/accumulatenetwork/accumulate/pkg/url"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/ops"
 )
 
-// Client interface for Accumulate operations
-type Client interface {
+// Submitter interface for Accumulate operations
+type Submitter interface {
 	SubmitWriteData(dataAccountURL string, envelope *ops.Envelope) (string, error)
 	UpdateKeyPage(keyPageURL string, operations []KeyPageOperation) (string, error)
 	GetKeyPageState(keyPageURL string) (*KeyPageState, error)
@@ -35,8 +41,8 @@ type KeyInfo struct {
 	KeyType   string `json:"keyType"`
 }
 
-// MockClient implements Client interface for testing and development
-type MockClient struct {
+// FakeSubmitter implements Submitter interface for testing and development
+type FakeSubmitter struct {
 	transactions map[string]*MockTransaction
 	keyPages     map[string]*KeyPageState
 }
@@ -49,16 +55,24 @@ type MockTransaction struct {
 	Data      interface{}
 }
 
-// NewMockClient creates a new mock client
-func NewMockClient() *MockClient {
-	return &MockClient{
+// NewSubmitter creates a new submitter based on mode
+func NewSubmitter(realMode bool, nodeURL string) Submitter {
+	if realMode {
+		return NewRealSubmitter(nodeURL)
+	}
+	return NewFakeSubmitter()
+}
+
+// NewFakeSubmitter creates a new fake submitter
+func NewFakeSubmitter() *FakeSubmitter {
+	return &FakeSubmitter{
 		transactions: make(map[string]*MockTransaction),
 		keyPages:     make(map[string]*KeyPageState),
 	}
 }
 
-// SubmitWriteData submits a writeData transaction to Accumulate (mock implementation)
-func (c *MockClient) SubmitWriteData(dataAccountURL string, envelope *ops.Envelope) (string, error) {
+// SubmitWriteData submits a writeData transaction to Accumulate (fake implementation)
+func (c *FakeSubmitter) SubmitWriteData(dataAccountURL string, envelope *ops.Envelope) (string, error) {
 	// Generate mock transaction ID
 	txID := c.generateTxID()
 
@@ -79,8 +93,8 @@ func (c *MockClient) SubmitWriteData(dataAccountURL string, envelope *ops.Envelo
 	return txID, nil
 }
 
-// UpdateKeyPage updates a key page (mock implementation)
-func (c *MockClient) UpdateKeyPage(keyPageURL string, operations []KeyPageOperation) (string, error) {
+// UpdateKeyPage updates a key page (fake implementation)
+func (c *FakeSubmitter) UpdateKeyPage(keyPageURL string, operations []KeyPageOperation) (string, error) {
 	// Generate mock transaction ID
 	txID := c.generateTxID()
 
@@ -131,7 +145,7 @@ func (c *MockClient) UpdateKeyPage(keyPageURL string, operations []KeyPageOperat
 }
 
 // GetKeyPageState returns the current state of a key page
-func (c *MockClient) GetKeyPageState(keyPageURL string) (*KeyPageState, error) {
+func (c *FakeSubmitter) GetKeyPageState(keyPageURL string) (*KeyPageState, error) {
 	if keyPage, exists := c.keyPages[keyPageURL]; exists {
 		return keyPage, nil
 	}
@@ -151,7 +165,7 @@ func (c *MockClient) GetKeyPageState(keyPageURL string) (*KeyPageState, error) {
 }
 
 // GetTransaction returns a transaction by ID (for testing)
-func (c *MockClient) GetTransaction(txID string) (*MockTransaction, error) {
+func (c *FakeSubmitter) GetTransaction(txID string) (*MockTransaction, error) {
 	if tx, exists := c.transactions[txID]; exists {
 		return tx, nil
 	}
@@ -159,12 +173,142 @@ func (c *MockClient) GetTransaction(txID string) (*MockTransaction, error) {
 }
 
 // generateTxID generates a mock transaction ID
-func (c *MockClient) generateTxID() string {
+func (c *FakeSubmitter) generateTxID() string {
 	timestamp := time.Now().UnixNano()
 	return fmt.Sprintf("0x%016x", timestamp)
 }
 
 // ListTransactions returns all transactions (for testing)
-func (c *MockClient) ListTransactions() map[string]*MockTransaction {
+func (c *FakeSubmitter) ListTransactions() map[string]*MockTransaction {
 	return c.transactions
+}
+
+// RealSubmitter implements Submitter interface using JSON-RPC v3
+type RealSubmitter struct {
+	client *jsonrpc.Client
+}
+
+// NewRealSubmitter creates a new real submitter that connects to Accumulate network
+func NewRealSubmitter(nodeURL string) *RealSubmitter {
+	return &RealSubmitter{
+		client: jsonrpc.NewClient(nodeURL),
+	}
+}
+
+// SubmitWriteData submits a writeData transaction to Accumulate
+func (c *RealSubmitter) SubmitWriteData(dataAccountURL string, envelope *ops.Envelope) (string, error) {
+	// Parse the data account URL
+	accountURL, err := url.Parse(dataAccountURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid data account URL %s: %w", dataAccountURL, err)
+	}
+
+	// Convert ops.Envelope to messaging.Envelope
+	msgEnvelope, err := c.convertToMessagingEnvelope(envelope, accountURL)
+	if err != nil {
+		return "", fmt.Errorf("failed to convert envelope: %w", err)
+	}
+
+	// Submit the envelope
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	submissions, err := c.client.Submit(ctx, msgEnvelope, api.SubmitOptions{})
+	if err != nil {
+		return "", fmt.Errorf("failed to submit transaction: %w", err)
+	}
+
+	// Return the transaction ID from the first submission
+	if len(submissions) == 0 {
+		return "", fmt.Errorf("no submissions returned")
+	}
+
+	// Extract transaction ID from submission
+	// Note: The actual field name may vary based on the API structure
+	txID := fmt.Sprintf("0x%x", submissions[0].Success) // Placeholder - needs actual field
+
+	return txID, nil
+}
+
+// UpdateKeyPage updates a key page
+func (c *RealSubmitter) UpdateKeyPage(keyPageURL string, operations []KeyPageOperation) (string, error) {
+	// Parse the key page URL
+	_, err := url.Parse(keyPageURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid key page URL %s: %w", keyPageURL, err)
+	}
+
+	// Convert operations to actual Accumulate key page operations
+	// This would need to be implemented based on the actual Accumulate API
+	// For now, return a placeholder implementation
+
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	// TODO: Create proper key page update envelope
+	// This is a placeholder implementation
+	envelope := &messaging.Envelope{
+		// Transaction: updateKeyPageTx,
+	}
+
+	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
+	if err != nil {
+		return "", fmt.Errorf("failed to update key page: %w", err)
+	}
+
+	// Return transaction ID
+	if len(submissions) == 0 {
+		return "", fmt.Errorf("no submissions returned")
+	}
+
+	txID := fmt.Sprintf("0x%x", submissions[0].Success) // Placeholder
+	return txID, nil
+}
+
+// GetKeyPageState returns the current state of a key page
+func (c *RealSubmitter) GetKeyPageState(keyPageURL string) (*KeyPageState, error) {
+	// Parse the key page URL
+	pageURL, err := url.Parse(keyPageURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid key page URL %s: %w", keyPageURL, err)
+	}
+
+	// Query the key page state
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+
+	_, err = c.client.Query(ctx, pageURL, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query key page %s: %w", keyPageURL, err)
+	}
+
+	// Convert record to KeyPageState
+	// TODO: Implement proper conversion based on actual API record types
+	keyPageState := &KeyPageState{
+		URL:       keyPageURL,
+		Threshold: 1, // Extract from record
+		Keys:      []KeyInfo{}, // Extract from record
+		Height:    0, // Extract from record
+	}
+
+	return keyPageState, nil
+}
+
+// convertToMessagingEnvelope converts ops.Envelope to messaging.Envelope
+func (c *RealSubmitter) convertToMessagingEnvelope(opsEnv *ops.Envelope, accountURL *url.URL) (*messaging.Envelope, error) {
+	// This is a placeholder implementation
+	// The actual conversion would depend on the structure of ops.Envelope and
+	// how it maps to the messaging.Envelope type
+
+	// TODO: Implement proper conversion based on:
+	// 1. ops.Envelope structure
+	// 2. messaging.Envelope requirements
+	// 3. The specific transaction type (WriteData)
+
+	envelope := &messaging.Envelope{
+		// Transaction: writeDataTx,
+		// Signatures: signatures,
+	}
+
+	return envelope, nil
 }

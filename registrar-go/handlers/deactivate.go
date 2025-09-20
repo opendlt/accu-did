@@ -13,7 +13,7 @@ import (
 
 // DeactivateHandler handles DID deactivation requests
 type DeactivateHandler struct {
-	accClient  acc.Client
+	accClient  acc.Submitter
 	authPolicy policy.AuthPolicy
 }
 
@@ -42,7 +42,7 @@ type ErrorResponse struct {
 }
 
 // NewDeactivateHandler creates a new deactivate handler
-func NewDeactivateHandler(accClient acc.Client, authPolicy policy.AuthPolicy) *DeactivateHandler {
+func NewDeactivateHandler(accClient acc.Submitter, authPolicy policy.AuthPolicy) *DeactivateHandler {
 	return &DeactivateHandler{
 		accClient:  accClient,
 		authPolicy: authPolicy,

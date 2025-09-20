@@ -2,6 +2,7 @@
 
 import (
 	"context"
+	"flag"
 	"log"
 	"net/http"
 	"os"
@@ -18,14 +19,30 @@ import (
 )
 
 func main() {
-	// Get port from environment
-	port := os.Getenv("REGISTRAR_PORT")
-	if port == "" {
-		port = "8082"
+	// Parse command line flags
+	var (
+		addr = flag.String("addr", ":8081", "listen address")
+		real = flag.Bool("real", false, "enable real mode (connect to Accumulate network)")
+	)
+	flag.Parse()
+
+	// Get Accumulate node URL from environment if in real mode
+	var nodeURL string
+	if *real {
+		nodeURL = os.Getenv("ACC_NODE_URL")
+		if nodeURL == "" {
+			log.Fatal("ACC_NODE_URL environment variable is required when using --real mode")
+		}
 	}
 
-	// Create Accumulate client (mock for now)
-	accClient := acc.NewMockClient()
+	// Determine mode for logging
+	mode := "FAKE"
+	if *real {
+		mode = "REAL"
+	}
+
+	// Create Accumulate submitter
+	accSubmitter := acc.NewSubmitter(*real, nodeURL)
 
 	// Create authorization policy
 	authPolicy := policy.NewPolicyV1()
@@ -43,9 +60,9 @@ func main() {
 	r.Get("/healthz", handlers.Healthz)
 
 	// DID registration endpoints
-	createHandler := handlers.NewCreateHandler(accClient, authPolicy)
-	updateHandler := handlers.NewUpdateHandler(accClient, authPolicy)
-	deactivateHandler := handlers.NewDeactivateHandler(accClient, authPolicy)
+	createHandler := handlers.NewCreateHandler(accSubmitter, authPolicy)
+	updateHandler := handlers.NewUpdateHandler(accSubmitter, authPolicy)
+	deactivateHandler := handlers.NewDeactivateHandler(accSubmitter, authPolicy)
 
 	r.Post("/create", createHandler.Create)
 	r.Post("/update", updateHandler.Update)
@@ -53,7 +70,7 @@ func main() {
 
 	// Create server
 	srv := &http.Server{
-		Addr:         ":" + port,
+		Addr:         *addr,
 		Handler:      r,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
@@ -62,7 +79,7 @@ func main() {
 
 	// Start server in goroutine
 	go func() {
-		log.Printf("Starting registrar on port %s", port)
+		log.Printf("Starting DID registrar on %s (mode: %s)", *addr, mode)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
 		}
