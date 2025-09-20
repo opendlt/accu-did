@@ -1,0 +1,108 @@
+name: Drivers CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'drivers/**'
+      - 'go.work'
+      - 'go.work.sum'
+      - '.github/workflows/drivers.yml'
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - 'drivers/**'
+      - 'go.work'
+      - 'go.work.sum'
+      - '.github/workflows/drivers.yml'
+
+jobs:
+  build-uniresolver:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21.x'
+        cache-dependency-path: |
+          drivers/uniresolver-go/go.sum
+          go.work.sum
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-uniresolver-${{ hashFiles('drivers/uniresolver-go/go.sum', 'go.work.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-uniresolver-
+          ${{ runner.os }}-go-
+
+    - name: Build Go binary
+      run: go build -o bin/driver ./cmd/driver
+      working-directory: drivers/uniresolver-go
+
+    - name: Test Go code
+      run: go test -v ./...
+      working-directory: drivers/uniresolver-go
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: drivers/uniresolver-go
+        push: false
+        tags: uni-resolver-driver-did-acc:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
+
+  build-uniregistrar:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version: '1.21.x'
+        cache-dependency-path: |
+          drivers/uniregistrar-go/go.sum
+          go.work.sum
+
+    - name: Cache Go modules
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cache/go-build
+          ~/go/pkg/mod
+        key: ${{ runner.os }}-go-uniregistrar-${{ hashFiles('drivers/uniregistrar-go/go.sum', 'go.work.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-uniregistrar-
+          ${{ runner.os }}-go-
+
+    - name: Build Go binary
+      run: go build -o bin/driver ./cmd/driver
+      working-directory: drivers/uniregistrar-go
+
+    - name: Test Go code
+      run: go test -v ./...
+      working-directory: drivers/uniregistrar-go
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Build Docker image
+      uses: docker/build-push-action@v5
+      with:
+        context: drivers/uniregistrar-go
+        push: false
+        tags: uni-registrar-driver-did-acc:latest
+        cache-from: type=gha
+        cache-to: type=gha,mode=max
