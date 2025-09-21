@@ -1,4 +1,5 @@
 # scripts/build-docs.ps1
+# Usage example: powershell -ExecutionPolicy Bypass -File .\scripts\build-docs.ps1 -Mode npx
 param(
   [ValidateSet("auto","docker","npx")]
   [string]$Mode = "auto"

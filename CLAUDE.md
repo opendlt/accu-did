@@ -4,7 +4,7 @@ Decentralized identifiers on Accumulate Protocol with Go services and Universal 
 
 ## Quick Start
 
-**Prerequisites:** Go 1.22+, Docker
+**Prerequisites:** Go 1.25+, Docker
 
 **Key Services:**
 - Resolver: `:8080` - DID document resolution with proper did:acc → acc:// URL mapping

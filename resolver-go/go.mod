@@ -1,6 +1,8 @@
 module github.com/opendlt/accu-did/resolver-go
 
-go 1.24.0
+go 1.25
+
+toolchain go1.25.1
 
 require (
 	github.com/go-chi/chi/v5 v5.0.11

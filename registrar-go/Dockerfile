@@ -1,21 +1,33 @@
-# Build stage
-FROM golang:1.22-alpine AS builder
+# syntax=docker/dockerfile:1
+FROM golang:1.25.1-alpine AS build
 
 WORKDIR /app
+
+# Install git for modules
+RUN apk add --no-cache git
+
+# Copy module files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
 COPY . .
 
-# Build the registrar
-RUN go mod download
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o registrar ./cmd/registrar
+# Build binary
+ENV CGO_ENABLED=0
+RUN go build -trimpath -ldflags="-s -w" -o /out/registrar ./cmd/registrar
 
-# Final stage
-FROM alpine:latest
+# Final stage - using alpine for curl health checks
+FROM alpine:3.20
 
-RUN apk --no-cache add ca-certificates curl
-WORKDIR /root/
+RUN apk --no-cache add ca-certificates curl && \
+    adduser -D app
 
-COPY --from=builder /app/registrar .
+USER app
+WORKDIR /home/app
+
+COPY --from=build /out/registrar /registrar
 
 EXPOSE 8081
 
-CMD ["./registrar", "--addr", ":8081", "--mode", "REAL"]
+ENTRYPOINT ["/registrar", "--addr", ":8081"]
