@@ -84,5 +84,9 @@ require (
 )
 
 replace gitlab.com/accumulatenetwork/accumulate => ../../accumulate
-replace google.golang.org/genproto => google.golang.org/genproto/googleapis/rpc v0.0.0-20250908214217-97024824d090
+
 replace github.com/opendlt/accu-did/shared => ../shared
+
+exclude google.golang.org/genproto v0.0.0-20230110181048-76db0878b65f
+
+exclude google.golang.org/genproto v0.0.0-20221118155620-16455021b5e6
