@@ -20,7 +20,7 @@ function Build-One {
   param([string]$yaml,[string]$html)
   if ($Mode -eq "docker" -or ($Mode -eq "auto" -and (Get-Command docker -ErrorAction SilentlyContinue))) {
     # Use ${Root} to avoid PowerShell drive parsing on ":" in C:\...
-    docker run --rm -v "${Root}:/work" -w /work redocly/redoc build -o "$html" "$yaml"
+    docker run --rm -v "${Root}:/work" -w /work redocly/redoc redoc build -o "$html" "$yaml"
   } else {
     npx --yes redoc-cli@0.15.1 build "$yaml" -o "$html"
   }

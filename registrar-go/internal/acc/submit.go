@@ -286,7 +286,12 @@ func (c *RealSubmitter) CreateIdentity(adiLabel string, keyPageURL string) (stri
 		return "", fmt.Errorf("no submissions returned")
 	}
 
-	txID := fmt.Sprintf("0x%x", submissions[0].Success)
+	// Generate a placeholder transaction ID since Success is boolean
+	// In a real implementation, this should use the actual transaction hash from submissions
+	if !submissions[0].Success {
+		return "", fmt.Errorf("submission failed")
+	}
+	txID := fmt.Sprintf("0x%x", time.Now().UnixNano()) // Temporary solution
 	return txID, nil
 }
 
@@ -321,7 +326,12 @@ func (c *RealSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (stri
 		return "", fmt.Errorf("no submissions returned")
 	}
 
-	txID := fmt.Sprintf("0x%x", submissions[0].Success)
+	// Generate a placeholder transaction ID since Success is boolean
+	// In a real implementation, this should use the actual transaction hash from submissions
+	if !submissions[0].Success {
+		return "", fmt.Errorf("submission failed")
+	}
+	txID := fmt.Sprintf("0x%x", time.Now().UnixNano()) // Temporary solution
 	return txID, nil
 }
 
@@ -356,7 +366,12 @@ func (c *RealSubmitter) WriteDataEntry(dataAccountURL string, data []byte) (stri
 		return "", fmt.Errorf("no submissions returned")
 	}
 
-	txID := fmt.Sprintf("0x%x", submissions[0].Success)
+	// Generate a placeholder transaction ID since Success is boolean
+	// In a real implementation, this should use the actual transaction hash from submissions
+	if !submissions[0].Success {
+		return "", fmt.Errorf("submission failed")
+	}
+	txID := fmt.Sprintf("0x%x", time.Now().UnixNano()) // Temporary solution
 	return txID, nil
 }
 
@@ -390,7 +405,12 @@ func (c *RealSubmitter) SubmitWriteData(dataAccountURL string, envelope *ops.Env
 
 	// Extract transaction ID from submission
 	// Note: The actual field name may vary based on the API structure
-	txID := fmt.Sprintf("0x%x", submissions[0].Success) // Placeholder - needs actual field
+	// Generate a placeholder transaction ID since Success is boolean
+	// In a real implementation, this should use the actual transaction hash from submissions
+	if !submissions[0].Success {
+		return "", fmt.Errorf("submission failed")
+	}
+	txID := fmt.Sprintf("0x%x", time.Now().UnixNano()) // Temporary solution
 
 	return txID, nil
 }
@@ -426,7 +446,12 @@ func (c *RealSubmitter) UpdateKeyPage(keyPageURL string, operations []KeyPageOpe
 		return "", fmt.Errorf("no submissions returned")
 	}
 
-	txID := fmt.Sprintf("0x%x", submissions[0].Success) // Placeholder
+	// Generate a placeholder transaction ID since Success is boolean
+	// In a real implementation, this should use the actual transaction hash from submissions
+	if !submissions[0].Success {
+		return "", fmt.Errorf("submission failed")
+	}
+	txID := fmt.Sprintf("0x%x", time.Now().UnixNano()) // Temporary solution
 	return txID, nil
 }
 
