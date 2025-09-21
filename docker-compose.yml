@@ -1,0 +1,27 @@
+version: "3.9"
+services:
+  resolver:
+    build: ./resolver-go
+    command: ["./resolver","--addr",":8080","--real"]
+    environment:
+      - ACC_NODE_URL=http://host.docker.internal:26660
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  registrar:
+    build: ./registrar-go
+    command: ["./registrar","--addr",":8081","--real"]
+    environment:
+      - ACC_NODE_URL=http://host.docker.internal:26660
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8081/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
