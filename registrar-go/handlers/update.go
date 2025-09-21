@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
+	"github.com/opendlt/accu-did/registrar-go/internal/api"
 	"github.com/opendlt/accu-did/registrar-go/internal/ops"
 	"github.com/opendlt/accu-did/registrar-go/internal/policy"
 )
@@ -17,8 +18,8 @@ type UpdateHandler struct {
 	authPolicy policy.AuthPolicy
 }
 
-// UpdateRequest represents a DID update request
-type UpdateRequest struct {
+// LegacyUpdateRequest represents a DID update request for legacy compatibility
+type LegacyUpdateRequest struct {
 	DID         string                 `json:"did"`
 	DIDDocument map[string]interface{} `json:"didDocument"`
 	Options     map[string]interface{} `json:"options,omitempty"`
@@ -44,7 +45,7 @@ func NewUpdateHandler(accClient acc.Submitter, authPolicy policy.AuthPolicy) *Up
 // Update handles POST /update requests
 func (h *UpdateHandler) Update(w http.ResponseWriter, r *http.Request) {
 	// Parse request
-	var req UpdateRequest
+	var req LegacyUpdateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		h.writeError(w, "invalidRequest", "Invalid JSON", http.StatusBadRequest, nil)
 		return
@@ -74,8 +75,14 @@ func (h *UpdateHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get data account URL using safe helper
+	dataAccountURL, err := policy.DIDToDataAccountURL(req.DID)
+	if err != nil {
+		h.writeError(w, "invalidDid", err.Error(), http.StatusBadRequest, nil)
+		return
+	}
+
 	// Submit to Accumulate
-	dataAccountURL := h.getDataAccountURL(req.DID)
 	txID, err := h.accClient.SubmitWriteData(dataAccountURL, envelope)
 	if err != nil {
 		h.writeError(w, "internalError", "Failed to submit transaction", http.StatusInternalServerError, nil)
@@ -112,7 +119,7 @@ func (h *UpdateHandler) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 // validateUpdateRequest validates the update request
-func (h *UpdateHandler) validateUpdateRequest(req *UpdateRequest) error {
+func (h *UpdateHandler) validateUpdateRequest(req *LegacyUpdateRequest) error {
 	if req.DID == "" {
 		return fmt.Errorf("DID is required")
 	}
@@ -149,26 +156,6 @@ func (h *UpdateHandler) getPreviousVersionID(did string) string {
 	return fmt.Sprintf("%d-%s", time.Now().Unix()-3600, "previous")
 }
 
-// getDataAccountURL constructs the data account URL for a DID
-func (h *UpdateHandler) getDataAccountURL(did string) string {
-	// Extract ADI from DID (simplified)
-	adi := did[8:] // Remove "did:acc:" prefix
-
-	// Handle URL components
-	for _, separator := range []string{"/", "?", "#", ";"} {
-		if idx := len(adi); idx > 0 {
-			for i, char := range adi {
-				if string(char) == separator {
-					adi = adi[:i]
-					break
-				}
-			}
-		}
-	}
-
-	return fmt.Sprintf("acc://%s/data/did", adi)
-}
-
 // generateJobID generates a job ID for tracking the operation
 func (h *UpdateHandler) generateJobID() string {
 	return fmt.Sprintf("job-%d", time.Now().UnixNano())
@@ -176,7 +163,7 @@ func (h *UpdateHandler) generateJobID() string {
 
 // writeError writes an error response
 func (h *UpdateHandler) writeError(w http.ResponseWriter, errorCode, message string, status int, details map[string]string) {
-	response := ErrorResponse{
+	response := api.ErrorResponse{
 		Error:     errorCode,
 		Message:   message,
 		Details:   details,

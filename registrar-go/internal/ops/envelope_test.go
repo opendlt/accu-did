@@ -158,11 +158,11 @@ func TestAuthorizationVectors(t *testing.T) {
 		Version     string `json:"version"`
 		Policy      string `json:"policy"`
 		Vectors     []struct {
-			Description   string `json:"description"`
-			DID          string `json:"did"`
-			AuthorKeyPage string `json:"authorKeyPage"`
+			Description    string `json:"description"`
+			DID            string `json:"did"`
+			AuthorKeyPage  string `json:"authorKeyPage"`
 			ExpectedResult string `json:"expectedResult"`
-			ExpectedError string `json:"expectedError"`
+			ExpectedError  string `json:"expectedError"`
 		} `json:"vectors"`
 	}
 	err = json.Unmarshal(vectorData, &vectors)

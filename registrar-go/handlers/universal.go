@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
+	"github.com/opendlt/accu-did/registrar-go/internal/api"
 	"github.com/opendlt/accu-did/registrar-go/internal/policy"
 	"github.com/opendlt/accu-did/shared/did"
 )
@@ -193,7 +194,7 @@ func (h *UniversalHandler) UniversalUpdate(w http.ResponseWriter, r *http.Reques
 	}
 
 	// Convert to native update request
-	nativeReq := UpdateRequest{
+	nativeReq := NativeUpdateRequest{
 		DID:         targetDID,
 		DIDDocument: updatedDoc,
 	}
@@ -238,7 +239,7 @@ func (h *UniversalHandler) UniversalDeactivate(w http.ResponseWriter, r *http.Re
 	}
 
 	// Convert to native deactivate request
-	nativeReq := DeactivateRequest{
+	nativeReq := api.DeactivateRequest{
 		DID: req.Identifier,
 	}
 
@@ -318,7 +319,7 @@ func (h *UniversalHandler) processNativeRegister(req *RegisterRequest) (*NativeR
 }
 
 // processNativeUpdate processes an update request using native logic
-func (h *UniversalHandler) processNativeUpdate(req *UpdateRequest) (*NativeResponse, error) {
+func (h *UniversalHandler) processNativeUpdate(req *NativeUpdateRequest) (*NativeResponse, error) {
 	// Parse DID to get data account URL
 	_, dataAccountURL, err := did.ParseDID(req.DID)
 	if err != nil {
@@ -346,7 +347,7 @@ func (h *UniversalHandler) processNativeUpdate(req *UpdateRequest) (*NativeRespo
 }
 
 // processNativeDeactivate processes a deactivate request using native logic
-func (h *UniversalHandler) processNativeDeactivate(req *DeactivateRequest) (*NativeResponse, error) {
+func (h *UniversalHandler) processNativeDeactivate(req *api.DeactivateRequest) (*NativeResponse, error) {
 	// Parse DID to get data account URL
 	_, dataAccountURL, err := did.ParseDID(req.DID)
 	if err != nil {
@@ -438,7 +439,7 @@ func (h *UniversalHandler) resolveCurrentDIDDocument(didStr string) (map[string]
 	}
 
 	// For FAKE mode, try to read from testdata
-	if fakeClient, ok := h.accClient.(*acc.FakeSubmitter); ok {
+	if _, ok := h.accClient.(*acc.FakeSubmitter); ok {
 		// In FAKE mode, we need to simulate reading the current document
 		// For simplicity, we'll return the existing testdata document
 		// In a real implementation, this would track the current state
@@ -456,9 +457,9 @@ func (h *UniversalHandler) resolveCurrentDIDDocument(didStr string) (map[string]
 				"id": didStr,
 				"verificationMethod": []interface{}{
 					map[string]interface{}{
-						"id":           didStr + "#key1",
-						"type":         "Ed25519VerificationKey2020",
-						"controller":   didStr,
+						"id":                 didStr + "#key1",
+						"type":               "Ed25519VerificationKey2020",
+						"controller":         didStr,
 						"publicKeyMultibase": "z6MkqRYqQiSgvZQdnBytw86Qbs2ZWUkGv22od935YF4s8M7V",
 					},
 				},

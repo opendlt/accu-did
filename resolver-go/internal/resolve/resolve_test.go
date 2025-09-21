@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gitlab.com/accumulatenetwork/accumulate/pkg/url"
 
 	"github.com/opendlt/accu-did/resolver-go/internal/acc"
 	"github.com/opendlt/accu-did/resolver-go/internal/normalize"
@@ -143,4 +144,9 @@ func (c *mockDeactivatedClient) GetEntryAtTime(adi string, t time.Time) (acc.Env
 
 func (c *mockDeactivatedClient) GetKeyPageState(url string) (acc.KeyPageState, error) {
 	return acc.KeyPageState{}, nil
+}
+
+// 🔑 New method to satisfy acc.Client
+func (c *mockDeactivatedClient) GetDataAccountEntry(dataAccountURL *url.URL) ([]byte, error) {
+	return []byte(`{"@context":["https://www.w3.org/ns/did/v1"],"id":"did:acc:alice","deactivated":true}`), nil
 }

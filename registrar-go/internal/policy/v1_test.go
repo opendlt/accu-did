@@ -71,10 +71,10 @@ func TestPolicyV1_GetRequiredKeyPage(t *testing.T) {
 	policy := NewPolicyV1()
 
 	tests := []struct {
-		name         string
-		did          string
-		expected     string
-		expectError  bool
+		name        string
+		did         string
+		expected    string
+		expectError bool
 	}{
 		{
 			name:     "simple ADI",

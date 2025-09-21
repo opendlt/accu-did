@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
+	"github.com/opendlt/accu-did/registrar-go/internal/api"
 	"github.com/opendlt/accu-did/registrar-go/internal/policy"
 )
 
@@ -83,7 +84,7 @@ func TestCreateHandler_Create(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
@@ -111,7 +112,7 @@ func TestCreateHandler_Create(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
@@ -128,7 +129,7 @@ func TestCreateHandler_Create(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 

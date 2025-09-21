@@ -6,11 +6,11 @@ import (
 
 func TestParseDID(t *testing.T) {
 	tests := []struct {
-		name               string
-		input              string
-		expectedADI        string
-		expectedDataPath   string
-		expectedError      bool
+		name             string
+		input            string
+		expectedADI      string
+		expectedDataPath string
+		expectedError    bool
 	}{
 		{
 			name:             "simple DID",

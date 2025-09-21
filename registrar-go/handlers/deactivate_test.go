@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
+	"github.com/opendlt/accu-did/registrar-go/internal/api"
 	"github.com/opendlt/accu-did/registrar-go/internal/policy"
 )
 
@@ -22,7 +23,7 @@ func TestDeactivateHandler_Deactivate(t *testing.T) {
 
 	// Test valid deactivate request
 	t.Run("valid deactivate request", func(t *testing.T) {
-		request := DeactivateRequest{
+		request := api.DeactivateRequest{
 			DID: "did:acc:alice",
 		}
 
@@ -52,7 +53,7 @@ func TestDeactivateHandler_Deactivate(t *testing.T) {
 
 	// Test invalid requests
 	t.Run("missing DID", func(t *testing.T) {
-		request := DeactivateRequest{}
+		request := api.DeactivateRequest{}
 
 		requestBody, err := json.Marshal(request)
 		require.NoError(t, err)
@@ -65,7 +66,7 @@ func TestDeactivateHandler_Deactivate(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
@@ -74,7 +75,7 @@ func TestDeactivateHandler_Deactivate(t *testing.T) {
 	})
 
 	t.Run("invalid DID format", func(t *testing.T) {
-		request := DeactivateRequest{
+		request := api.DeactivateRequest{
 			DID: "did:key:invalid",
 		}
 
@@ -89,7 +90,7 @@ func TestDeactivateHandler_Deactivate(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
@@ -106,7 +107,7 @@ func TestDeactivateHandler_Deactivate(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 

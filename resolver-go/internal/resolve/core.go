@@ -6,8 +6,6 @@ import (
 	"time"
 
 	"github.com/opendlt/accu-did/resolver-go/internal/acc"
-	"github.com/opendlt/accu-did/resolver-go/internal/canon"
-	"github.com/opendlt/accu-did/resolver-go/internal/normalize"
 	"github.com/opendlt/accu-did/shared/did"
 )
 
@@ -68,7 +66,7 @@ func ResolveDID(client acc.Client, didStr string, versionTime *time.Time) (*DIDR
 	start := time.Now()
 
 	// Step 1: Parse DID into Accumulate URLs
-	adiURL, dataAccountURL, err := did.ParseDID(didStr)
+	_, dataAccountURL, err := did.ParseDID(didStr)
 	if err != nil {
 		return nil, &InvalidDIDError{DID: didStr, Reason: err.Error()}
 	}

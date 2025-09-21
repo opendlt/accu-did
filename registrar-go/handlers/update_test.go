@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
+	"github.com/opendlt/accu-did/registrar-go/internal/api"
 	"github.com/opendlt/accu-did/registrar-go/internal/policy"
 )
 
@@ -22,9 +23,9 @@ func TestUpdateHandler_Update(t *testing.T) {
 
 	// Test valid update request
 	t.Run("valid update request", func(t *testing.T) {
-		request := UpdateRequest{
+		request := api.UpdateRequest{
 			DID: "did:acc:alice",
-			DIDDocument: map[string]interface{}{
+			Document: map[string]interface{}{
 				"@context": []interface{}{"https://www.w3.org/ns/did/v1"},
 				"id":       "did:acc:alice",
 				"verificationMethod": []interface{}{
@@ -72,8 +73,8 @@ func TestUpdateHandler_Update(t *testing.T) {
 
 	// Test invalid requests
 	t.Run("missing DID", func(t *testing.T) {
-		request := UpdateRequest{
-			DIDDocument: map[string]interface{}{
+		request := api.UpdateRequest{
+			Document: map[string]interface{}{
 				"@context": []interface{}{"https://www.w3.org/ns/did/v1"},
 				"id":       "did:acc:alice",
 			},
@@ -90,7 +91,7 @@ func TestUpdateHandler_Update(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
@@ -99,7 +100,7 @@ func TestUpdateHandler_Update(t *testing.T) {
 	})
 
 	t.Run("missing DID document", func(t *testing.T) {
-		request := UpdateRequest{
+		request := api.UpdateRequest{
 			DID: "did:acc:alice",
 		}
 
@@ -114,7 +115,7 @@ func TestUpdateHandler_Update(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
@@ -123,9 +124,9 @@ func TestUpdateHandler_Update(t *testing.T) {
 	})
 
 	t.Run("DID mismatch", func(t *testing.T) {
-		request := UpdateRequest{
+		request := api.UpdateRequest{
 			DID: "did:acc:alice",
-			DIDDocument: map[string]interface{}{
+			Document: map[string]interface{}{
 				"@context": []interface{}{"https://www.w3.org/ns/did/v1"},
 				"id":       "did:acc:bob", // Different DID
 			},
@@ -142,7 +143,7 @@ func TestUpdateHandler_Update(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
@@ -151,9 +152,9 @@ func TestUpdateHandler_Update(t *testing.T) {
 	})
 
 	t.Run("missing context", func(t *testing.T) {
-		request := UpdateRequest{
+		request := api.UpdateRequest{
 			DID: "did:acc:alice",
-			DIDDocument: map[string]interface{}{
+			Document: map[string]interface{}{
 				"id": "did:acc:alice",
 			},
 		}
@@ -169,7 +170,7 @@ func TestUpdateHandler_Update(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
@@ -178,9 +179,9 @@ func TestUpdateHandler_Update(t *testing.T) {
 	})
 
 	t.Run("missing document id", func(t *testing.T) {
-		request := UpdateRequest{
+		request := api.UpdateRequest{
 			DID: "did:acc:alice",
-			DIDDocument: map[string]interface{}{
+			Document: map[string]interface{}{
 				"@context": []interface{}{"https://www.w3.org/ns/did/v1"},
 			},
 		}
@@ -196,7 +197,7 @@ func TestUpdateHandler_Update(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 
@@ -213,7 +214,7 @@ func TestUpdateHandler_Update(t *testing.T) {
 
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 
-		var response ErrorResponse
+		var response api.ErrorResponse
 		err := json.Unmarshal(w.Body.Bytes(), &response)
 		require.NoError(t, err)
 

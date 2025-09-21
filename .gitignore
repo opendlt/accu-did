@@ -18,6 +18,7 @@ build/
 .env.*
 .claude/
 claude.log
+CLAUDE.md
 
 # Go
 vendor/

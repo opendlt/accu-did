@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
+	"github.com/opendlt/accu-did/registrar-go/internal/api"
 	"github.com/opendlt/accu-did/registrar-go/internal/ops"
 	"github.com/opendlt/accu-did/registrar-go/internal/policy"
 )
@@ -17,28 +18,12 @@ type DeactivateHandler struct {
 	authPolicy policy.AuthPolicy
 }
 
-// DeactivateRequest represents a DID deactivation request
-type DeactivateRequest struct {
-	DID     string                 `json:"did"`
-	Options map[string]interface{} `json:"options,omitempty"`
-	Secret  map[string]interface{} `json:"secret,omitempty"`
-}
-
 // DeactivateResponse represents a DID deactivation response
 type DeactivateResponse struct {
 	JobID                   string                  `json:"jobId"`
 	DIDState                DIDState                `json:"didState"`
 	DIDRegistrationMetadata DIDRegistrationMetadata `json:"didRegistrationMetadata"`
 	DIDDocumentMetadata     DIDDocumentMetadata     `json:"didDocumentMetadata"`
-}
-
-// ErrorResponse represents an error response
-type ErrorResponse struct {
-	Error     string            `json:"error"`
-	Message   string            `json:"message"`
-	Details   map[string]string `json:"details,omitempty"`
-	RequestID string            `json:"requestId,omitempty"`
-	Timestamp time.Time         `json:"timestamp"`
 }
 
 // NewDeactivateHandler creates a new deactivate handler
@@ -52,7 +37,7 @@ func NewDeactivateHandler(accClient acc.Submitter, authPolicy policy.AuthPolicy)
 // Deactivate handles POST /deactivate requests
 func (h *DeactivateHandler) Deactivate(w http.ResponseWriter, r *http.Request) {
 	// Parse request
-	var req DeactivateRequest
+	var req api.DeactivateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		h.writeError(w, "invalidRequest", "Invalid JSON", http.StatusBadRequest, nil)
 		return
@@ -89,8 +74,14 @@ func (h *DeactivateHandler) Deactivate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get data account URL using safe helper
+	dataAccountURL, err := policy.DIDToDataAccountURL(req.DID)
+	if err != nil {
+		h.writeError(w, "invalidDid", err.Error(), http.StatusBadRequest, nil)
+		return
+	}
+
 	// Submit to Accumulate
-	dataAccountURL := h.getDataAccountURL(req.DID)
 	txID, err := h.accClient.SubmitWriteData(dataAccountURL, envelope)
 	if err != nil {
 		h.writeError(w, "internalError", "Failed to submit transaction", http.StatusInternalServerError, nil)
@@ -127,7 +118,7 @@ func (h *DeactivateHandler) Deactivate(w http.ResponseWriter, r *http.Request) {
 }
 
 // validateDeactivateRequest validates the deactivate request
-func (h *DeactivateHandler) validateDeactivateRequest(req *DeactivateRequest) error {
+func (h *DeactivateHandler) validateDeactivateRequest(req *api.DeactivateRequest) error {
 	if req.DID == "" {
 		return fmt.Errorf("DID is required")
 	}
@@ -146,26 +137,6 @@ func (h *DeactivateHandler) getPreviousVersionID(did string) string {
 	return fmt.Sprintf("%d-%s", time.Now().Unix()-3600, "current")
 }
 
-// getDataAccountURL constructs the data account URL for a DID
-func (h *DeactivateHandler) getDataAccountURL(did string) string {
-	// Extract ADI from DID (simplified)
-	adi := did[8:] // Remove "did:acc:" prefix
-
-	// Handle URL components
-	for _, separator := range []string{"/", "?", "#", ";"} {
-		if idx := len(adi); idx > 0 {
-			for i, char := range adi {
-				if string(char) == separator {
-					adi = adi[:i]
-					break
-				}
-			}
-		}
-	}
-
-	return fmt.Sprintf("acc://%s/data/did", adi)
-}
-
 // generateJobID generates a job ID for tracking the operation
 func (h *DeactivateHandler) generateJobID() string {
 	return fmt.Sprintf("job-%d", time.Now().UnixNano())
@@ -173,7 +144,7 @@ func (h *DeactivateHandler) generateJobID() string {
 
 // writeError writes an error response
 func (h *DeactivateHandler) writeError(w http.ResponseWriter, errorCode, message string, status int, details map[string]string) {
-	response := ErrorResponse{
+	response := api.ErrorResponse{
 		Error:     errorCode,
 		Message:   message,
 		Details:   details,

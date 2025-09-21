@@ -11,9 +11,9 @@ import (
 )
 
 type URLNormalizationVector struct {
-	Description string            `json:"description"`
-	Input       string            `json:"input"`
-	Expected    NormalizedDIDURL  `json:"expected"`
+	Description string           `json:"description"`
+	Input       string           `json:"input"`
+	Expected    NormalizedDIDURL `json:"expected"`
 }
 
 type URLNormalizationVectors struct {
@@ -21,7 +21,6 @@ type URLNormalizationVectors struct {
 	Version     string                   `json:"version"`
 	Vectors     []URLNormalizationVector `json:"vectors"`
 }
-
 
 func TestURLNormalizationVectors(t *testing.T) {
 	// Load test vectors

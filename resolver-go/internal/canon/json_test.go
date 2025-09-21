@@ -17,11 +17,11 @@ type EnvelopeHashVector struct {
 }
 
 type EnvelopeHashVectors struct {
-	Description            string               `json:"description"`
-	Version                string               `json:"version"`
-	Algorithm              string               `json:"algorithm"`
-	DocumentVectors        []EnvelopeHashVector `json:"document_vectors"`
-	CanonicalizationNotes  []string             `json:"canonicalization_notes"`
+	Description           string               `json:"description"`
+	Version               string               `json:"version"`
+	Algorithm             string               `json:"algorithm"`
+	DocumentVectors       []EnvelopeHashVector `json:"document_vectors"`
+	CanonicalizationNotes []string             `json:"canonicalization_notes"`
 }
 
 func TestEnvelopeHashVectors(t *testing.T) {

@@ -58,7 +58,7 @@ func main() {
 func healthHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
-		"status": "healthy",
+		"status":  "healthy",
 		"service": "uniresolver-driver-did-acc",
 	})
 }
@@ -66,7 +66,7 @@ func healthHandler(w http.ResponseWriter, r *http.Request) {
 func driverInfoHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"driver": "did-acc",
+		"driver":  "did-acc",
 		"version": "1.0.0",
 		"methods": []string{"acc"},
 		"endpoints": map[string]string{

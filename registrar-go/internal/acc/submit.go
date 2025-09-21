@@ -25,7 +25,7 @@ type Submitter interface {
 
 // KeyPageOperation represents a key page operation
 type KeyPageOperation struct {
-	Type      string `json:"type"`      // "add", "remove", "update"
+	Type      string `json:"type"` // "add", "remove", "update"
 	PublicKey string `json:"publicKey"`
 	KeyType   string `json:"keyType"`
 }
@@ -102,8 +102,8 @@ func (c *FakeSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (stri
 		Status:    "committed",
 		Timestamp: time.Now().UTC(),
 		Data: map[string]interface{}{
-			"type":              "createDataAccount",
-			"adiURL":            adiURL,
+			"type":             "createDataAccount",
+			"adiURL":           adiURL,
 			"dataAccountLabel": dataAccountLabel,
 		},
 	}
@@ -258,7 +258,7 @@ func NewRealSubmitter(nodeURL string) *RealSubmitter {
 // CreateIdentity creates a new ADI using Accumulate API
 func (c *RealSubmitter) CreateIdentity(adiLabel string, keyPageURL string) (string, error) {
 	// Parse the key page URL to get the key page for ADI creation
-	keyPage, err := url.Parse(keyPageURL)
+	_, err := url.Parse(keyPageURL)
 	if err != nil {
 		return "", fmt.Errorf("invalid key page URL %s: %w", keyPageURL, err)
 	}
@@ -293,7 +293,7 @@ func (c *RealSubmitter) CreateIdentity(adiLabel string, keyPageURL string) (stri
 // CreateDataAccount creates a new data account using Accumulate API
 func (c *RealSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (string, error) {
 	// Parse the ADI URL
-	adi, err := url.Parse(adiURL)
+	_, err := url.Parse(adiURL)
 	if err != nil {
 		return "", fmt.Errorf("invalid ADI URL %s: %w", adiURL, err)
 	}
@@ -328,7 +328,7 @@ func (c *RealSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (stri
 // WriteDataEntry writes data to a data account using Accumulate API
 func (c *RealSubmitter) WriteDataEntry(dataAccountURL string, data []byte) (string, error) {
 	// Parse the data account URL
-	dataAccount, err := url.Parse(dataAccountURL)
+	_, err := url.Parse(dataAccountURL)
 	if err != nil {
 		return "", fmt.Errorf("invalid data account URL %s: %w", dataAccountURL, err)
 	}
@@ -451,9 +451,9 @@ func (c *RealSubmitter) GetKeyPageState(keyPageURL string) (*KeyPageState, error
 	// TODO: Implement proper conversion based on actual API record types
 	keyPageState := &KeyPageState{
 		URL:       keyPageURL,
-		Threshold: 1, // Extract from record
+		Threshold: 1,           // Extract from record
 		Keys:      []KeyInfo{}, // Extract from record
-		Height:    0, // Extract from record
+		Height:    0,           // Extract from record
 	}
 
 	return keyPageState, nil

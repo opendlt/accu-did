@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
+	"github.com/opendlt/accu-did/registrar-go/internal/api"
 	"github.com/opendlt/accu-did/shared/did"
 )
 
@@ -22,34 +23,21 @@ type RegisterRequest struct {
 	KeyPageURL  string                 `json:"keyPageUrl,omitempty"`
 }
 
-// UpdateRequest represents a native DID update request
-type UpdateRequest struct {
+// NativeUpdateRequest represents a native DID update request
+type NativeUpdateRequest struct {
 	DID         string                 `json:"did"`
 	DIDDocument map[string]interface{} `json:"didDocument"`
 }
 
-// DeactivateRequest represents a native DID deactivation request
-type DeactivateRequest struct {
-	DID string `json:"did"`
-}
-
 // NativeResponse represents a native API response
 type NativeResponse struct {
-	Success    bool                   `json:"success"`
-	TxID       string                 `json:"txid,omitempty"`
-	DID        string                 `json:"did"`
-	JobID      string                 `json:"jobId,omitempty"`
-	Metadata   map[string]interface{} `json:"metadata,omitempty"`
-	Error      string                 `json:"error,omitempty"`
-	Timestamp  time.Time              `json:"timestamp"`
-}
-
-// ErrorResponse represents an error response
-type ErrorResponse struct {
-	Error     string            `json:"error"`
-	Message   string            `json:"message"`
-	Details   map[string]string `json:"details,omitempty"`
-	Timestamp time.Time         `json:"timestamp"`
+	Success   bool                   `json:"success"`
+	TxID      string                 `json:"txid,omitempty"`
+	DID       string                 `json:"did"`
+	JobID     string                 `json:"jobId,omitempty"`
+	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	Error     string                 `json:"error,omitempty"`
+	Timestamp time.Time              `json:"timestamp"`
 }
 
 // NewNativeHandler creates a new native handler
@@ -138,7 +126,7 @@ func (h *NativeHandler) Register(w http.ResponseWriter, r *http.Request) {
 
 // Update handles POST /update requests
 func (h *NativeHandler) Update(w http.ResponseWriter, r *http.Request) {
-	var req UpdateRequest
+	var req NativeUpdateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		h.writeError(w, "invalidRequest", "Invalid JSON", http.StatusBadRequest, nil)
 		return
@@ -185,7 +173,7 @@ func (h *NativeHandler) Update(w http.ResponseWriter, r *http.Request) {
 
 // Deactivate handles POST /deactivate requests
 func (h *NativeHandler) Deactivate(w http.ResponseWriter, r *http.Request) {
-	var req DeactivateRequest
+	var req api.DeactivateRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		h.writeError(w, "invalidRequest", "Invalid JSON", http.StatusBadRequest, nil)
 		return
@@ -264,7 +252,7 @@ func (h *NativeHandler) validateRegisterRequest(req *RegisterRequest) error {
 }
 
 // validateUpdateRequest validates the update request
-func (h *NativeHandler) validateUpdateRequest(req *UpdateRequest) error {
+func (h *NativeHandler) validateUpdateRequest(req *NativeUpdateRequest) error {
 	if req.DID == "" {
 		return fmt.Errorf("DID is required")
 	}
@@ -284,7 +272,7 @@ func (h *NativeHandler) validateUpdateRequest(req *UpdateRequest) error {
 }
 
 // validateDeactivateRequest validates the deactivate request
-func (h *NativeHandler) validateDeactivateRequest(req *DeactivateRequest) error {
+func (h *NativeHandler) validateDeactivateRequest(req *api.DeactivateRequest) error {
 	if req.DID == "" {
 		return fmt.Errorf("DID is required")
 	}
@@ -299,7 +287,7 @@ func (h *NativeHandler) generateJobID() string {
 
 // writeError writes an error response
 func (h *NativeHandler) writeError(w http.ResponseWriter, errorCode, message string, status int, details map[string]string) {
-	response := ErrorResponse{
+	response := api.ErrorResponse{
 		Error:     errorCode,
 		Message:   message,
 		Details:   details,

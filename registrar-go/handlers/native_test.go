@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
+	"github.com/opendlt/accu-did/registrar-go/internal/api"
 )
 
 func TestNativeRegister(t *testing.T) {
@@ -30,9 +31,9 @@ func TestNativeRegister(t *testing.T) {
 					"id":       "did:acc:testuser",
 					"verificationMethod": []interface{}{
 						map[string]interface{}{
-							"id":           "did:acc:testuser#key1",
-							"type":         "Ed25519VerificationKey2020",
-							"controller":   "did:acc:testuser",
+							"id":                 "did:acc:testuser#key1",
+							"type":               "Ed25519VerificationKey2020",
+							"controller":         "did:acc:testuser",
 							"publicKeyMultibase": "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
 						},
 					},
@@ -124,22 +125,22 @@ func TestNativeUpdate(t *testing.T) {
 	client := acc.NewFakeSubmitter()
 	handler := NewNativeHandler(client)
 
-	requestBody := UpdateRequest{
+	requestBody := api.UpdateRequest{
 		DID: "did:acc:testuser",
-		DIDDocument: map[string]interface{}{
+		Document: map[string]interface{}{
 			"@context": []string{"https://www.w3.org/ns/did/v1"},
 			"id":       "did:acc:testuser",
 			"verificationMethod": []interface{}{
 				map[string]interface{}{
-					"id":           "did:acc:testuser#key1",
-					"type":         "Ed25519VerificationKey2020",
-					"controller":   "did:acc:testuser",
+					"id":                 "did:acc:testuser#key1",
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         "did:acc:testuser",
 					"publicKeyMultibase": "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK",
 				},
 				map[string]interface{}{
-					"id":           "did:acc:testuser#key2",
-					"type":         "Ed25519VerificationKey2020",
-					"controller":   "did:acc:testuser",
+					"id":                 "did:acc:testuser#key2",
+					"type":               "Ed25519VerificationKey2020",
+					"controller":         "did:acc:testuser",
 					"publicKeyMultibase": "z6MkgoLTnTypo3tDRwCkZXSccTPHRLhF4ZnjhueYAFpEX6vg",
 				},
 			},
@@ -180,7 +181,7 @@ func TestNativeDeactivate(t *testing.T) {
 	client := acc.NewFakeSubmitter()
 	handler := NewNativeHandler(client)
 
-	requestBody := DeactivateRequest{
+	requestBody := api.DeactivateRequest{
 		DID: "did:acc:testuser",
 	}
 

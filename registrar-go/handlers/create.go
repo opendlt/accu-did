@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
+	"github.com/opendlt/accu-did/registrar-go/internal/api"
 	"github.com/opendlt/accu-did/registrar-go/internal/ops"
 	"github.com/opendlt/accu-did/registrar-go/internal/policy"
 )
@@ -91,8 +92,14 @@ func (h *CreateHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Get data account URL using safe helper
+	dataAccountURL, err := policy.DIDToDataAccountURL(req.DID)
+	if err != nil {
+		h.writeError(w, "invalidDid", err.Error(), http.StatusBadRequest, nil)
+		return
+	}
+
 	// Submit to Accumulate
-	dataAccountURL := h.getDataAccountURL(req.DID)
 	txID, err := h.accClient.SubmitWriteData(dataAccountURL, envelope)
 	if err != nil {
 		h.writeError(w, "internalError", "Failed to submit transaction", http.StatusInternalServerError, nil)
@@ -159,26 +166,6 @@ func (h *CreateHandler) validateCreateRequest(req *CreateRequest) error {
 	return nil
 }
 
-// getDataAccountURL constructs the data account URL for a DID
-func (h *CreateHandler) getDataAccountURL(did string) string {
-	// Extract ADI from DID (simplified)
-	adi := did[8:] // Remove "did:acc:" prefix
-
-	// Handle URL components
-	for _, separator := range []string{"/", "?", "#", ";"} {
-		if idx := len(adi); idx > 0 {
-			for i, char := range adi {
-				if string(char) == separator {
-					adi = adi[:i]
-					break
-				}
-			}
-		}
-	}
-
-	return fmt.Sprintf("acc://%s/data/did", adi)
-}
-
 // generateJobID generates a job ID for tracking the operation
 func (h *CreateHandler) generateJobID() string {
 	return fmt.Sprintf("job-%d", time.Now().UnixNano())
@@ -186,7 +173,7 @@ func (h *CreateHandler) generateJobID() string {
 
 // writeError writes an error response
 func (h *CreateHandler) writeError(w http.ResponseWriter, errorCode, message string, status int, details map[string]string) {
-	response := ErrorResponse{
+	response := api.ErrorResponse{
 		Error:     errorCode,
 		Message:   message,
 		Details:   details,
