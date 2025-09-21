@@ -1,0 +1,42 @@
+%% Accu-DID high-level architecture
+graph TD
+  subgraph Client Side
+    A[Client / Postman / SDK]:::client
+    UDrv[Universal Drivers (optional)\n- Uni-Resolver driver\n- Uni-Registrar driver]:::infra
+  end
+
+  subgraph DID Services (Local)
+    R[Resolver :8080]:::svc
+    G[Registrar :8081]:::svc
+  end
+
+  subgraph Accumulate Node (Local Devnet)
+    J[JSON-RPC v3 Gateway :26660]:::infra
+    DN[Directory Network]:::chain
+    BVN1[BVN-1]:::chain
+    BVN2[BVN-2]:::chain
+  end
+
+  subgraph On-chain Data
+    DAcct[DID Data Account\nacc://<adi>/did]:::data
+  end
+
+  A -->|Resolve DID| R
+  A -->|Create/Update/Deactivate| G
+  UDrv -->|HTTP proxy| R
+  UDrv -->|HTTP proxy| G
+
+  R -->|query data| J
+  G -->|build+submit tx| J
+
+  J --> DN
+  J --> BVN1
+  J --> BVN2
+  BVN1 --> DAcct
+  BVN2 --> DAcct
+
+  classDef svc fill:#eef,border:#447,stroke-width:1.5;
+  classDef infra fill:#efe,border:#474,stroke-width:1.5;
+  classDef chain fill:#fee,border:#744,stroke-width:1.5;
+  classDef data fill:#ffd,border:#aa6,stroke-width:1.5;
+  classDef client fill:#f0f0f0,border:#666,stroke-width:1.5;

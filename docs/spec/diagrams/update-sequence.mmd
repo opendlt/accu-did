@@ -1,0 +1,28 @@
+sequenceDiagram
+  participant C as Client
+  participant G as Registrar (:8081)
+  participant R as Resolver (:8080)
+  participant J as JSON-RPC v3 (:26660)
+  participant DA as Data Account acc://<adi>/did
+
+  Note over C: Update DID (add service)
+  C->>G: POST /update { did, patch: { addService } }
+
+  Note over G: Resolve current DID document
+  G->>R: GET /resolve?did=<did>
+  R->>J: Query current DID document
+  J-->>R: Return current DID document
+  R-->>G: Current DID document
+
+  Note over G: Apply patch operations
+  G->>G: Merge addService into document
+
+  Note over G: Submit updated document
+  G->>J: Submit WriteData (updated DID document)
+  J-->>G: txid / accepted
+  G-->>C: 200 { did, txids[], result: "updated" }
+
+  Note over J: Execute transaction
+  J->>DA: Append updated DID document entry
+
+  Note over C: Updated DID is now resolvable

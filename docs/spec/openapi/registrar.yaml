@@ -1,0 +1,829 @@
+openapi: 3.1.0
+info:
+  title: Accu-DID Registrar API
+  version: 0.1.0
+  description: >
+    DID registrar for did:acc on Accumulate devnet. Supports both native endpoints and
+    DIF Universal Registrar-compatible endpoints for complete DID lifecycle management.
+
+    **Operation Modes:**
+    - FAKE: Uses mock submitter for offline testing
+    - REAL: Connects to Accumulate blockchain via JSON-RPC v3
+
+    **API Patterns:**
+    - Native endpoints: Clean, direct API for Accumulate DID operations
+    - Universal endpoints: DIF-compatible for interoperability with Universal Registrar infrastructure
+  contact:
+    name: Accumulate DID Working Group
+    url: https://github.com/opendlt/accu-did
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://127.0.0.1:8081
+    description: Local development server
+  - url: http://localhost:8081
+    description: Local development server (alternate)
+
+tags:
+  - name: health
+    description: Service health and monitoring
+  - name: native
+    description: Native Accumulate DID operations
+  - name: universal
+    description: Universal Registrar compatible endpoints
+
+paths:
+  /healthz:
+    get:
+      tags: [health]
+      summary: Service health check
+      description: Returns service status and timestamp for monitoring and liveness probes
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                    description: Service status
+                  timestamp:
+                    type: string
+                    format: date-time
+                    description: Current server timestamp
+                required: [status, timestamp]
+              example:
+                status: ok
+                timestamp: "2024-01-21T12:00:00Z"
+
+  # Native endpoints
+  /register:
+    post:
+      tags: [native]
+      summary: Create a new did:acc DID
+      description: >
+        Creates a new DID with complete Accumulate transaction flow:
+        1. Create ADI (if needed)
+        2. Create data account
+        3. Write initial DID Document
+      operationId: createDID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRequest'
+            examples:
+              minimal:
+                summary: Minimal DID Document
+                value:
+                  didDocument:
+                    '@context': ['https://www.w3.org/ns/did/v1']
+                    id: 'did:acc:beastmode.acme'
+                    verificationMethod:
+                      - id: 'did:acc:beastmode.acme#key-1'
+                        type: 'Ed25519VerificationKey2020'
+                        controller: 'did:acc:beastmode.acme'
+                        publicKeyMultibase: 'z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK'
+                    authentication: ['did:acc:beastmode.acme#key-1']
+              with_services:
+                summary: DID with Services
+                value:
+                  didDocument:
+                    '@context': ['https://www.w3.org/ns/did/v1']
+                    id: 'did:acc:company.example'
+                    verificationMethod:
+                      - id: 'did:acc:company.example#key-1'
+                        type: 'Ed25519VerificationKey2020'
+                        controller: 'did:acc:company.example'
+                        publicKeyMultibase: 'z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK'
+                    authentication: ['did:acc:company.example#key-1']
+                    service:
+                      - id: 'did:acc:company.example#website'
+                        type: 'LinkedDomains'
+                        serviceEndpoint: 'https://company.example.com'
+      responses:
+        '200':
+          description: DID created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateResponse'
+              example:
+                did: 'did:acc:beastmode.acme'
+                txids: ['0x1234567890abcdef', '0xabcdef1234567890']
+                accounts: ['acc://beastmode.acme', 'acc://beastmode.acme/did']
+                result: 'created'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: 400
+                error: 'invalidRequest'
+                message: 'Invalid DID document format'
+        '409':
+          description: DID already exists
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                code: 409
+                error: 'alreadyExists'
+                message: 'DID already exists'
+        '502':
+          description: Accumulate node unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /update:
+    post:
+      tags: [native]
+      summary: Update existing DID Document
+      description: >
+        Updates an existing DID Document by appending new content.
+        Supports adding/removing services and other DID Document properties.
+      operationId: updateDID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRequest'
+            examples:
+              add_service:
+                summary: Add a service
+                value:
+                  did: 'did:acc:beastmode.acme'
+                  patch:
+                    addService:
+                      - id: 'did:acc:beastmode.acme#messaging'
+                        type: 'MessagingService'
+                        serviceEndpoint: 'https://messaging.example.com'
+              remove_service:
+                summary: Remove a service
+                value:
+                  did: 'did:acc:beastmode.acme'
+                  patch:
+                    removeServiceIds: ['did:acc:beastmode.acme#messaging']
+      responses:
+        '200':
+          description: DID updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: DID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /deactivate:
+    post:
+      tags: [native]
+      summary: Deactivate a DID
+      description: >
+        Deactivates a DID by writing a tombstone entry to the data account.
+        Once deactivated, the DID cannot be reactivated.
+      operationId: deactivateDID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeactivateRequest'
+            example:
+              did: 'did:acc:beastmode.acme'
+              deactivate: true
+      responses:
+        '200':
+          description: DID deactivated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeactivateResponse'
+        '404':
+          description: DID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  # Universal Registrar-compatible endpoints
+  /1.0/create:
+    post:
+      tags: [universal]
+      summary: Universal Registrar create endpoint
+      description: >
+        DIF Universal Registrar compatible create endpoint.
+        Requires method=acc query parameter for Accumulate DID method selection.
+      operationId: createDIDUniversal
+      parameters:
+        - name: method
+          in: query
+          required: true
+          description: DID method identifier
+          schema:
+            type: string
+            enum: [acc]
+            example: acc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UniCreateRequest'
+            example:
+              jobId: 'test-create-001'
+              options:
+                network: 'devnet'
+              secret: {}
+              registration:
+                didDocument:
+                  '@context': ['https://www.w3.org/ns/did/v1']
+                  id: 'did:acc:beastmode.acme'
+                  verificationMethod:
+                    - id: 'did:acc:beastmode.acme#key-1'
+                      type: 'Ed25519VerificationKey2020'
+                      controller: 'did:acc:beastmode.acme'
+                      publicKeyMultibase: 'z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK'
+                  authentication: ['did:acc:beastmode.acme#key-1']
+      responses:
+        '200':
+          description: DID created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UniversalCreateResponse'
+        '400':
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /1.0/update:
+    post:
+      tags: [universal]
+      summary: Universal Registrar update endpoint
+      description: >
+        DIF Universal Registrar compatible update endpoint.
+        Supports patch-based updates including addService/removeService operations.
+      operationId: updateDIDUniversal
+      parameters:
+        - name: method
+          in: query
+          required: true
+          description: DID method identifier
+          schema:
+            type: string
+            enum: [acc]
+            example: acc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UniUpdateRequest'
+            examples:
+              add_service:
+                summary: Add service via patch
+                value:
+                  jobId: 'test-update-001'
+                  options:
+                    network: 'devnet'
+                  secret: {}
+                  registration:
+                    did: 'did:acc:beastmode.acme'
+                    patch:
+                      addService:
+                        id: 'did:acc:beastmode.acme#messaging'
+                        type: 'MessagingService'
+                        serviceEndpoint: 'https://messaging.example.com'
+              json_patch:
+                summary: JSON Patch operation
+                value:
+                  jobId: 'test-update-002'
+                  options:
+                    network: 'devnet'
+                  secret: {}
+                  registration:
+                    did: 'did:acc:beastmode.acme'
+                    didDocumentOperation:
+                      - op: 'add'
+                        path: '/service'
+                        value:
+                          - id: 'did:acc:beastmode.acme#api'
+                            type: 'ApiService'
+                            serviceEndpoint: 'https://api.example.com'
+      responses:
+        '200':
+          description: DID updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UniversalUpdateResponse'
+
+  /1.0/deactivate:
+    post:
+      tags: [universal]
+      summary: Universal Registrar deactivate endpoint
+      description: >
+        DIF Universal Registrar compatible deactivate endpoint.
+        Writes a deactivation tombstone to the Accumulate data account.
+      operationId: deactivateDIDUniversal
+      parameters:
+        - name: method
+          in: query
+          required: true
+          description: DID method identifier
+          schema:
+            type: string
+            enum: [acc]
+            example: acc
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UniDeactivateRequest'
+            example:
+              jobId: 'test-deactivate-001'
+              options:
+                network: 'devnet'
+              secret: {}
+              registration:
+                did: 'did:acc:beastmode.acme'
+                deactivate: true
+      responses:
+        '200':
+          description: DID deactivated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UniversalDeactivateResponse'
+
+components:
+  schemas:
+    # Native API request/response schemas
+    CreateRequest:
+      type: object
+      description: Request to create a new DID
+      properties:
+        didDocument:
+          $ref: '#/components/schemas/DIDDocument'
+        options:
+          type: object
+          description: Creation options
+          properties:
+            network:
+              type: string
+              description: Target network
+              default: 'devnet'
+              enum: [devnet, testnet, mainnet]
+          additionalProperties: true
+      required: [didDocument]
+
+    UpdateRequest:
+      type: object
+      description: Request to update an existing DID
+      properties:
+        did:
+          type: string
+          description: The DID to update
+          pattern: '^did:acc:.+'
+          example: 'did:acc:beastmode.acme'
+        patch:
+          type: object
+          description: Patch operations to apply
+          properties:
+            addService:
+              type: array
+              description: Services to add
+              items:
+                $ref: '#/components/schemas/Service'
+            removeServiceIds:
+              type: array
+              description: Service IDs to remove
+              items:
+                type: string
+          additionalProperties: true
+      required: [did, patch]
+
+    DeactivateRequest:
+      type: object
+      description: Request to deactivate a DID
+      properties:
+        did:
+          type: string
+          description: The DID to deactivate
+          pattern: '^did:acc:.+'
+          example: 'did:acc:beastmode.acme'
+        deactivate:
+          type: boolean
+          description: Deactivation flag
+          enum: [true]
+      required: [did, deactivate]
+
+    # Universal Registrar request schemas
+    UniCreateRequest:
+      type: object
+      description: Universal Registrar create request
+      properties:
+        jobId:
+          type: string
+          description: Job identifier for tracking
+          example: 'test-create-001'
+        options:
+          type: object
+          description: Method-specific options
+          additionalProperties: true
+        secret:
+          type: object
+          description: Secret material (keys, credentials)
+          additionalProperties: true
+        registration:
+          type: object
+          description: Registration data
+          properties:
+            didDocument:
+              $ref: '#/components/schemas/DIDDocument'
+          required: [didDocument]
+          additionalProperties: true
+      required: [registration]
+
+    UniUpdateRequest:
+      type: object
+      description: Universal Registrar update request
+      properties:
+        jobId:
+          type: string
+          description: Job identifier for tracking
+        options:
+          type: object
+          description: Method-specific options
+          additionalProperties: true
+        secret:
+          type: object
+          description: Secret material (keys, credentials)
+          additionalProperties: true
+        registration:
+          type: object
+          description: Update registration data
+          properties:
+            did:
+              type: string
+              description: The DID to update
+              pattern: '^did:acc:.+'
+            patch:
+              type: object
+              description: Patch operations (addService/removeService format)
+              properties:
+                addService:
+                  oneOf:
+                    - $ref: '#/components/schemas/Service'
+                    - type: array
+                      items:
+                        $ref: '#/components/schemas/Service'
+                removeService:
+                  oneOf:
+                    - type: string
+                    - type: array
+                      items:
+                        type: string
+              additionalProperties: true
+            didDocumentOperation:
+              type: array
+              description: JSON Patch operations
+              items:
+                type: object
+                properties:
+                  op:
+                    type: string
+                    enum: [add, remove, replace, move, copy, test]
+                  path:
+                    type: string
+                  value: {}
+                  from:
+                    type: string
+                required: [op, path]
+          required: [did]
+          additionalProperties: true
+      required: [registration]
+
+    UniDeactivateRequest:
+      type: object
+      description: Universal Registrar deactivate request
+      properties:
+        jobId:
+          type: string
+          description: Job identifier for tracking
+        options:
+          type: object
+          description: Method-specific options
+          additionalProperties: true
+        secret:
+          type: object
+          description: Secret material (keys, credentials)
+          additionalProperties: true
+        registration:
+          type: object
+          description: Deactivation registration data
+          properties:
+            did:
+              type: string
+              description: The DID to deactivate
+              pattern: '^did:acc:.+'
+            deactivate:
+              type: boolean
+              enum: [true]
+          required: [did, deactivate]
+          additionalProperties: true
+      required: [registration]
+
+    # Response schemas
+    CreateResponse:
+      type: object
+      description: Successful DID creation response
+      properties:
+        did:
+          type: string
+          description: The created DID
+          example: 'did:acc:beastmode.acme'
+        txids:
+          type: array
+          description: Accumulate transaction IDs
+          items:
+            type: string
+          example: ['0x1234567890abcdef', '0xabcdef1234567890']
+        accounts:
+          type: array
+          description: Created Accumulate accounts
+          items:
+            type: string
+          example: ['acc://beastmode.acme', 'acc://beastmode.acme/did']
+        result:
+          type: string
+          enum: [created]
+          description: Operation result
+      required: [did, result]
+
+    UpdateResponse:
+      type: object
+      description: Successful DID update response
+      properties:
+        did:
+          type: string
+          description: The updated DID
+        txids:
+          type: array
+          description: Accumulate transaction IDs
+          items:
+            type: string
+        result:
+          type: string
+          enum: [updated]
+          description: Operation result
+      required: [did, result]
+
+    DeactivateResponse:
+      type: object
+      description: Successful DID deactivation response
+      properties:
+        did:
+          type: string
+          description: The deactivated DID
+        txids:
+          type: array
+          description: Accumulate transaction IDs
+          items:
+            type: string
+        result:
+          type: string
+          enum: [deactivated]
+          description: Operation result
+      required: [did, result]
+
+    # Universal Registrar response schemas
+    UniversalCreateResponse:
+      type: object
+      description: Universal Registrar create response
+      properties:
+        jobId:
+          type: string
+          description: Job identifier
+        didState:
+          type: object
+          description: DID state information
+          properties:
+            did:
+              type: string
+            state:
+              type: string
+              enum: [finished, failed, action, wait]
+            action:
+              type: string
+              enum: [create]
+          required: [did, state, action]
+        didRegistrationMetadata:
+          type: object
+          description: Registration metadata
+          properties:
+            txid:
+              type: string
+              description: Primary transaction ID
+            created:
+              type: string
+              format: date-time
+          additionalProperties: true
+        didDocumentMetadata:
+          type: object
+          description: DID Document metadata
+          additionalProperties: true
+      required: [didState]
+
+    UniversalUpdateResponse:
+      type: object
+      description: Universal Registrar update response
+      properties:
+        jobId:
+          type: string
+        didState:
+          type: object
+          properties:
+            did:
+              type: string
+            state:
+              type: string
+              enum: [finished, failed, action, wait]
+            action:
+              type: string
+              enum: [update]
+          required: [did, state, action]
+        didRegistrationMetadata:
+          type: object
+          additionalProperties: true
+      required: [didState]
+
+    UniversalDeactivateResponse:
+      type: object
+      description: Universal Registrar deactivate response
+      properties:
+        jobId:
+          type: string
+        didState:
+          type: object
+          properties:
+            did:
+              type: string
+            state:
+              type: string
+              enum: [finished, failed]
+            action:
+              type: string
+              enum: [deactivate]
+          required: [did, state, action]
+        didRegistrationMetadata:
+          type: object
+          properties:
+            deactivated:
+              type: boolean
+              enum: [true]
+          additionalProperties: true
+      required: [didState]
+
+    # Shared schemas
+    DIDDocument:
+      type: object
+      description: A W3C DID Core compliant DID Document
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: JSON-LD context
+          example: ['https://www.w3.org/ns/did/v1']
+        id:
+          type: string
+          description: The DID subject
+          pattern: '^did:acc:.+'
+          example: 'did:acc:beastmode.acme'
+        controller:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Entity that controls the DID Document
+        verificationMethod:
+          type: array
+          description: Cryptographic verification methods
+          items:
+            $ref: '#/components/schemas/VerificationMethod'
+        authentication:
+          type: array
+          description: Authentication verification methods
+          items:
+            oneOf:
+              - type: string
+              - $ref: '#/components/schemas/VerificationMethod'
+        assertionMethod:
+          type: array
+          description: Assertion verification methods
+          items:
+            oneOf:
+              - type: string
+              - $ref: '#/components/schemas/VerificationMethod'
+        service:
+          type: array
+          description: Service endpoints
+          items:
+            $ref: '#/components/schemas/Service'
+      required: [id]
+      additionalProperties: true
+
+    VerificationMethod:
+      type: object
+      description: A cryptographic verification method
+      properties:
+        id:
+          type: string
+          description: Verification method identifier
+          example: 'did:acc:beastmode.acme#key-1'
+        type:
+          type: string
+          description: Cryptographic suite type
+          example: 'Ed25519VerificationKey2020'
+        controller:
+          type: string
+          description: Entity that controls this verification method
+          example: 'did:acc:beastmode.acme'
+        publicKeyMultibase:
+          type: string
+          description: Multibase-encoded public key
+          pattern: '^z[1-9A-HJ-NP-Za-km-z]+'
+          example: 'z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK'
+      required: [id, type, controller]
+      additionalProperties: true
+
+    Service:
+      type: object
+      description: A service endpoint
+      properties:
+        id:
+          type: string
+          description: Service identifier
+          example: 'did:acc:beastmode.acme#messaging'
+        type:
+          type: string
+          description: Service type
+          example: 'MessagingService'
+        serviceEndpoint:
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+          description: Service endpoint URL or object
+          example: 'https://messaging.example.com'
+      required: [id, type, serviceEndpoint]
+      additionalProperties: true
+
+    Error:
+      type: object
+      description: Error response
+      properties:
+        code:
+          type: integer
+          description: HTTP status code
+          example: 400
+        error:
+          type: string
+          description: Error identifier
+          enum: [invalidRequest, alreadyExists, notFound, unauthorized, methodNotSupported]
+          example: 'invalidRequest'
+        message:
+          type: string
+          description: Human-readable error description
+          example: 'Invalid DID document format'
+      required: [code, error, message]

@@ -1,0 +1,21 @@
+sequenceDiagram
+  participant C as Client
+  participant G as Registrar (:8081)
+  participant J as JSON-RPC v3 (:26660)
+  participant DA as Data Account acc://<adi>/did
+
+  Note over C: Deactivate DID
+  C->>G: POST /deactivate { did, deactivate: true }
+
+  Note over G: Create tombstone document
+  G->>G: Build tombstone { "@context", "id", "deactivated": true }
+
+  Note over G: Submit tombstone
+  G->>J: Submit WriteData (tombstone)
+  J-->>G: txid / accepted
+  G-->>C: 200 { did, txids[], result: "deactivated" }
+
+  Note over J: Execute transaction
+  J->>DA: Append tombstone entry
+
+  Note over C: DID now resolves as deactivated (410)

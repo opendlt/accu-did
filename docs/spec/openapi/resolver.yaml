@@ -1,0 +1,371 @@
+openapi: 3.1.0
+info:
+  title: Accu-DID Resolver API
+  version: 0.1.0
+  description: >
+    DID resolver for did:acc on Accumulate devnet. Supports FAKE (offline) and REAL (JSON-RPC v3) modes.
+
+    The resolver implements W3C DID Core resolution for the Accumulate DID method, mapping
+    `did:acc:<adi>[/<path>]` to Accumulate data accounts at `acc://<adi>/<path|did>`.
+
+    **Operation Modes:**
+    - FAKE: Uses fixture files for offline testing
+    - REAL: Connects to Accumulate blockchain via JSON-RPC v3
+  contact:
+    name: Accumulate DID Working Group
+    url: https://github.com/opendlt/accu-did
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://127.0.0.1:8080
+    description: Local development server
+  - url: http://localhost:8080
+    description: Local development server (alternate)
+
+tags:
+  - name: health
+    description: Service health and monitoring
+  - name: resolution
+    description: DID document resolution operations
+
+paths:
+  /healthz:
+    get:
+      tags: [health]
+      summary: Service health check
+      description: Returns service status and timestamp for monitoring and liveness probes
+      operationId: getHealth
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    enum: [ok]
+                    description: Service status
+                  timestamp:
+                    type: string
+                    format: date-time
+                    description: Current server timestamp
+                required: [status, timestamp]
+              example:
+                status: ok
+                timestamp: "2024-01-21T12:00:00Z"
+
+  /resolve:
+    get:
+      tags: [resolution]
+      summary: Resolve a did:acc DID
+      description: >
+        Resolves a DID to its DID Document following W3C DID Core specification.
+        Maps `did:acc:<adi>[/<path>]` to Accumulate data account `acc://<adi>/<path|did>`
+        and returns the latest DID Document entry.
+      operationId: resolveDID
+      parameters:
+        - name: did
+          in: query
+          required: true
+          description: The DID to resolve (must start with 'did:acc:')
+          schema:
+            type: string
+            pattern: '^did:acc:.+'
+            example: 'did:acc:beastmode.acme'
+        - name: versionTime
+          in: query
+          required: false
+          description: ISO 8601 timestamp for historical resolution (optional)
+          schema:
+            type: string
+            format: date-time
+            example: '2024-01-01T00:00:00Z'
+      responses:
+        '200':
+          description: Successfully resolved DID Document
+          content:
+            application/did+json:
+              schema:
+                $ref: '#/components/schemas/DIDResolutionResult'
+              examples:
+                active_did:
+                  summary: Active DID Document
+                  value:
+                    didDocument:
+                      '@context': ['https://www.w3.org/ns/did/v1']
+                      id: 'did:acc:beastmode.acme'
+                      verificationMethod:
+                        - id: 'did:acc:beastmode.acme#key-1'
+                          type: 'Ed25519VerificationKey2020'
+                          controller: 'did:acc:beastmode.acme'
+                          publicKeyMultibase: 'z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK'
+                      authentication: ['did:acc:beastmode.acme#key-1']
+                      assertionMethod: ['did:acc:beastmode.acme#key-1']
+                    didDocumentMetadata:
+                      versionId: '2'
+                      created: '2024-01-01T00:00:00Z'
+                      updated: '2024-01-02T00:00:00Z'
+                    didResolutionMetadata:
+                      contentType: 'application/did+json'
+                deactivated_did:
+                  summary: Deactivated DID Document
+                  value:
+                    didDocument:
+                      '@context': ['https://www.w3.org/ns/did/v1']
+                      id: 'did:acc:beastmode.acme'
+                      deactivated: true
+                    didDocumentMetadata:
+                      deactivated: true
+                      versionId: '3'
+                      updated: '2024-01-03T00:00:00Z'
+                    didResolutionMetadata:
+                      contentType: 'application/did+json'
+        '404':
+          description: DID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: 'notFound'
+                errorMessage: 'DID not found'
+        '410':
+          description: DID has been deactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: 'deactivated'
+                errorMessage: 'DID has been deactivated'
+        '422':
+          description: Invalid DID syntax
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: 'invalidDid'
+                errorMessage: 'DID must start with "did:acc:"'
+        '502':
+          description: Accumulate node unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error: 'methodNotSupported'
+                errorMessage: 'Accumulate node unavailable'
+
+  /1.0/identifiers/{did}:
+    get:
+      tags: [resolution]
+      summary: Universal Resolver 1.0 compatible endpoint
+      description: >
+        Universal Resolver compatible endpoint for DID resolution.
+        Follows DIF Universal Resolver specification patterns.
+      operationId: resolveUniversal
+      parameters:
+        - name: did
+          in: path
+          required: true
+          description: The DID to resolve (URL encoded)
+          schema:
+            type: string
+            pattern: '^did:acc:.+'
+            example: 'did:acc:beastmode.acme'
+      responses:
+        '200':
+          description: Successfully resolved DID Document
+          content:
+            application/did+json:
+              schema:
+                $ref: '#/components/schemas/DIDResolutionResult'
+        '404':
+          description: DID not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '410':
+          description: DID has been deactivated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    DIDDocument:
+      type: object
+      description: A W3C DID Core compliant DID Document
+      properties:
+        '@context':
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: JSON-LD context
+          example: ['https://www.w3.org/ns/did/v1']
+        id:
+          type: string
+          description: The DID subject
+          pattern: '^did:acc:.+'
+          example: 'did:acc:beastmode.acme'
+        controller:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                type: string
+          description: Entity that controls the DID Document
+        verificationMethod:
+          type: array
+          description: Cryptographic verification methods
+          items:
+            $ref: '#/components/schemas/VerificationMethod'
+        authentication:
+          type: array
+          description: Authentication verification methods
+          items:
+            oneOf:
+              - type: string
+              - $ref: '#/components/schemas/VerificationMethod'
+        assertionMethod:
+          type: array
+          description: Assertion verification methods
+          items:
+            oneOf:
+              - type: string
+              - $ref: '#/components/schemas/VerificationMethod'
+        service:
+          type: array
+          description: Service endpoints
+          items:
+            $ref: '#/components/schemas/Service'
+        deactivated:
+          type: boolean
+          description: Whether the DID has been deactivated
+          example: false
+      required: [id]
+      additionalProperties: true
+
+    VerificationMethod:
+      type: object
+      description: A cryptographic verification method
+      properties:
+        id:
+          type: string
+          description: Verification method identifier
+          example: 'did:acc:beastmode.acme#key-1'
+        type:
+          type: string
+          description: Cryptographic suite type
+          example: 'Ed25519VerificationKey2020'
+        controller:
+          type: string
+          description: Entity that controls this verification method
+          example: 'did:acc:beastmode.acme'
+        publicKeyMultibase:
+          type: string
+          description: Multibase-encoded public key
+          pattern: '^z[1-9A-HJ-NP-Za-km-z]+'
+          example: 'z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK'
+      required: [id, type, controller]
+      additionalProperties: true
+
+    Service:
+      type: object
+      description: A service endpoint
+      properties:
+        id:
+          type: string
+          description: Service identifier
+          example: 'did:acc:beastmode.acme#messaging'
+        type:
+          type: string
+          description: Service type
+          example: 'MessagingService'
+        serviceEndpoint:
+          oneOf:
+            - type: string
+            - type: object
+            - type: array
+          description: Service endpoint URL or object
+          example: 'https://messaging.example.com'
+      required: [id, type, serviceEndpoint]
+      additionalProperties: true
+
+    DIDDocumentMetadata:
+      type: object
+      description: Metadata about the DID Document
+      properties:
+        versionId:
+          type: string
+          description: Version identifier
+          example: '2'
+        created:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: '2024-01-01T00:00:00Z'
+        updated:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: '2024-01-02T00:00:00Z'
+        deactivated:
+          type: boolean
+          description: Whether the DID is deactivated
+          example: false
+      additionalProperties: true
+
+    DIDResolutionMetadata:
+      type: object
+      description: Metadata about the resolution process
+      properties:
+        contentType:
+          type: string
+          description: Content type of the resolved document
+          example: 'application/did+json'
+        retrieved:
+          type: string
+          format: date-time
+          description: Timestamp when document was retrieved
+        pattern:
+          type: string
+          description: DID method pattern matched
+          example: '^did:acc:'
+      additionalProperties: true
+
+    DIDResolutionResult:
+      type: object
+      description: Complete DID resolution result following W3C DID Core
+      properties:
+        didDocument:
+          $ref: '#/components/schemas/DIDDocument'
+        didDocumentMetadata:
+          $ref: '#/components/schemas/DIDDocumentMetadata'
+        didResolutionMetadata:
+          $ref: '#/components/schemas/DIDResolutionMetadata'
+      required: [didDocument]
+
+    Error:
+      type: object
+      description: Error response following DID Core error patterns
+      properties:
+        error:
+          type: string
+          description: Error code
+          enum: [invalidDid, notFound, deactivated, methodNotSupported]
+          example: 'notFound'
+        errorMessage:
+          type: string
+          description: Human-readable error description
+          example: 'DID not found'
+      required: [error, errorMessage]
