@@ -1,8 +1,36 @@
-# Accumulate DID Specification
+# Spec & Docs Index
 
-Complete specification documents for the `did:acc` method implementation.
+- OpenAPI (Resolver): `docs/spec/openapi/resolver.yaml`
+- OpenAPI (Registrar): `docs/spec/openapi/registrar.yaml`
+- DID Method Draft: `docs/spec/method.md`
+- Diagrams (Mermaid): `docs/spec/diagrams/*.mmd`
 
-## 📋 Method Specification
+## Building a static site
+- **PowerShell (Windows):** `.\scripts\build-docs.ps1`
+- **Unix/mac (with make):** `make docs`
+- Output goes to `docs/site/`:
+  - `resolver.html` (Redoc)
+  - `registrar.html` (Redoc)
+  - `index.html` (links + Mermaid previews)
+
+**Builder preference:** Uses Docker image `redocly/redoc` when available, else `npx redoc-cli`.
+
+## Quick Preview Tips
+
+### Mermaid Diagrams
+- **Online**: Copy `.mmd` content to [https://mermaid.live](https://mermaid.live) for instant preview
+- **VS Code**: Install Mermaid Preview extension
+- **GitHub**: All `.mmd` files render automatically in the repository
+
+### OpenAPI Specifications
+- **Swagger Editor**:
+  - Web: [https://editor.swagger.io](https://editor.swagger.io) - paste YAML content
+  - Local: `docker run -p 8082:8080 swaggerapi/swagger-editor`
+- **Redoc**:
+  - Online: [https://redocly.github.io/redoc/](https://redocly.github.io/redoc/)
+  - CLI: `npm install -g redoc-cli && redoc-cli serve resolver.yaml`
+
+## Method Specification
 
 - **[method.md](method.md)** - Complete `did:acc` DID Method specification
   - ABNF grammar and syntax rules
@@ -10,7 +38,7 @@ Complete specification documents for the `did:acc` method implementation.
   - Security considerations and examples
   - W3C DID Core compliance
 
-## 🔗 API Specifications
+## API Specifications
 
 ### OpenAPI 3.1.0 Documents
 - **[openapi/resolver.yaml](openapi/resolver.yaml)** - DID Resolution service API
@@ -30,7 +58,7 @@ Complete specification documents for the `did:acc` method implementation.
   - Complete curl examples for all endpoints
   - Service configuration and troubleshooting
 
-## 📊 Architecture Diagrams
+## Architecture Diagrams
 
 ### System Architecture
 - **[diagrams/architecture.mmd](diagrams/architecture.mmd)** - High-level system overview
@@ -59,7 +87,7 @@ Complete specification documents for the `did:acc` method implementation.
   - Deactivation transaction submission
   - Resolution behavior after deactivation
 
-## 🧪 Testing Resources
+## Testing Resources
 
 - **[../../postman/](../../postman/)** - Postman collection and environment
   - Complete API test suite
@@ -71,7 +99,7 @@ Complete specification documents for the `did:acc` method implementation.
   - Real Accumulate API integration
   - Smoke testing scripts
 
-## 🏗️ Implementation Status
+## Implementation Status
 
 | Component | Status | Description |
 |-----------|--------|-------------|
@@ -82,29 +110,14 @@ Complete specification documents for the `did:acc` method implementation.
 | **OpenAPI Specs** | ✅ Complete | Interactive API documentation |
 | **Examples** | ✅ Complete | Working code demonstrations |
 
-## 🔗 Related Resources
+## Related Resources
 
 - **[W3C DID Core](https://www.w3.org/TR/did-core/)** - DID specification standard
 - **[Universal Resolver](https://github.com/decentralized-identity/universal-resolver)** - DIF resolution infrastructure
 - **[Universal Registrar](https://github.com/decentralized-identity/universal-registrar)** - DIF registration infrastructure
 - **[Accumulate Protocol](https://accumulatenetwork.io)** - Blockchain platform documentation
 
-## 🔍 Quick Preview Tips
-
-### Mermaid Diagrams
-- **Online**: Copy `.mmd` content to [https://mermaid.live](https://mermaid.live) for instant preview
-- **VS Code**: Install Mermaid Preview extension
-- **GitHub**: All `.mmd` files render automatically in the repository
-
-### OpenAPI Specifications
-- **Swagger Editor**:
-  - Web: [https://editor.swagger.io](https://editor.swagger.io) - paste YAML content
-  - Local: `docker run -p 8082:8080 swaggerapi/swagger-editor`
-- **Redoc**:
-  - Online: [https://redocly.github.io/redoc/](https://redocly.github.io/redoc/)
-  - CLI: `npm install -g redoc-cli && redoc-cli serve resolver.yaml`
-
-## 🚀 Quick Start
+## Quick Start
 
 1. **Read the method spec**: [method.md](method.md)
 2. **Preview diagrams**: Copy [diagrams/architecture.mmd](diagrams/architecture.mmd) to [mermaid.live](https://mermaid.live)

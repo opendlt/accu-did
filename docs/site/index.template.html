@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Accu-DID Developer Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;line-height:1.5;margin:0;background:#0b0e14;color:#e6e6e6}
+    header{padding:20px 24px;border-bottom:1px solid #1f2430;background:#0f131a;position:sticky;top:0}
+    a{color:#7ab7ff;text-decoration:none} a:hover{text-decoration:underline}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    .card{background:#11161f;border:1px solid #1f2430;border-radius:14px;padding:16px 18px;margin:12px 0}
+    pre{background:#0f131a;border:1px solid #1f2430;border-radius:10px;padding:12px;overflow:auto}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  </style>
+  <script src="https://unpkg.com/mermaid@10/dist/mermaid.min.js"></script>
+  <script>mermaid.initialize({ startOnLoad: true, theme: 'dark' });</script>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Accu-DID Developer Docs</h1>
+    <div>OpenAPI (Redoc) • Method Spec • Architecture Diagrams</div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="grid">
+    <div class="card">
+      <h2>OpenAPI (Redoc)</h2>
+      <ul>
+        <li><a href="./resolver.html" target="_blank">Resolver API</a></li>
+        <li><a href="./registrar.html" target="_blank">Registrar API</a></li>
+      </ul>
+      <p>Built from <code>docs/spec/openapi/*.yaml</code>.</p>
+    </div>
+    <div class="card">
+      <h2>DID Method Draft</h2>
+      <p>Source: <code>docs/spec/method.md</code></p>
+      <p>Open the markdown in your editor; publishing can be added later via mkdocs/docusaurus if desired.</p>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Architecture</h2>
+    <p>Diagrams render directly from Mermaid:</p>
+    <div class="grid">
+      <div>
+        <h3>High-Level</h3>
+        <pre class="mermaid">
+%% loaded from file at build time if desired; inline for now
+%% (kept in sync with docs/spec/diagrams/architecture.mmd)
+graph TD
+  subgraph Client Side
+    A[Client / Postman / SDK]
+    UDrv[Universal Drivers (optional)]
+  end
+  subgraph DID Services (Local)
+    R[Resolver :8080]
+    G[Registrar :8081]
+  end
+  subgraph Accumulate Node (Devnet)
+    J[JSON-RPC v3 :26660]
+    DN[Directory Network]
+    BVN1[BVN-1]
+    BVN2[BVN-2]
+  end
+  subgraph On-chain Data
+    DAcct[DID Data Account acc://&lt;adi&gt;/did]
+  end
+  A -->|Resolve DID| R
+  A -->|Create/Update/Deactivate| G
+  UDrv --> R
+  UDrv --> G
+  R -->|query| J
+  G -->|submit| J
+  J --> DN
+  J --> BVN1
+  J --> BVN2
+  BVN1 --> DAcct
+  BVN2 --> DAcct
+        </pre>
+      </div>
+      <div>
+        <h3>Resolve Sequence</h3>
+        <pre class="mermaid">
+sequenceDiagram
+  participant C as Client
+  participant R as Resolver (:8080)
+  participant J as JSON-RPC v3 (:26660)
+  participant DA as Data Account acc://&lt;adi&gt;/did
+
+  C->>R: GET /resolve?did=did:acc:&lt;adi&gt;
+  R->>J: Query latest entry for acc://&lt;adi&gt;/did
+  J-->>R: DID doc JSON (or 404/410)
+  R-->>C: 200 application/did+json (or error)
+        </pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Local Build Help</h2>
+    <pre>PowerShell:   .\scripts\build-docs.ps1
+Make (Unix):  make docs
+Output:       docs/site/ (open resolver.html, registrar.html, index.html)</pre>
+  </section>
+</main>
+</body>
+</html>
