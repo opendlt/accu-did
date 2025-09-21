@@ -56,3 +56,39 @@ open-docs:
 	@echo "  - $(RESOLVER_HTML)"
 	@echo "  - $(REGISTRAR_HTML)"
 	@echo "  - $(INDEX_HTML)"
+
+# Test all services
+.PHONY: test
+test:
+	@echo "🧪 Running tests for all services..."
+	@cd resolver-go && go test ./... -v
+	@cd registrar-go && go test ./... -v
+
+# Build Docker images
+.PHONY: docker-build
+docker-build:
+	@echo "🐳 Building Docker images..."
+	docker build -t accu-did/resolver:latest -f drivers/resolver/Dockerfile .
+	docker build -t accu-did/registrar:latest -f drivers/registrar/Dockerfile .
+
+# Combined target: test + docs + docker
+.PHONY: all
+all: test docs docker-build
+	@echo "✅ All tasks completed"
+
+# Clean all build artifacts
+.PHONY: clean-all
+clean-all: clean-docs
+	@echo "🧹 Cleaning all build artifacts..."
+	@cd resolver-go && go clean -cache -testcache
+	@cd registrar-go && go clean -cache -testcache
+	@docker rmi accu-did/resolver:latest accu-did/registrar:latest 2>/dev/null || true
+
+# Local CI (runs all checks)
+.PHONY: ci
+ci:
+	@if [ -x scripts/local-ci.sh ]; then \
+		bash scripts/local-ci.sh; \
+	else \
+		$(MAKE) test && $(MAKE) docs && $(MAKE) docker-build; \
+	fi
