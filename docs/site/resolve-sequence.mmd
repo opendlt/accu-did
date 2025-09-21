@@ -1,0 +1,22 @@
+sequenceDiagram
+  participant C as Client
+  participant R as Resolver (:8080)
+  participant J as JSON-RPC v3 (:26660)
+  participant DA as Data Account acc://<adi>/did
+
+  C->>R: GET /resolve?did=did:acc:<adi>
+  Note over R: Parse DID → acc://<adi>/did
+  R->>J: Query latest entry for acc://<adi>/did
+
+  alt DID exists and active
+    J-->>R: Return DID document JSON
+    R-->>C: 200 application/did+json
+  else DID not found
+    J-->>R: 404 account not found
+    R-->>C: 404 { error: "notFound" }
+  else DID deactivated
+    J-->>R: Return tombstone { deactivated: true }
+    R-->>C: 410 { error: "deactivated" }
+  end
+
+  Note over C: Client processes resolution result

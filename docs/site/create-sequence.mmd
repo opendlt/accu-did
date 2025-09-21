@@ -1,0 +1,24 @@
+sequenceDiagram
+  participant C as Client
+  participant G as Registrar (:8081)
+  participant J as JSON-RPC v3 (:26660)
+  participant CH as Accumulate Chains
+  participant DA as Data Account acc://<adi>/did
+
+  C->>G: POST /register { didDocument, options }
+  Note over G: Parse DID, extract ADI name
+  G->>J: Submit CreateIdentity (if ADI missing)
+  J-->>G: txid / pending
+  Note over G: Wait for ADI creation
+  G->>J: Submit CreateDataAccount (if missing)
+  J-->>G: txid / pending
+  Note over G: Wait for data account creation
+  G->>J: Submit WriteData (DID Document)
+  J-->>G: txid / accepted
+  G-->>C: 200 { did, txids[], accounts[] }
+
+  Note over J,CH: Consensus & execution
+  J->>CH: Execute transactions
+  CH->>DA: Store DID document entry
+
+  Note over C: DID is now resolvable
