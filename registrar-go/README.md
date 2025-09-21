@@ -1,239 +1,363 @@
 # Accumulate DID Registrar
 
-DID Registration service implementing DID Registration protocol for the Accumulate blockchain.
-
-## Service Ports & Flags
-
-**Default Port:** 8081
-**Listen Address:** `--addr` (default ":8081")
-**Mode:** `--real` (default: FAKE mode using mock submitter)
-**Environment:** `ACC_NODE_URL` (required when using `--real`)
-
-**Examples:**
-```bash
-# FAKE mode (default) - uses mock submitter
-./registrar --addr :8081
-
-# REAL mode - connects to Accumulate network
-export ACC_NODE_URL=http://localhost:26657
-./registrar --real --addr :8081
-```
+W3C DID Registration compliant service for `did:acc` method with Universal Registrar compatibility.
 
 ## Quick Start
 
-### Prerequisites
-- Go 1.22+
-- golangci-lint (for development)
-
-### Install Dependencies
 ```bash
-make deps
-```
+# Run with defaults (port 8081, FAKE mode)
+go run cmd/server/main.go
 
-### Run Registrar
+# Run with custom port and REAL mode
+go run cmd/server/main.go --addr :8082 --mode REAL
 
-**FAKE Mode (Development):**
-```bash
-make run
-# OR directly:
-go run cmd/registrar/main.go --addr :8081
-```
-
-**REAL Mode (Production):**
-```bash
-export ACC_NODE_URL=http://localhost:26657
-go run cmd/registrar/main.go --real --addr :8081
-```
-
-The registrar will start on port 8081 by default.
-
-### Test Endpoints
-
-#### Health Check (Both FAKE and REAL modes)
-```bash
-curl http://localhost:8081/healthz
-```
-
-Expected response:
-```json
-{
-  "status": "ok",
-  "timestamp": "2025-09-20T14:26:41.6380802Z"
-}
-```
-
-**Note:** Health endpoint is always at `/healthz` (not `/health`)
-
-#### DID Creation
-```bash
-curl -X POST http://localhost:8081/create \
-  -H "Content-Type: application/json" \
-  -d '{
-    "did": "did:acc:alice",
-    "didDocument": {
-      "@context": ["https://www.w3.org/ns/did/v1"],
-      "id": "did:acc:alice",
-      "verificationMethod": [{
-        "id": "did:acc:alice#key-1",
-        "type": "AccumulateKeyPage",
-        "controller": "did:acc:alice",
-        "keyPageUrl": "acc://alice/book/1",
-        "threshold": 1
-      }],
-      "authentication": ["did:acc:alice#key-1"]
-    }
-  }'
-```
-
-#### DID Update
-```bash
-curl -X POST http://localhost:8081/update \
-  -H "Content-Type: application/json" \
-  -d '{
-    "did": "did:acc:alice",
-    "didDocument": {
-      "@context": ["https://www.w3.org/ns/did/v1"],
-      "id": "did:acc:alice",
-      "verificationMethod": [{
-        "id": "did:acc:alice#key-1",
-        "type": "AccumulateKeyPage",
-        "controller": "did:acc:alice",
-        "keyPageUrl": "acc://alice/book/1",
-        "threshold": 1
-      }],
-      "service": [{
-        "id": "did:acc:alice#messaging",
-        "type": "MessagingService",
-        "serviceEndpoint": "https://messaging.alice.example.com"
-      }]
-    }
-  }'
-```
-
-#### DID Deactivation
-```bash
-curl -X POST http://localhost:8081/deactivate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "did": "did:acc:alice"
-  }'
-```
-
-Expected response format:
-```json
-{
-  "jobId": "uuid-1234-5678-9abc",
-  "didState": {
-    "did": "did:acc:alice",
-    "state": "finished",
-    "action": "create"
-  },
-  "didRegistrationMetadata": {
-    "versionId": "1704067200-8b4c4f7b",
-    "contentHash": "sha256:abc123...",
-    "txid": "0x1234567890abcdef"
-  },
-  "didDocumentMetadata": {
-    "created": "2024-01-01T00:00:00Z",
-    "versionId": "1704067200-8b4c4f7b"
-  }
-}
-```
-
-## Development
-
-### Build
-```bash
-make build
-```
-
-### Test
-```bash
-make test
-```
-
-### Lint
-```bash
-make lint
-```
-
-### Format
-```bash
-make fmt
-```
-
-## API Reference
-
-### POST /create
-
-Creates a new DID document.
-
-**Request Body:**
-- `did` (required): The DID to create (e.g., `did:acc:alice`)
-- `didDocument` (required): The DID document to create
-- `options` (optional): Registration options
-
-**Response:** DID Registration Result
-
-### POST /update
-
-Updates an existing DID document.
-
-**Request Body:**
-- `did` (required): The DID to update
-- `didDocument` (required): The updated DID document
-- `options` (optional): Registration options
-
-**Response:** DID Registration Result
-
-### POST /deactivate
-
-Deactivates a DID.
-
-**Request Body:**
-- `did` (required): The DID to deactivate
-- `options` (optional): Registration options
-
-**Response:** DID Registration Result
-
-### GET /healthz
-
-Health check endpoint.
-
-**Response:**
-```json
-{
-  "status": "ok",
-  "timestamp": "2024-01-01T12:00:00Z"
-}
+# Set Accumulate node URL (for REAL mode)
+export ACC_NODE_URL=http://localhost:26657  # Local devnet
+# or
+export ACC_NODE_URL=https://testnet.accumulatenetwork.io  # Testnet
 ```
 
 ## Configuration
 
-**Command Line Flags:**
-- `--addr`: Listen address (default: ":8081")
-- `--real`: Enable real mode to connect to Accumulate network
+| Flag/Env | Default | Description |
+|----------|---------|-------------|
+| `--addr` | `:8081` | Server listen address |
+| `--mode` | `FAKE` | Operation mode: `FAKE` (mock) or `REAL` (Accumulate) |
+| `ACC_NODE_URL` | - | Accumulate JSON-RPC endpoint (required for REAL mode) |
 
-**Environment Variables:**
-- `ACC_NODE_URL`: Accumulate node URL (required when using `--real`)
-- `LOG_LEVEL`: Logging level (default: info)
+## Endpoints
 
-**Legacy Environment Variables (deprecated):**
-- `REGISTRAR_PORT`: Use `--addr` flag instead
+### Health Check
+```http
+GET /health
+```
 
-## Authorization Policy
+### Native API
 
-By default, the registrar enforces Policy v1:
-- Only the Key Page at `acc://<adi>/book/1` can authorize DID operations
-- This ensures that only the ADI owner can create/update/deactivate their DID
+#### Create DID
+```http
+POST /create
+```
+
+**Request:**
+```json
+{
+  "did": "did:acc:alice.acme",
+  "didDocument": {
+    "@context": ["https://www.w3.org/ns/did/v1"],
+    "id": "did:acc:alice.acme",
+    "verificationMethod": [{
+      "id": "did:acc:alice.acme#key-1",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:acc:alice.acme",
+      "publicKeyMultibase": "z8c7e8b4f2d1a9c5e3b7f6a8d9e2c4f1b5a7c8e9f0d2b4c6e8a1d3f5c7e9b2a4d"
+    }],
+    "authentication": ["did:acc:alice.acme#key-1"]
+  }
+}
+```
+
+**Response:**
+```json
+{
+  "jobId": "create-1234",
+  "didState": {
+    "did": "did:acc:alice.acme",
+    "state": "finished",
+    "action": "create"
+  },
+  "didRegistrationMetadata": {
+    "txid": "0x1234567890abcdef",
+    "versionId": "1",
+    "created": "2024-01-01T00:00:00Z"
+  }
+}
+```
+
+#### Update DID
+```http
+POST /update
+```
+
+**Request:**
+```json
+{
+  "did": "did:acc:alice.acme",
+  "didDocument": {
+    "@context": ["https://www.w3.org/ns/did/v1"],
+    "id": "did:acc:alice.acme",
+    "verificationMethod": [{
+      "id": "did:acc:alice.acme#key-1",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:acc:alice.acme",
+      "publicKeyMultibase": "z8c7e8b4f2d1a9c5e3b7f6a8d9e2c4f1b5a7c8e9f0d2b4c6e8a1d3f5c7e9b2a4d"
+    }],
+    "authentication": ["did:acc:alice.acme#key-1"],
+    "service": [{
+      "id": "did:acc:alice.acme#messaging",
+      "type": "MessagingService",
+      "serviceEndpoint": "https://alice.example.com"
+    }]
+  }
+}
+```
+
+#### Deactivate DID
+```http
+POST /deactivate
+```
+
+**Request:**
+```json
+{
+  "did": "did:acc:alice.acme"
+}
+```
+
+**Response:**
+```json
+{
+  "jobId": "deactivate-5678",
+  "didState": {
+    "did": "did:acc:alice.acme",
+    "state": "finished",
+    "action": "deactivate"
+  },
+  "didRegistrationMetadata": {
+    "txid": "0xabcdef1234567890",
+    "deactivated": true
+  }
+}
+```
+
+### Universal Registrar 1.0 API
+
+#### Create (Universal)
+```http
+POST /1.0/create
+```
+
+**Request:**
+```json
+{
+  "jobId": "test-create",
+  "options": {
+    "network": "testnet"
+  },
+  "secret": {},
+  "didDocument": {
+    "@context": ["https://www.w3.org/ns/did/v1"],
+    "id": "did:acc:alice.acme",
+    "verificationMethod": [{
+      "id": "did:acc:alice.acme#key-1",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:acc:alice.acme",
+      "publicKeyMultibase": "z8c7e8b4f2d1a9c5e3b7f6a8d9e2c4f1b5a7c8e9f0d2b4c6e8a1d3f5c7e9b2a4d"
+    }]
+  }
+}
+```
+
+#### Update (Universal)
+```http
+POST /1.0/update
+```
+
+**Request with Patch:**
+```json
+{
+  "jobId": "test-update",
+  "did": "did:acc:alice.acme",
+  "options": {
+    "network": "testnet"
+  },
+  "secret": {},
+  "didDocumentOperation": [
+    {
+      "op": "add",
+      "path": "/service",
+      "value": [{
+        "id": "did:acc:alice.acme#messaging",
+        "type": "MessagingService",
+        "serviceEndpoint": "https://alice.example.com"
+      }]
+    }
+  ]
+}
+```
+
+**Request with addService/removeService:**
+```json
+{
+  "jobId": "test-update",
+  "did": "did:acc:alice.acme",
+  "options": {
+    "network": "testnet"
+  },
+  "secret": {},
+  "didDocumentOperation": {
+    "addService": {
+      "id": "did:acc:alice.acme#messaging",
+      "type": "MessagingService",
+      "serviceEndpoint": "https://alice.example.com"
+    }
+  }
+}
+```
+
+#### Deactivate (Universal)
+```http
+POST /1.0/deactivate
+```
+
+**Request:**
+```json
+{
+  "jobId": "test-deactivate",
+  "did": "did:acc:beastmode.acme",
+  "options": {
+    "network": "testnet"
+  },
+  "secret": {}
+}
+```
+
+## FAKE vs REAL Mode
+
+### FAKE Mode (Development)
+- Uses mock submitter for instant responses
+- No blockchain connection required
+- Stores DIDs in memory
+- Default mode for testing
+
+### REAL Mode (Production)
+- Connects to Accumulate blockchain via JSON-RPC
+- Requires `ACC_NODE_URL` environment variable
+- Creates actual blockchain transactions
+- Maps `did:acc:name` → `acc://name/did`
+
+## Example Workflows
+
+### Complete DID Lifecycle
+```bash
+# 1. Create DID
+curl -X POST http://localhost:8081/create \
+  -H "Content-Type: application/json" \
+  -d '{"did":"did:acc:alice.acme","didDocument":{...}}'
+
+# 2. Update DID (add service)
+curl -X POST http://localhost:8081/1.0/update \
+  -H "Content-Type: application/json" \
+  -d '{"did":"did:acc:alice.acme","didDocumentOperation":{"addService":{...}}}'
+
+# 3. Resolve DID (using resolver)
+curl "http://localhost:8080/resolve?did=did:acc:alice.acme"
+
+# 4. Deactivate DID
+curl -X POST http://localhost:8081/deactivate \
+  -H "Content-Type: application/json" \
+  -d '{"did":"did:acc:alice.acme"}'
+
+# 5. Resolve deactivated DID
+curl "http://localhost:8080/resolve?did=did:acc:alice.acme"
+# Returns: {"deactivated": true}
+```
+
+## Troubleshooting
+
+### Windows Port Issues
+```powershell
+# Check if port is in use
+netstat -an | findstr :8081
+
+# Kill process using port
+Get-Process -Id (Get-NetTCPConnection -LocalPort 8081).OwningProcess | Stop-Process -Force
+
+# Use alternate port
+./registrar.exe --addr :8082
+```
+
+### Firewall Rules
+```powershell
+# Allow registrar through Windows Firewall
+New-NetFirewallRule -DisplayName "DID Registrar" -Direction Inbound -LocalPort 8081 -Protocol TCP -Action Allow
+```
+
+### Node Connection Issues
+```bash
+# Test Accumulate node
+curl $ACC_NODE_URL/status
+
+# Use local devnet
+export ACC_NODE_URL=http://localhost:26657
+
+# Use testnet
+export ACC_NODE_URL=https://testnet.accumulatenetwork.io
+```
+
+### Common Errors
+
+| Error | Cause | Solution |
+|-------|-------|----------|
+| `invalidDid` | Wrong DID format | Use `did:acc:name` format |
+| `alreadyExists` | DID already registered | Use update instead of create |
+| `notFound` | DID doesn't exist | Create DID before update/deactivate |
+| `unauthorized` | Missing credentials | Provide proper authentication |
+| Connection refused | Node unreachable | Check `ACC_NODE_URL` |
+| Port already in use | Another process on port | Use different port with `--addr` |
+
+## Architecture
+
+```
+┌─────────────┐     ┌──────────────┐     ┌────────────┐
+│   Client    │────▶│  Registrar   │────▶│ Accumulate │
+│ (curl/http) │     │   :8081      │     │    Node    │
+└─────────────┘     └──────────────┘     └────────────┘
+                           │
+                           ▼
+                    ┌──────────────┐
+                    │     Mock     │
+                    │ (FAKE mode)  │
+                    └──────────────┘
+```
 
 ## Testing
 
-The registrar includes comprehensive tests:
-- DID document validation
-- Envelope generation and signing
-- Authorization policy enforcement
-- Error handling scenarios
+```bash
+# Run unit tests
+go test ./...
 
-**Unit Tests:** All tests run with FakeSubmitter for offline development.
-**Integration Tests:** Optional `*_integration_test.go` files can test against real Accumulate networks.
+# Run with coverage
+go test -cover ./...
+
+# Integration test (requires node)
+ACC_NODE_URL=http://localhost:26657 go test -tags=integration
+```
+
+## Docker
+
+```bash
+# Build image
+docker build -t accu-registrar .
+
+# Run container (FAKE mode)
+docker run -p 8081:8081 accu-registrar
+
+# Run container (REAL mode)
+docker run -p 8081:8081 -e ACC_NODE_URL=http://host.docker.internal:26657 accu-registrar --mode REAL
+```
+
+## Authorization Policy
+
+The registrar enforces the following authorization rules:
+- **Create**: Requires signature from the ADI's key page (`acc://name/book/1`)
+- **Update**: Requires signature from the ADI's key page
+- **Deactivate**: Requires signature from the ADI's key page
+- Only the ADI owner can manage their DID document
+
+## See Also
+
+- [Resolver Service](../resolver-go/README.md) - DID document resolution
+- [Universal Registrar](https://github.com/decentralized-identity/universal-registrar) - DID registration standard
+- [W3C DID Core](https://www.w3.org/TR/did-core/) - DID specification
+- [Accumulate Protocol](https://accumulatenetwork.io) - Blockchain platform
