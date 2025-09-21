@@ -1,0 +1,366 @@
+{
+  "info": {
+    "name": "Accu-DID Local (devnet)",
+    "description": "Complete DID lifecycle testing for Accumulate DID method",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Resolver Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{RESOLVER_URL}}/healthz",
+              "host": ["{{RESOLVER_URL}}"],
+              "path": ["healthz"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has status ok', function() {",
+                  "    pm.expect(pm.response.json().status).to.eql('ok');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Registrar Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{REGISTRAR_URL}}/healthz",
+              "host": ["{{REGISTRAR_URL}}"],
+              "path": ["healthz"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has status ok', function() {",
+                  "    pm.expect(pm.response.json().status).to.eql('ok');",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Resolve",
+      "item": [
+        {
+          "name": "Resolve DID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{RESOLVER_URL}}/resolve?did={{DID}}",
+              "host": ["{{RESOLVER_URL}}"],
+              "path": ["resolve"],
+              "query": [
+                {
+                  "key": "did",
+                  "value": "{{DID}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response has DID document', function() {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.didDocument.id).to.eql(pm.environment.get('DID'));",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Registrar Native",
+      "item": [
+        {
+          "name": "Create DID (Native)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"did\": \"{{DID}}\",\n  \"didDocument\": {\n    \"@context\": [\"https://www.w3.org/ns/did/v1\"],\n    \"id\": \"{{DID}}\",\n    \"verificationMethod\": [{\n      \"id\": \"{{DID}}#key-1\",\n      \"type\": \"Ed25519VerificationKey2020\",\n      \"controller\": \"{{DID}}\",\n      \"publicKeyMultibase\": \"z6Mk...REPLACE...with-real-key\"\n    }],\n    \"authentication\": [\"{{DID}}#key-1\"],\n    \"assertionMethod\": [\"{{DID}}#key-1\"]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{REGISTRAR_URL}}/register",
+              "host": ["{{REGISTRAR_URL}}"],
+              "path": ["register"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "if (!pm.environment.get('DID') && jsonData.didState && jsonData.didState.did) {",
+                  "    pm.environment.set('DID', jsonData.didState.did);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update DID (Native)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"did\": \"{{DID}}\",\n  \"didDocument\": {\n    \"@context\": [\"https://www.w3.org/ns/did/v1\"],\n    \"id\": \"{{DID}}\",\n    \"verificationMethod\": [{\n      \"id\": \"{{DID}}#key-1\",\n      \"type\": \"Ed25519VerificationKey2020\",\n      \"controller\": \"{{DID}}\",\n      \"publicKeyMultibase\": \"z6Mk...REPLACE...with-real-key\"\n    }],\n    \"authentication\": [\"{{DID}}#key-1\"],\n    \"assertionMethod\": [\"{{DID}}#key-1\"],\n    \"service\": [{\n      \"id\": \"{{DID}}#linked-domain\",\n      \"type\": \"LinkedDomains\",\n      \"serviceEndpoint\": \"https://example.com\"\n    }]\n  }\n}"
+            },
+            "url": {
+              "raw": "{{REGISTRAR_URL}}/update",
+              "host": ["{{REGISTRAR_URL}}"],
+              "path": ["update"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "if (!pm.environment.get('DID') && jsonData.didState && jsonData.didState.did) {",
+                  "    pm.environment.set('DID', jsonData.didState.did);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deactivate DID (Native)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"did\": \"{{DID}}\",\n  \"deactivate\": true\n}"
+            },
+            "url": {
+              "raw": "{{REGISTRAR_URL}}/deactivate",
+              "host": ["{{REGISTRAR_URL}}"],
+              "path": ["deactivate"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "if (!pm.environment.get('DID') && jsonData.didState && jsonData.didState.did) {",
+                  "    pm.environment.set('DID', jsonData.didState.did);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Universal Registrar API",
+      "item": [
+        {
+          "name": "Create DID (Universal)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": \"test-create-001\",\n  \"options\": {\n    \"network\": \"devnet\"\n  },\n  \"secret\": {},\n  \"registration\": {\n    \"didDocument\": {\n      \"@context\": [\"https://www.w3.org/ns/did/v1\"],\n      \"id\": \"{{DID}}\",\n      \"verificationMethod\": [{\n        \"id\": \"{{DID}}#key-1\",\n        \"type\": \"Ed25519VerificationKey2020\",\n        \"controller\": \"{{DID}}\",\n        \"publicKeyMultibase\": \"z6Mk...REPLACE...with-real-key\"\n      }],\n      \"authentication\": [\"{{DID}}#key-1\"]\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{REGISTRAR_URL}}/1.0/create?method=acc",
+              "host": ["{{REGISTRAR_URL}}"],
+              "path": ["1.0", "create"],
+              "query": [
+                {
+                  "key": "method",
+                  "value": "acc"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "if (!pm.environment.get('DID') && jsonData.didState && jsonData.didState.did) {",
+                  "    pm.environment.set('DID', jsonData.didState.did);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update DID (Universal)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": \"test-update-001\",\n  \"options\": {\n    \"network\": \"devnet\"\n  },\n  \"secret\": {},\n  \"registration\": {\n    \"did\": \"{{DID}}\",\n    \"patch\": {\n      \"addService\": {\n        \"id\": \"{{DID}}#messaging\",\n        \"type\": \"MessagingService\",\n        \"serviceEndpoint\": \"https://messaging.example.com\"\n      }\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{REGISTRAR_URL}}/1.0/update?method=acc",
+              "host": ["{{REGISTRAR_URL}}"],
+              "path": ["1.0", "update"],
+              "query": [
+                {
+                  "key": "method",
+                  "value": "acc"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "if (!pm.environment.get('DID') && jsonData.didState && jsonData.didState.did) {",
+                  "    pm.environment.set('DID', jsonData.didState.did);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deactivate DID (Universal)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"jobId\": \"test-deactivate-001\",\n  \"options\": {\n    \"network\": \"devnet\"\n  },\n  \"secret\": {},\n  \"registration\": {\n    \"did\": \"{{DID}}\",\n    \"deactivate\": true\n  }\n}"
+            },
+            "url": {
+              "raw": "{{REGISTRAR_URL}}/1.0/deactivate?method=acc",
+              "host": ["{{REGISTRAR_URL}}"],
+              "path": ["1.0", "deactivate"],
+              "query": [
+                {
+                  "key": "method",
+                  "value": "acc"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', function() {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "const jsonData = pm.response.json();",
+                  "if (!pm.environment.get('DID') && jsonData.didState && jsonData.didState.did) {",
+                  "    pm.environment.set('DID', jsonData.didState.did);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
