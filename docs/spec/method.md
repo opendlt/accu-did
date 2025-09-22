@@ -68,11 +68,25 @@ Accumulate DID operations map to specific Accumulate blockchain transactions:
 
 ### 3.2 Read (Resolve)
 
-**Resolution Process:**
+**Deterministic Resolution Process:**
 1. Map DID to data account URL: `did:acc:<adi>[/<path>]` → `acc://<adi>/<path|did>`
-2. Query latest data entry containing the DID Document (JSON format)
-3. If multiple entries exist, select the most recent by timestamp/sequence number
-4. Return DID Resolution Result with `application/did+json` content type
+2. Query all data entries from the data account
+3. Filter malformed entries (invalid JSON, log warnings)
+4. Apply deterministic selection algorithm:
+   - **Primary:** Highest sequence number (latest blockchain entry)
+   - **Tiebreaker 1:** Latest timestamp if sequences equal
+   - **Tiebreaker 2:** SHA256 content hash (lexicographically highest) for deterministic selection
+5. If tombstone entry (`"deactivated": true`), return 410 Gone with deactivation metadata
+6. Return DID Resolution Result with `application/did+json` content type
+
+**Configurable Ordering:**
+- `--resolve-order sequence` (default): Primary sequence → timestamp → hash
+- `--resolve-order timestamp`: Primary timestamp → sequence → hash
+
+**Stability Guarantees:**
+- Resolution results are deterministic even with network pagination jitter
+- Malformed entries are ignored to prevent manipulation
+- Content-addressable tiebreaking prevents adversarial influence
 
 ### 3.3 Update
 
@@ -83,10 +97,19 @@ Accumulate DID operations map to specific Accumulate blockchain transactions:
 
 ### 3.4 Deactivate
 
-**Process:**
-1. Create tombstone entry: `{"@context": ["https://www.w3.org/ns/did/v1"], "id": "<did>", "deactivated": true}`
-2. Submit `WriteData` transaction with tombstone entry
-3. All subsequent resolutions MUST return `deactivated: true` in metadata
+**Canonical Tombstone Process:**
+1. Create canonical deactivation tombstone:
+   ```json
+   {
+     "@context": ["https://www.w3.org/ns/did/v1"],
+     "id": "<did>",
+     "deactivated": true,
+     "deactivatedAt": "2024-01-15T10:30:00Z"
+   }
+   ```
+2. Submit `WriteData` transaction with canonical tombstone entry
+3. Resolver MUST return 410 Gone status with `didDocumentMetadata.deactivated: true`
+4. Response includes minimal deactivated document and content hash for verification
 
 ### 3.5 Key Rotation / Recovery
 

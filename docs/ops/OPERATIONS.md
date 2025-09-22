@@ -59,6 +59,38 @@ accumulate credits <lite-account-url> <amount>
 - For REAL mode testing, start with a funded devnet lite account
 - Consider credit costs when designing production deployment strategies
 
+### Accumulate Credits Quickstart
+
+**Development/Testing (Devnet):**
+```bash
+# Get devnet faucet credits (if available)
+curl -X POST https://devnet-faucet.accumulate.io/get -d '{"url":"<lite-account-url>"}'
+
+# Check balance
+accumulate account get <lite-account-url>
+
+# Manual credit transfer from funded account
+accumulate tx create <source-lite-account> --to <destination-lite-account> --amount 1000.00
+```
+
+**Mainnet Production:**
+1. **Acquire ACME tokens** via exchange or transfer
+2. **Convert ACME to credits** using oracle rate:
+   ```bash
+   accumulate oracle price  # Check current ACME:credit rate
+   accumulate tx create <acme-account> --to <lite-account> --amount <acme-amount>
+   ```
+3. **Fund ADI Key Page** for transaction authorization:
+   ```bash
+   accumulate credits <adi-key-page-url> <credit-amount>
+   ```
+
+**Registrar Preflight Check:**
+- **Operator must ensure sufficient credits** before running registrar operations
+- **Registrar returns error** if submitted transactions fail due to insufficient credits
+- **Monitor credit balances** and set up alerts for low balance conditions
+- **Budget 20-50 credits** per DID for full lifecycle testing scenarios
+
 ## 2. Container-First Workflow (RECOMMENDED)
 
 ### Prerequisites

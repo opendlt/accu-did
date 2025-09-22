@@ -128,6 +128,36 @@ curl -X GET "http://localhost:8080/health"
 }
 ```
 
+### DID Deactivated (410 Gone)
+
+When a DID has been deactivated, the resolver returns HTTP 410 Gone with deactivation metadata:
+
+**Headers:**
+```
+HTTP/1.1 410 Gone
+Content-Type: application/did+json
+```
+
+**Response Body:**
+```json
+{
+  "didDocument": {
+    "@context": ["https://www.w3.org/ns/did/v1"],
+    "id": "did:acc:beastmode.acme",
+    "deactivated": true,
+    "deactivatedAt": "2024-01-15T10:30:00Z"
+  },
+  "didDocumentMetadata": {
+    "deactivated": true,
+    "versionId": "1705329000-deactivated",
+    "updated": "2024-01-15T10:30:00Z",
+    "contentHash": "8f434346648f6b96df89dda901c5176b10e6d8b9b1ee1e6e6e5e8e3d5c7c2e1a"
+  },
+  "didResolutionMetadata": {
+    "contentType": "application/did+json"
+  }
+}
+
 ## Testing with Fixtures
 
 ### Available Test DIDs
