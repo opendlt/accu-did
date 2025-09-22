@@ -29,6 +29,36 @@ Complete operator's guide for running and managing the Accumulate DID resolver a
   - Local devnet: `http://127.0.0.1:26660`
   - MainNet: `https://mainnet.accumulate.defidevs.io/v2`
 
+### Credit Requirements (REAL Mode)
+
+**⚠️ IMPORTANT:** DID operations on Accumulate require credits for blockchain transactions.
+
+**Credit Costs:**
+- **ADI Creation:** ~10 credits per ADI (one-time for each unique `did:acc:<adi>` namespace)
+- **Data Account Creation:** ~5 credits per data account
+- **DID Document Write:** ~2-5 credits per write operation (create/update/deactivate)
+- **Total for new DID:** ~17-20 credits for complete `did:acc:<adi>/<path>` setup
+
+**Credit Management:**
+- Credits must be pre-funded to the signer's lite account before operations
+- Monitor credit balance: insufficient credits will cause transaction failures
+- Each service operation may require multiple blockchain transactions
+- Budget approximately 20-50 credits per DID for full lifecycle testing
+
+**Funding Commands:**
+```bash
+# Check balance (requires Accumulate CLI)
+accumulate account get <lite-account-url>
+
+# Add credits to lite account
+accumulate credits <lite-account-url> <amount>
+```
+
+**Development Recommendations:**
+- Use FAKE mode for development to avoid credit consumption
+- For REAL mode testing, start with a funded devnet lite account
+- Consider credit costs when designing production deployment strategies
+
 ## 2. Container-First Workflow (RECOMMENDED)
 
 ### Prerequisites
