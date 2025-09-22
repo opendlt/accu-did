@@ -13,13 +13,20 @@ import (
 
 // Handler handles DID resolution requests
 type Handler struct {
-	accClient acc.Client
+	resolver *DeterministicResolver
 }
 
 // NewHandler creates a new resolve handler
 func NewHandler(accClient acc.Client) *Handler {
 	return &Handler{
-		accClient: accClient,
+		resolver: NewDeterministicResolver(accClient, ResolveOrderSequence),
+	}
+}
+
+// NewHandlerWithOrder creates a new resolve handler with custom ordering
+func NewHandlerWithOrder(accClient acc.Client, order ResolveOrder) *Handler {
+	return &Handler{
+		resolver: NewDeterministicResolver(accClient, order),
 	}
 }
 
@@ -58,8 +65,8 @@ func (h *Handler) Resolve(w http.ResponseWriter, r *http.Request) {
 		versionTime = &parsed
 	}
 
-	// Resolve DID
-	result, err := ResolveDID(h.accClient, did, versionTime)
+	// Resolve DID using deterministic resolver
+	result, err := h.resolver.ResolveDID(did, versionTime)
 	if err != nil {
 		switch err.(type) {
 		case *NotFoundError:
@@ -70,6 +77,16 @@ func (h *Handler) Resolve(w http.ResponseWriter, r *http.Request) {
 			h.writeError(w, "deactivated", err.Error(), http.StatusGone, nil)
 		default:
 			h.writeError(w, "internalError", "Internal server error", http.StatusInternalServerError, nil)
+		}
+		return
+	}
+
+	// Check if result indicates deactivation (deterministic resolver returns result instead of error)
+	if result.DIDDocumentMetadata.Deactivated {
+		w.Header().Set("Content-Type", "application/did+ld+json")
+		w.WriteHeader(http.StatusGone)
+		if err := json.NewEncoder(w).Encode(result); err != nil {
+			h.writeError(w, "internalError", "Failed to encode deactivated response", http.StatusInternalServerError, nil)
 		}
 		return
 	}
@@ -113,8 +130,8 @@ func (h *Handler) UniversalResolve(w http.ResponseWriter, r *http.Request) {
 		versionTime = &parsed
 	}
 
-	// Resolve DID
-	result, err := ResolveDID(h.accClient, did, versionTime)
+	// Resolve DID using deterministic resolver
+	result, err := h.resolver.ResolveDID(did, versionTime)
 	if err != nil {
 		switch err.(type) {
 		case *NotFoundError:
@@ -125,6 +142,16 @@ func (h *Handler) UniversalResolve(w http.ResponseWriter, r *http.Request) {
 			h.writeError(w, "deactivated", err.Error(), http.StatusGone, nil)
 		default:
 			h.writeError(w, "internalError", "Internal server error", http.StatusInternalServerError, nil)
+		}
+		return
+	}
+
+	// Check if result indicates deactivation (deterministic resolver returns result instead of error)
+	if result.DIDDocumentMetadata.Deactivated {
+		w.Header().Set("Content-Type", "application/did+ld+json")
+		w.WriteHeader(http.StatusGone)
+		if err := json.NewEncoder(w).Encode(result); err != nil {
+			h.writeError(w, "internalError", "Failed to encode deactivated response", http.StatusInternalServerError, nil)
 		}
 		return
 	}

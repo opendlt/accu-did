@@ -27,6 +27,7 @@ func main() {
 		bind            = flag.String("bind", "127.0.0.1", "bind address (security: 127.0.0.1 for localhost only)")
 		real            = flag.Bool("real", false, "enable real mode (connect to Accumulate network)")
 		corsAllowOrigins = flag.String("cors-allow-origins", "", "comma-separated CORS allowed origins (empty=none, *=all)")
+		resolveOrder    = flag.String("resolve-order", "sequence", "resolution ordering strategy: sequence or timestamp")
 	)
 	flag.Parse()
 
@@ -45,6 +46,17 @@ func main() {
 		mode = "REAL"
 	}
 
+	// Validate and parse resolve order
+	var order resolve.ResolveOrder
+	switch *resolveOrder {
+	case "sequence":
+		order = resolve.ResolveOrderSequence
+	case "timestamp":
+		order = resolve.ResolveOrderTimestamp
+	default:
+		log.Fatalf("Invalid resolve-order: %s (must be 'sequence' or 'timestamp')", *resolveOrder)
+	}
+
 	// Parse CORS origins
 	var corsOrigins []string
 	if *corsAllowOrigins != "" {
@@ -61,6 +73,7 @@ func main() {
 	log.Printf("Starting DID Resolver")
 	log.Printf("  Mode: %s", mode)
 	log.Printf("  Bind: %s", fullAddr)
+	log.Printf("  Resolve Order: %s", *resolveOrder)
 	log.Printf("  CORS Origins: %v", corsOrigins)
 	if *real && nodeURL != "" {
 		log.Printf("  Accumulate Node: %s", nodeURL)
@@ -85,7 +98,7 @@ func main() {
 	r.Get("/healthz", handlers.Healthz)
 
 	// DID resolution
-	resolveHandler := resolve.NewHandler(accClient)
+	resolveHandler := resolve.NewHandlerWithOrder(accClient, order)
 	r.Get("/resolve", resolveHandler.Resolve)
 
 	// Universal Resolver 1.0 compatibility
