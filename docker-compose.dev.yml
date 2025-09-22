@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  # Development container with all build tools
+  dev:
+    build:
+      context: .
+      dockerfile: docker/dev/Dockerfile
+    volumes:
+      # Mount the entire project
+      - .:/workspace
+      # Mount accumulate as read-only if it exists
+      - ../accumulate:/workspace/.accumulate-ro:ro
+      # Preserve Go module cache between runs
+      - go-mod-cache:/go/pkg/mod
+      - go-build-cache:/root/.cache/go-build
+    working_dir: /workspace
+    environment:
+      - ACC_NODE_URL=http://host.docker.internal:26660
+      - GO111MODULE=on
+      - CGO_ENABLED=0
+      - PATH=/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    entrypoint: ["bash", "-lc"]
+    command: ["bash"]
+    stdin_open: true
+    tty: true
+    networks:
+      - accu-did-dev
+
+  # Resolver service in REAL mode
+  resolver:
+    build: ./resolver-go
+    command: ["./resolver", "--addr", ":8080", "--real"]
+    environment:
+      - ACC_NODE_URL=http://host.docker.internal:26660
+    ports:
+      - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8080/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks:
+      - accu-did-dev
+    depends_on:
+      - dev
+
+  # Registrar service in REAL mode
+  registrar:
+    build: ./registrar-go
+    command: ["./registrar", "--addr", ":8081", "--real"]
+    environment:
+      - ACC_NODE_URL=http://host.docker.internal:26660
+    ports:
+      - "8081:8081"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8081/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+    networks:
+      - accu-did-dev
+    depends_on:
+      - dev
+
+networks:
+  accu-did-dev:
+    driver: bridge
+
+volumes:
+  go-mod-cache:
+  go-build-cache:
