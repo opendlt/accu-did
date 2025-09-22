@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -16,15 +17,29 @@ import (
 	"github.com/opendlt/accu-did/registrar-go/handlers"
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
 	"github.com/opendlt/accu-did/registrar-go/internal/policy"
+	"github.com/opendlt/accu-did/registrar-go/internal/security"
 )
 
 func main() {
 	// Parse command line flags
 	var (
-		addr = flag.String("addr", ":8081", "listen address")
-		real = flag.Bool("real", false, "enable real mode (connect to Accumulate network)")
+		addr        = flag.String("addr", ":8081", "listen address")
+		bind        = flag.String("bind", "127.0.0.1", "bind address (security: 127.0.0.1 for localhost only)")
+		real        = flag.Bool("real", false, "enable real mode (connect to Accumulate network)")
+		authAPIKey  = flag.String("auth-api-key", "", "API key for authentication (env: REGISTRAR_API_KEY)")
+		allowlist   = flag.String("allowlist", "", "comma-separated CIDR/IP allowlist (env: REGISTRAR_ALLOWLIST)")
+		rateRPS     = flag.Int("rate-rps", 50, "rate limit requests per second")
+		rateBurst   = flag.Int("rate-burst", 100, "rate limit burst capacity")
 	)
 	flag.Parse()
+
+	// Override from environment variables
+	if envAPIKey := os.Getenv("REGISTRAR_API_KEY"); envAPIKey != "" {
+		*authAPIKey = envAPIKey
+	}
+	if envAllowlist := os.Getenv("REGISTRAR_ALLOWLIST"); envAllowlist != "" {
+		*allowlist = envAllowlist
+	}
 
 	// Get Accumulate node URL from environment if in real mode
 	var nodeURL string
@@ -41,6 +56,43 @@ func main() {
 		mode = "REAL"
 	}
 
+	// Parse allowlist
+	var allowList []string
+	if *allowlist != "" {
+		allowList = strings.Split(*allowlist, ",")
+		for i, item := range allowList {
+			allowList[i] = strings.TrimSpace(item)
+		}
+	}
+
+	// Build full bind address
+	fullAddr := *bind + *addr
+
+	// Security configuration logged above
+	_ = &security.SecurityConfig{
+		APIKey:    *authAPIKey,
+		AllowList: allowList,
+		RateRPS:   *rateRPS,
+		RateBurst: *rateBurst,
+		BindAddr:  fullAddr,
+	}
+
+	// Log startup configuration
+	log.Printf("Starting DID Registrar")
+	log.Printf("  Mode: %s", mode)
+	log.Printf("  Bind: %s", fullAddr)
+	log.Printf("  API Key: %s", func() string {
+		if *authAPIKey != "" {
+			return "configured"
+		}
+		return "disabled"
+	}())
+	log.Printf("  IP Allowlist: %v", allowList)
+	log.Printf("  Rate Limit: %d RPS, %d burst", *rateRPS, *rateBurst)
+	if *real && nodeURL != "" {
+		log.Printf("  Accumulate Node: %s", nodeURL)
+	}
+
 	// Create Accumulate submitter
 	accSubmitter := acc.NewSubmitter(*real, nodeURL)
 
@@ -50,10 +102,15 @@ func main() {
 	// Setup router
 	r := chi.NewRouter()
 
-	// Middleware
+	// Security middleware (applied to all routes)
+	r.Use(security.RequestIDMiddleware())
+	r.Use(security.IPAllowListMiddleware(allowList))
+	r.Use(security.RateLimitMiddleware(*rateRPS, *rateBurst))
+	r.Use(security.APIKeyMiddleware(*authAPIKey))
+
+	// Standard middleware
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(middleware.RequestID)
 	r.Use(middleware.Timeout(30 * time.Second))
 
 	// Health check
@@ -82,7 +139,7 @@ func main() {
 
 	// Create server
 	srv := &http.Server{
-		Addr:         *addr,
+		Addr:         fullAddr,
 		Handler:      r,
 		ReadTimeout:  15 * time.Second,
 		WriteTimeout: 15 * time.Second,
@@ -91,7 +148,7 @@ func main() {
 
 	// Start server in goroutine
 	go func() {
-		log.Printf("Starting DID registrar on %s (mode: %s)", *addr, mode)
+		log.Printf("Server listening on %s", fullAddr)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("Server failed to start: %v", err)
 		}
