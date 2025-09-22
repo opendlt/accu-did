@@ -53,12 +53,20 @@ EOF
 fi
 
 # Run k6 test
+EXIT_CODE=0
+
 if command -v k6 >/dev/null 2>&1; then
     echo "Running k6 locally..."
-    k6 run "$K6_SCRIPT"
+    k6 run "$K6_SCRIPT" || EXIT_CODE=$?
 else
     echo "Running k6 in Docker..."
-    docker run --rm -i --network host grafana/k6 run - < "$K6_SCRIPT"
+    docker run --rm -i --network host grafana/k6 run - < "$K6_SCRIPT" || EXIT_CODE=$?
 fi
 
-echo "[OK] Performance tests completed"
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "[OK] Performance tests completed successfully"
+else
+    echo "[FAIL] Performance tests failed"
+fi
+
+exit $EXIT_CODE
