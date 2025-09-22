@@ -97,7 +97,7 @@ ci:
 # Container-based development targets (RECOMMENDED)
 # ========================================================================
 
-.PHONY: dev-shell test-all ci-local dev-up dev-down check-imports conformance perf help
+.PHONY: dev-shell test-all ci-local dev-up dev-down check-imports conformance perf help lint test-race vet qa
 
 dev-shell:
 	@echo "🐳 Starting development container shell..."
@@ -113,7 +113,7 @@ docs-container:
 
 ci-local:
 	@echo "🚀 Running local CI in container..."
-	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "chmod +x scripts/*.sh 2>/dev/null || true; ./scripts/local-ci.sh"'
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "chmod +x scripts/local-ci.sh 2>/dev/null || true; ./scripts/local-ci.sh"'
 
 dev-up:
 	@echo "🚀 Starting development services..."
@@ -135,6 +135,32 @@ perf:
 	@echo "🚀 Running performance tests in container..."
 	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "chmod +x scripts/perf.sh 2>/dev/null || true; ./scripts/perf.sh"'
 
+docs:
+	@echo "📚 Building documentation in container..."
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "chmod +x scripts/build-docs.sh 2>/dev/null || true; ./scripts/build-docs.sh npx"'
+
+# Static analysis targets
+lint:
+	@echo "🔍 Running golangci-lint..."
+	@golangci-lint run ./...
+
+test-race:
+	@echo "🏁 Running race tests..."
+	@cd resolver-go && go test -race ./...
+	@cd registrar-go && go test -race ./...
+
+vet:
+	@echo "🔬 Running go vet..."
+	@cd resolver-go && go vet ./...
+	@cd registrar-go && go vet ./...
+
+qa:
+	@echo "🔍 Running QA checks..."
+	@chmod +x scripts/check-imports.sh 2>/dev/null || true && ./scripts/check-imports.sh
+	$(MAKE) vet
+	$(MAKE) lint
+	$(MAKE) test-race
+
 help:
 	@echo "📖 Accumulate DID Development Guide"
 	@echo ""
@@ -148,6 +174,12 @@ help:
 	@echo "  check-imports   - Verify no forbidden imports"
 	@echo "  conformance     - Run conformance tests"
 	@echo "  perf           - Run performance tests"
+	@echo ""
+	@echo "🔍 Static analysis (requires local tools):"
+	@echo "  lint           - Run golangci-lint"
+	@echo "  test-race      - Run race condition tests"
+	@echo "  vet            - Run go vet"
+	@echo "  qa             - Run all QA checks (imports, vet, lint, race)"
 	@echo ""
 	@echo "🖥️  Legacy targets (requires local tools):"
 	@echo "  docs           - Build documentation (requires Node.js)"
