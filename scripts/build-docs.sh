@@ -11,7 +11,7 @@ build_one () {
   if command -v docker >/dev/null 2>&1; then
     docker run --rm -v "$ROOT":/work -w /work redocly/redoc build -o "$h" "$y"
   else
-    npx --yes redoc-cli@0.15.1 build "$y" -o "$h"
+    npx --yes @redocly/cli build-docs "$y" --output "$h"
   fi
 }
 

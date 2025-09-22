@@ -1,7 +1,8 @@
 openapi: 3.1.0
+x-api-freeze: true
 info:
   title: Accu-DID Resolver API
-  version: 0.1.0
+  version: 0.9.0
   description: >
     DID resolver for did:acc on Accumulate devnet. Supports FAKE (offline) and REAL (JSON-RPC v3) modes.
 

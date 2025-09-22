@@ -58,6 +58,10 @@
   - Complete curl examples for all endpoints
   - Service configuration and troubleshooting
 
+### API Documentation
+- **[../api/CHANGELOG.md](../api/CHANGELOG.md)** - API-specific changes and version history
+- **[../api/VERSIONING.md](../api/VERSIONING.md)** - Semantic versioning policy and stability guarantees
+
 ## Architecture Diagrams
 
 ### System Architecture

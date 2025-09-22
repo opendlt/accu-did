@@ -7,7 +7,7 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$Root    = Split-Path -Parent $PSScriptRoot | Split-Path -Parent
+$Root    = Split-Path -Parent $PSScriptRoot
 $SpecDir = Join-Path $Root "docs/spec/openapi"
 $SiteDir = Join-Path $Root "docs/site"
 New-Item -ItemType Directory -Force -Path $SiteDir | Out-Null
@@ -23,7 +23,7 @@ function Build-One {
     # Use ${Root} to avoid PowerShell drive parsing on ":" in C:\...
     docker run --rm -v "${Root}:/work" -w /work redocly/redoc redoc build -o "$html" "$yaml"
   } else {
-    npx --yes redoc-cli@0.15.1 build "$yaml" -o "$html"
+    npx --yes @redocly/cli build-docs "$yaml" --output "$html"
   }
 }
 
