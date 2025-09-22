@@ -3,7 +3,10 @@ package resolve
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 	"time"
+
+	"github.com/go-chi/chi/v5"
 
 	"github.com/opendlt/accu-did/resolver-go/internal/acc"
 )
@@ -72,6 +75,61 @@ func (h *Handler) Resolve(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Return successful resolution
+	w.Header().Set("Content-Type", "application/did+ld+json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(result); err != nil {
+		h.writeError(w, "internalError", "Failed to encode response", http.StatusInternalServerError, nil)
+		return
+	}
+}
+
+// UniversalResolve handles Universal Resolver v1.0 style requests
+// GET /1.0/identifiers/{did}
+func (h *Handler) UniversalResolve(w http.ResponseWriter, r *http.Request) {
+	// Extract DID from URL path
+	did := chi.URLParam(r, "did")
+	if did == "" {
+		h.writeError(w, "invalidDid", "DID parameter is required", http.StatusBadRequest, nil)
+		return
+	}
+
+	// URL decode the DID if necessary
+	if strings.Contains(did, "%") {
+		// Already URL encoded, chi should have decoded it
+	}
+
+	// Extract versionTime if provided (Universal Resolver 1.0 compatibility)
+	var versionTime *time.Time
+	if vt := r.URL.Query().Get("versionTime"); vt != "" {
+		parsed, err := time.Parse(time.RFC3339, vt)
+		if err != nil {
+			h.writeError(w, "invalidVersionTime", "Invalid versionTime format", http.StatusBadRequest, map[string]string{
+				"versionTime": vt,
+				"expected":    "ISO 8601",
+			})
+			return
+		}
+		versionTime = &parsed
+	}
+
+	// Resolve DID
+	result, err := ResolveDID(h.accClient, did, versionTime)
+	if err != nil {
+		switch err.(type) {
+		case *NotFoundError:
+			h.writeError(w, "notFound", err.Error(), http.StatusNotFound, nil)
+		case *InvalidDIDError:
+			h.writeError(w, "invalidDid", err.Error(), http.StatusBadRequest, nil)
+		case *DeactivatedError:
+			h.writeError(w, "deactivated", err.Error(), http.StatusGone, nil)
+		default:
+			h.writeError(w, "internalError", "Internal server error", http.StatusInternalServerError, nil)
+		}
+		return
+	}
+
+	// Return successful resolution in Universal Resolver format
 	w.Header().Set("Content-Type", "application/did+ld+json")
 	w.WriteHeader(http.StatusOK)
 

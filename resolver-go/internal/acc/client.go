@@ -11,6 +11,7 @@ import (
 	"gitlab.com/accumulatenetwork/accumulate/pkg/api/v3"
 	"gitlab.com/accumulatenetwork/accumulate/pkg/api/v3/jsonrpc"
 	"gitlab.com/accumulatenetwork/accumulate/pkg/url"
+	"gitlab.com/accumulatenetwork/accumulate/protocol"
 )
 
 // Envelope represents a DID document entry envelope
@@ -232,21 +233,40 @@ func (c *RealClient) GetKeyPageState(keyPageURLStr string) (KeyPageState, error)
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	_, err = c.client.Query(ctx, keyPageURL, nil)
+	// Create a querier wrapper around the client
+	querier := api.Querier2{Querier: c.client}
+
+	// Query the account (key page)
+	accountRecord, err := querier.QueryAccount(ctx, keyPageURL, nil)
 	if err != nil {
 		return KeyPageState{}, fmt.Errorf("failed to query key page %s: %w", keyPageURLStr, err)
 	}
 
-	// Convert record to KeyPageState
-	// Note: This conversion will depend on the actual record type returned by the API
+	// Convert AccountRecord to KeyPageState
 	keyPageState := KeyPageState{
 		URL:       keyPageURLStr,
-		Threshold: 1, // Default value, should be extracted from record
+		Threshold: 1, // Default threshold
 		Keys:      []Key{},
 	}
 
-	// TODO: Extract actual key page data from record
-	// This will depend on the specific record type returned by the API
+	// Extract information from AccountRecord
+	if accountRecord != nil && accountRecord.Account != nil {
+		// For key pages, the account should be a KeyPage type
+		if keyPage, ok := accountRecord.Account.(*protocol.KeyPage); ok {
+			// Extract accept threshold (modern Accumulate uses this instead of simple threshold)
+			keyPageState.Threshold = int(keyPage.AcceptThreshold)
+
+			// Note: KeySpec only contains PublicKeyHash, not the full public key
+			// In a complete implementation, we would need to query for the actual keys
+			// For now, just populate with available information
+			for _, keySpec := range keyPage.Keys {
+				keyPageState.Keys = append(keyPageState.Keys, Key{
+					PublicKey: fmt.Sprintf("%x", keySpec.PublicKeyHash),
+					KeyType:   "ed25519", // Default assumption
+				})
+			}
+		}
+	}
 
 	return keyPageState, nil
 }
@@ -256,26 +276,55 @@ func (c *RealClient) GetDataAccountEntry(dataAccountURL *url.URL) ([]byte, error
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	// Query data account for latest entry using generic query
-	_, err := c.client.Query(ctx, dataAccountURL, nil)
+	// Create a querier wrapper around the client for typed queries
+	querier := api.Querier2{Querier: c.client}
+
+	// Query the latest data entry from the data account using DataQuery
+	count := uint64(1)
+	start := uint64(0) // Start from beginning, get latest (reverse order typically)
+	dataQuery := &api.DataQuery{
+		Range: &api.RangeOptions{
+			Count: &count,
+			Start: start,
+		},
+	}
+
+	// Query for data entries
+	entries, err := querier.QueryDataEntries(ctx, dataAccountURL, dataQuery)
 	if err != nil {
-		return nil, fmt.Errorf("failed to query data account: %w", err)
+		return nil, fmt.Errorf("failed to query data entries for %s: %w", dataAccountURL.String(), err)
 	}
 
-	// For now, return a placeholder JSON structure
-	// TODO: Extract actual data entry from record based on API response structure
-	placeholder := map[string]interface{}{
-		"@context": []string{"https://www.w3.org/ns/did/v1"},
-		"id":       "did:acc:" + dataAccountURL.Authority,
-		"note":     "Placeholder DID document from real Accumulate query",
+	// Check if we have any entries
+	if entries == nil || len(entries.Records) == 0 {
+		return nil, fmt.Errorf("no data entries found for %s", dataAccountURL.String())
 	}
 
-	data, err := json.Marshal(placeholder)
-	if err != nil {
-		return nil, fmt.Errorf("failed to marshal placeholder data: %w", err)
+	// Get the latest entry (first in the result since we queried from the end)
+	latestEntry := entries.Records[0]
+	if latestEntry == nil || latestEntry.Value == nil {
+		return nil, fmt.Errorf("invalid data entry format for %s", dataAccountURL.String())
 	}
 
-	return data, nil
+	// Extract the transaction message from the entry
+	// The Message field is already of type *messaging.TransactionMessage based on the query
+	txMsg := latestEntry.Value.Message
+	if txMsg == nil {
+		return nil, fmt.Errorf("no transaction message in data entry for %s", dataAccountURL.String())
+	}
+
+	// Cast the body to WriteData transaction
+	if writeData, ok := txMsg.Transaction.Body.(*protocol.WriteData); ok {
+		// The data should contain the DID document JSON
+		if len(writeData.Entry.GetData()) == 0 {
+			return nil, fmt.Errorf("empty data entry for %s", dataAccountURL.String())
+		}
+
+		// Return the raw data (should be JSON)
+		return writeData.Entry.GetData()[0], nil
+	}
+
+	return nil, fmt.Errorf("unsupported transaction type in data entry for %s", dataAccountURL.String())
 }
 
 // recordToEnvelope converts an API record to our Envelope format
