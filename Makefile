@@ -14,7 +14,7 @@ INDEX_HTML := $(SITE_DIR)/index.html
 REDOC_DOCKER := docker run --rm -v "$(PWD)":/work -w /work redocly/redoc
 REDOC_NPX := npx --yes redoc-cli@0.15.1
 
-.PHONY: docs clean-docs open-docs
+.PHONY: docs clean-docs open-docs test docker-build all clean-all ci
 
 docs: $(RESOLVER_HTML) $(REGISTRAR_HTML) $(INDEX_HTML)
 	@echo "✅ Docs built under $(SITE_DIR)"
@@ -92,3 +92,70 @@ ci:
 	else \
 		$(MAKE) test && $(MAKE) docs && $(MAKE) docker-build; \
 	fi
+
+# ========================================================================
+# Container-based development targets (RECOMMENDED)
+# ========================================================================
+
+.PHONY: dev-shell test-all ci-local dev-up dev-down check-imports conformance perf help
+
+dev-shell:
+	@echo "🐳 Starting development container shell..."
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "exec bash -i"'
+
+test-all:
+	@echo "🧪 Running all tests in container..."
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "go work sync 2>/dev/null || true; go test ./... -count=1"'
+
+docs-container:
+	@echo "📚 Building documentation in container..."
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "chmod +x scripts/build-docs.sh 2>/dev/null || true; ./scripts/build-docs.sh npx"'
+
+ci-local:
+	@echo "🚀 Running local CI in container..."
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "chmod +x scripts/*.sh 2>/dev/null || true; ./scripts/local-ci.sh"'
+
+dev-up:
+	@echo "🚀 Starting development services..."
+	@docker compose -f docker-compose.dev.yml up -d --build resolver registrar
+
+dev-down:
+	@echo "🛑 Stopping development services..."
+	@docker compose -f docker-compose.dev.yml down
+
+check-imports:
+	@echo "🔍 Checking imports in container..."
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "chmod +x scripts/check-imports.sh 2>/dev/null || true; ./scripts/check-imports.sh"'
+
+conformance:
+	@echo "🔍 Running conformance tests in container..."
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "chmod +x scripts/conformance.sh 2>/dev/null || true; ./scripts/conformance.sh"'
+
+perf:
+	@echo "🚀 Running performance tests in container..."
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "chmod +x scripts/perf.sh 2>/dev/null || true; ./scripts/perf.sh"'
+
+help:
+	@echo "📖 Accumulate DID Development Guide"
+	@echo ""
+	@echo "🐳 Container-first development (RECOMMENDED):"
+	@echo "  dev-shell        - Launch interactive development container"
+	@echo "  test-all         - Run all tests in container"
+	@echo "  docs-container   - Build documentation in container"
+	@echo "  ci-local         - Run complete local CI in container"
+	@echo "  dev-up          - Start resolver and registrar services"
+	@echo "  dev-down        - Stop development services"
+	@echo "  check-imports   - Verify no forbidden imports"
+	@echo "  conformance     - Run conformance tests"
+	@echo "  perf           - Run performance tests"
+	@echo ""
+	@echo "🖥️  Legacy targets (requires local tools):"
+	@echo "  docs           - Build documentation (requires Node.js)"
+	@echo "  test           - Run tests (requires Go)"
+	@echo "  ci             - Run local CI script"
+	@echo "  docker-build   - Build Docker images"
+	@echo "  clean-docs     - Remove generated documentation"
+	@echo "  clean-all      - Clean all build artifacts"
+	@echo ""
+	@echo "💡 Quick start: 'make dev-shell' for interactive development"
+	@echo "💡 CI/CD ready: 'make ci-local' for complete validation"
