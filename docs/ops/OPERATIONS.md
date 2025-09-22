@@ -29,20 +29,77 @@ Complete operator's guide for running and managing the Accumulate DID resolver a
   - Local devnet: `http://127.0.0.1:26660`
   - MainNet: `https://mainnet.accumulate.defidevs.io/v2`
 
-## 2. Quick Start (Local Devnet)
+## 2. Container-First Workflow (RECOMMENDED)
 
 ### Prerequisites
 
-Ensure Accumulate devnet is running:
-```powershell
-# Windows (if not already running)
-accumulated run devnet --reset
+- Docker and Docker Compose
+- Optional: Accumulate devnet running for REAL mode testing
+
+### Quick Start with Containers
+
+**One-liner development shell:**
+```bash
+make dev-shell
 ```
 
+**Complete development workflow:**
 ```bash
-# Unix/Mac (if not already running)
-accumulated run devnet --reset
+# 1. Interactive development environment
+make dev-shell
+
+# 2. Run all tests
+make test-all
+
+# 3. Build documentation
+make docs-container
+
+# 4. Run complete local CI
+make ci-local
+
+# 5. Start services for testing
+make dev-up
+
+# 6. Stop services
+make dev-down
 ```
+
+### Container Environment Details
+
+The development container provides:
+- **Repository mounted at:** `/workspace`
+- **Accumulate repo (read-only):** `/workspace/.accumulate-ro` (if `../accumulate` exists)
+- **Go 1.23** with modules and workspace support
+- **Node.js LTS** with npm for documentation builds
+- **Non-root user:** `dev` (uid 1000) for file permission compatibility
+
+**Environment Variables in Container:**
+- `ACC_NODE_URL=http://host.docker.internal:26660` (for REAL mode)
+- `GO111MODULE=on`
+- `CGO_ENABLED=0`
+
+### Available Make Targets
+
+| Target | Description |
+|--------|-------------|
+| `make help` | Show all available targets |
+| `make dev-shell` | Launch interactive development container |
+| `make test-all` | Run all Go tests in container |
+| `make docs-container` | Build API documentation in container |
+| `make ci-local` | Run complete CI pipeline in container |
+| `make dev-up` | Start resolver and registrar services |
+| `make dev-down` | Stop all development services |
+| `make check-imports` | Verify no forbidden imports |
+| `make conformance` | Run conformance tests |
+| `make perf` | Run performance tests with k6 |
+
+## 3. Legacy Workflow (Local Tools)
+
+### Prerequisites
+
+- Go 1.23+
+- Node.js LTS (for documentation)
+- Optional: Accumulate devnet running
 
 ### Option A: Go Services (Development)
 
@@ -585,4 +642,16 @@ w.Header().Set("Access-Control-Allow-Origin", "*")
 | `VERSION` | Current version |
 | `CHANGELOG.md` | Release notes |
 | `Makefile` | Build automation |
-| `docker-compose.yml` | Container orchestration |
+| `docker-compose.yml` | Container orchestration (production) |
+| `docker-compose.dev.yml` | Development container orchestration |
+| `docker/dev/Dockerfile` | Development container image |
+
+## Windows Development Notes
+
+**Container-First Approach:** Windows users should primarily use the containerized development workflow (`make dev-shell`, etc.) for consistency and easier onboarding.
+
+**PowerShell Scripts:** The `.ps1` scripts in `scripts/` are maintained as legacy fallbacks but are **secondary** to the Linux container approach. New team members should start with containers.
+
+**WSL2 Recommended:** For Windows users, WSL2 with Docker Desktop provides the best container development experience.
+
+**File Permissions:** The development container uses uid 1000 (`dev` user) which maps well to most Linux and WSL2 environments. Windows file permission issues are avoided by working inside the container.
