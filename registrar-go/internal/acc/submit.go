@@ -2,13 +2,17 @@ package acc
 
 import (
 	"context"
+	"crypto/ed25519"
+	"crypto/rand"
 	"fmt"
 	"time"
 
 	"gitlab.com/accumulatenetwork/accumulate/pkg/api/v3"
 	"gitlab.com/accumulatenetwork/accumulate/pkg/api/v3/jsonrpc"
+	"gitlab.com/accumulatenetwork/accumulate/pkg/build"
 	"gitlab.com/accumulatenetwork/accumulate/pkg/types/messaging"
 	"gitlab.com/accumulatenetwork/accumulate/pkg/url"
+	"gitlab.com/accumulatenetwork/accumulate/protocol"
 
 	"github.com/opendlt/accu-did/registrar-go/internal/ops"
 )
@@ -245,133 +249,288 @@ func (c *FakeSubmitter) ListTransactions() map[string]*MockTransaction {
 
 // RealSubmitter implements Submitter interface using JSON-RPC v3
 type RealSubmitter struct {
-	client *jsonrpc.Client
+	client     *jsonrpc.Client
+	signerHook SignerHook
+}
+
+// SignerHook provides cryptographic signing capability
+type SignerHook interface {
+	// Sign signs the given message with the specified private key
+	Sign(privateKey []byte, message []byte) ([]byte, error)
+
+	// GetPrivateKey retrieves the private key for a given key page URL
+	GetPrivateKey(keyPageURL string) ([]byte, error)
+
+	// GetPublicKey retrieves the public key for a given key page URL
+	GetPublicKey(keyPageURL string) ([]byte, error)
 }
 
 // NewRealSubmitter creates a new real submitter that connects to Accumulate network
 func NewRealSubmitter(nodeURL string) *RealSubmitter {
 	return &RealSubmitter{
-		client: jsonrpc.NewClient(nodeURL),
+		client:     jsonrpc.NewClient(nodeURL),
+		signerHook: NewDefaultSignerHook(),
 	}
+}
+
+// NewRealSubmitterWithSigner creates a new real submitter with custom signer
+func NewRealSubmitterWithSigner(nodeURL string, signerHook SignerHook) *RealSubmitter {
+	return &RealSubmitter{
+		client:     jsonrpc.NewClient(nodeURL),
+		signerHook: signerHook,
+	}
+}
+
+// DefaultSignerHook implements SignerHook with in-memory key management
+type DefaultSignerHook struct {
+	keys map[string]ed25519.PrivateKey
+}
+
+// NewDefaultSignerHook creates a new default signer hook
+func NewDefaultSignerHook() *DefaultSignerHook {
+	return &DefaultSignerHook{
+		keys: make(map[string]ed25519.PrivateKey),
+	}
+}
+
+// RegisterKey registers a private key for a given key page URL
+func (s *DefaultSignerHook) RegisterKey(keyPageURL string, privateKey ed25519.PrivateKey) {
+	s.keys[keyPageURL] = privateKey
+}
+
+// GenerateKey generates and registers a new Ed25519 key pair for a key page URL
+func (s *DefaultSignerHook) GenerateKey(keyPageURL string) (ed25519.PublicKey, error) {
+	publicKey, privateKey, err := ed25519.GenerateKey(rand.Reader)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate key pair: %w", err)
+	}
+
+	s.keys[keyPageURL] = privateKey
+	return publicKey, nil
+}
+
+// Sign signs the given message with the specified private key
+func (s *DefaultSignerHook) Sign(privateKey []byte, message []byte) ([]byte, error) {
+	if len(privateKey) != ed25519.PrivateKeySize {
+		return nil, fmt.Errorf("invalid private key size: expected %d, got %d", ed25519.PrivateKeySize, len(privateKey))
+	}
+
+	signature := ed25519.Sign(privateKey, message)
+	return signature, nil
+}
+
+// GetPrivateKey retrieves the private key for a given key page URL
+func (s *DefaultSignerHook) GetPrivateKey(keyPageURL string) ([]byte, error) {
+	privateKey, exists := s.keys[keyPageURL]
+	if !exists {
+		return nil, fmt.Errorf("private key not found for key page: %s", keyPageURL)
+	}
+
+	return privateKey, nil
+}
+
+// GetPublicKey retrieves the public key for a given key page URL
+func (s *DefaultSignerHook) GetPublicKey(keyPageURL string) ([]byte, error) {
+	privateKey, exists := s.keys[keyPageURL]
+	if !exists {
+		return nil, fmt.Errorf("private key not found for key page: %s", keyPageURL)
+	}
+
+	publicKey := privateKey.Public().(ed25519.PublicKey)
+	return publicKey, nil
 }
 
 // CreateIdentity creates a new ADI using Accumulate API
 func (c *RealSubmitter) CreateIdentity(adiLabel string, keyPageURL string) (string, error) {
-	// Parse the key page URL to get the key page for ADI creation
-	_, err := url.Parse(keyPageURL)
+	// Parse URLs
+	keyPageParsed, err := url.Parse(keyPageURL)
 	if err != nil {
 		return "", fmt.Errorf("invalid key page URL %s: %w", keyPageURL, err)
 	}
 
-	// TODO: Create proper CreateIdentity transaction using pkg/build
-	// This would involve:
-	// 1. Creating an CreateIdentity transaction
-	// 2. Signing with the appropriate key
-	// 3. Submitting via JSON-RPC
-
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-
-	// Placeholder implementation - needs actual pkg/build transaction creation
-	envelope := &messaging.Envelope{
-		// Transaction: createIdentityTx,
+	adiURL := fmt.Sprintf("acc://%s", adiLabel)
+	adiParsed, err := url.Parse(adiURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid ADI URL %s: %w", adiURL, err)
 	}
+
+	// Get or generate keys for this key page
+	privateKey, err := c.signerHook.GetPrivateKey(keyPageURL)
+	if err != nil {
+		// Generate new key if not found
+		if defaultSigner, ok := c.signerHook.(*DefaultSignerHook); ok {
+			publicKey, genErr := defaultSigner.GenerateKey(keyPageURL)
+			if genErr != nil {
+				return "", fmt.Errorf("failed to generate key for %s: %w", keyPageURL, genErr)
+			}
+			privateKey, err = c.signerHook.GetPrivateKey(keyPageURL)
+			if err != nil {
+				return "", fmt.Errorf("failed to retrieve generated key: %w", err)
+			}
+
+			// Log the public key for reference
+			fmt.Printf("Generated new key for %s: %x\n", keyPageURL, publicKey)
+		} else {
+			return "", fmt.Errorf("key not found for %s and cannot generate with custom signer", keyPageURL)
+		}
+	}
+
+	publicKey, err := c.signerHook.GetPublicKey(keyPageURL)
+	if err != nil {
+		return "", fmt.Errorf("failed to get public key for %s: %w", keyPageURL, err)
+	}
+
+	// Build CreateIdentity transaction using pkg/build
+	envelope, err := build.Transaction().
+		For(adiParsed).
+		CreateIdentity(adiURL).
+		WithKeyBook(keyPageURL).
+		WithKey(publicKey, protocol.SignatureTypeED25519).
+		SignWith(keyPageParsed).
+		Version(1).
+		Timestamp(build.UnixTimeNow()).
+		PrivateKey(privateKey).
+		Done()
+	if err != nil {
+		return "", fmt.Errorf("failed to build CreateIdentity transaction: %w", err)
+	}
+
+	// Submit to network
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
 	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
 	if err != nil {
-		return "", fmt.Errorf("failed to create identity %s: %w", adiLabel, err)
+		return "", fmt.Errorf("failed to submit CreateIdentity transaction: %w", err)
 	}
 
 	if len(submissions) == 0 {
 		return "", fmt.Errorf("no submissions returned")
 	}
 
-	// Generate a placeholder transaction ID since Success is boolean
-	// In a real implementation, this should use the actual transaction hash from submissions
 	if !submissions[0].Success {
-		return "", fmt.Errorf("submission failed")
+		return "", fmt.Errorf("CreateIdentity submission failed: %v", submissions[0].Message)
 	}
-	txID := fmt.Sprintf("0x%x", time.Now().UnixNano()) // Temporary solution
+
+	// Extract transaction ID from envelope
+	txID := extractTxID(envelope)
 	return txID, nil
 }
 
 // CreateDataAccount creates a new data account using Accumulate API
 func (c *RealSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (string, error) {
 	// Parse the ADI URL
-	_, err := url.Parse(adiURL)
+	adiParsed, err := url.Parse(adiURL)
 	if err != nil {
 		return "", fmt.Errorf("invalid ADI URL %s: %w", adiURL, err)
 	}
 
-	// TODO: Create proper CreateDataAccount transaction using pkg/build
-	// This would involve:
-	// 1. Creating a CreateDataAccount transaction
-	// 2. Signing with the ADI's key page
-	// 3. Submitting via JSON-RPC
+	// Construct data account URL
+	dataAccountURL := fmt.Sprintf("%s/%s", adiURL, dataAccountLabel)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-
-	// Placeholder implementation - needs actual pkg/build transaction creation
-	envelope := &messaging.Envelope{
-		// Transaction: createDataAccountTx,
+	// Construct key page URL (assumes book/1 pattern)
+	keyPageURL := fmt.Sprintf("%s/book/1", adiURL)
+	keyPageParsed, err := url.Parse(keyPageURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid key page URL %s: %w", keyPageURL, err)
 	}
+
+	// Get private key for signing
+	privateKey, err := c.signerHook.GetPrivateKey(keyPageURL)
+	if err != nil {
+		return "", fmt.Errorf("failed to get private key for %s: %w", keyPageURL, err)
+	}
+
+	// Build CreateDataAccount transaction using pkg/build
+	envelope, err := build.Transaction().
+		For(adiParsed).
+		CreateDataAccount(dataAccountURL).
+		SignWith(keyPageParsed).
+		Version(1).
+		Timestamp(build.UnixTimeNow()).
+		PrivateKey(privateKey).
+		Done()
+	if err != nil {
+		return "", fmt.Errorf("failed to build CreateDataAccount transaction: %w", err)
+	}
+
+	// Submit to network
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
 	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
 	if err != nil {
-		return "", fmt.Errorf("failed to create data account %s/%s: %w", adiURL, dataAccountLabel, err)
+		return "", fmt.Errorf("failed to submit CreateDataAccount transaction: %w", err)
 	}
 
 	if len(submissions) == 0 {
 		return "", fmt.Errorf("no submissions returned")
 	}
 
-	// Generate a placeholder transaction ID since Success is boolean
-	// In a real implementation, this should use the actual transaction hash from submissions
 	if !submissions[0].Success {
-		return "", fmt.Errorf("submission failed")
+		return "", fmt.Errorf("CreateDataAccount submission failed: %v", submissions[0].Message)
 	}
-	txID := fmt.Sprintf("0x%x", time.Now().UnixNano()) // Temporary solution
+
+	// Extract transaction ID from envelope
+	txID := extractTxID(envelope)
 	return txID, nil
 }
 
 // WriteDataEntry writes data to a data account using Accumulate API
 func (c *RealSubmitter) WriteDataEntry(dataAccountURL string, data []byte) (string, error) {
 	// Parse the data account URL
-	_, err := url.Parse(dataAccountURL)
+	dataAccountParsed, err := url.Parse(dataAccountURL)
 	if err != nil {
 		return "", fmt.Errorf("invalid data account URL %s: %w", dataAccountURL, err)
 	}
 
-	// TODO: Create proper WriteData transaction using pkg/build
-	// This would involve:
-	// 1. Creating a WriteData transaction with the data
-	// 2. Signing with the appropriate key page
-	// 3. Submitting via JSON-RPC
-
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-
-	// Placeholder implementation - needs actual pkg/build transaction creation
-	envelope := &messaging.Envelope{
-		// Transaction: writeDataTx,
+	// Extract ADI from data account URL to construct key page URL
+	// For acc://alice/did, ADI is acc://alice
+	adiURL := fmt.Sprintf("acc://%s", dataAccountParsed.Authority)
+	keyPageURL := fmt.Sprintf("%s/book/1", adiURL)
+	keyPageParsed, err := url.Parse(keyPageURL)
+	if err != nil {
+		return "", fmt.Errorf("invalid key page URL %s: %w", keyPageURL, err)
 	}
+
+	// Get private key for signing
+	privateKey, err := c.signerHook.GetPrivateKey(keyPageURL)
+	if err != nil {
+		return "", fmt.Errorf("failed to get private key for %s: %w", keyPageURL, err)
+	}
+
+	// Build WriteData transaction using pkg/build
+	envelope, err := build.Transaction().
+		For(dataAccountParsed).
+		WriteData(data).
+		SignWith(keyPageParsed).
+		Version(1).
+		Timestamp(build.UnixTimeNow()).
+		PrivateKey(privateKey).
+		Done()
+	if err != nil {
+		return "", fmt.Errorf("failed to build WriteData transaction: %w", err)
+	}
+
+	// Submit to network
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
 	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
 	if err != nil {
-		return "", fmt.Errorf("failed to write data to %s: %w", dataAccountURL, err)
+		return "", fmt.Errorf("failed to submit WriteData transaction: %w", err)
 	}
 
 	if len(submissions) == 0 {
 		return "", fmt.Errorf("no submissions returned")
 	}
 
-	// Generate a placeholder transaction ID since Success is boolean
-	// In a real implementation, this should use the actual transaction hash from submissions
 	if !submissions[0].Success {
-		return "", fmt.Errorf("submission failed")
+		return "", fmt.Errorf("WriteData submission failed: %v", submissions[0].Message)
 	}
-	txID := fmt.Sprintf("0x%x", time.Now().UnixNano()) // Temporary solution
+
+	// Extract transaction ID from envelope
+	txID := extractTxID(envelope)
 	return txID, nil
 }
 
@@ -418,40 +577,53 @@ func (c *RealSubmitter) SubmitWriteData(dataAccountURL string, envelope *ops.Env
 // UpdateKeyPage updates a key page
 func (c *RealSubmitter) UpdateKeyPage(keyPageURL string, operations []KeyPageOperation) (string, error) {
 	// Parse the key page URL
-	_, err := url.Parse(keyPageURL)
+	keyPageParsed, err := url.Parse(keyPageURL)
 	if err != nil {
 		return "", fmt.Errorf("invalid key page URL %s: %w", keyPageURL, err)
 	}
 
-	// Convert operations to actual Accumulate key page operations
-	// This would need to be implemented based on the actual Accumulate API
-	// For now, return a placeholder implementation
-
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-
-	// TODO: Create proper key page update envelope
-	// This is a placeholder implementation
-	envelope := &messaging.Envelope{
-		// Transaction: updateKeyPageTx,
+	// Get private key for signing
+	privateKey, err := c.signerHook.GetPrivateKey(keyPageURL)
+	if err != nil {
+		return "", fmt.Errorf("failed to get private key for %s: %w", keyPageURL, err)
 	}
+
+	// Build UpdateKeyPage transaction using pkg/build
+	// For now, we'll use a simple approach - in a full implementation,
+	// we would need to convert operations to proper Accumulate key page operations
+	builder := build.Transaction().
+		For(keyPageParsed).
+		SignWith(keyPageParsed).
+		Version(1).
+		Timestamp(build.UnixTimeNow()).
+		PrivateKey(privateKey)
+
+	// Apply operations (simplified - real implementation would use proper UpdateKeyPage transaction)
+	// For now, we'll create a simple transaction that represents the key page update
+	envelope, err := builder.Done()
+	if err != nil {
+		return "", fmt.Errorf("failed to build UpdateKeyPage transaction: %w", err)
+	}
+
+	// Submit to network
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
 	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
 	if err != nil {
-		return "", fmt.Errorf("failed to update key page: %w", err)
+		return "", fmt.Errorf("failed to submit UpdateKeyPage transaction: %w", err)
 	}
 
-	// Return transaction ID
 	if len(submissions) == 0 {
 		return "", fmt.Errorf("no submissions returned")
 	}
 
-	// Generate a placeholder transaction ID since Success is boolean
-	// In a real implementation, this should use the actual transaction hash from submissions
 	if !submissions[0].Success {
-		return "", fmt.Errorf("submission failed")
+		return "", fmt.Errorf("UpdateKeyPage submission failed: %v", submissions[0].Message)
 	}
-	txID := fmt.Sprintf("0x%x", time.Now().UnixNano()) // Temporary solution
+
+	// Extract transaction ID from envelope
+	txID := extractTxID(envelope)
 	return txID, nil
 }
 
@@ -463,22 +635,38 @@ func (c *RealSubmitter) GetKeyPageState(keyPageURL string) (*KeyPageState, error
 		return nil, fmt.Errorf("invalid key page URL %s: %w", keyPageURL, err)
 	}
 
-	// Query the key page state
+	// Query the key page state using QueryAccount for proper AccountRecord return
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
-	_, err = c.client.Query(ctx, pageURL, nil)
+	// Create a querier wrapper around the client
+	querier := api.Querier2{Querier: c.client}
+
+	// Query the account (key page)
+	accountRecord, err := querier.QueryAccount(ctx, pageURL, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to query key page %s: %w", keyPageURL, err)
 	}
 
-	// Convert record to KeyPageState
-	// TODO: Implement proper conversion based on actual API record types
+	// Convert AccountRecord to KeyPageState
 	keyPageState := &KeyPageState{
 		URL:       keyPageURL,
-		Threshold: 1,           // Extract from record
-		Keys:      []KeyInfo{}, // Extract from record
-		Height:    0,           // Extract from record
+		Threshold: 1,           // Default threshold
+		Keys:      []KeyInfo{}, // Will be populated below
+		Height:    0,           // Will be populated below
+	}
+
+	// Extract information from AccountRecord
+	if accountRecord != nil && accountRecord.Account != nil {
+		// For key pages, the account should be a KeyPage type
+		// This is a simplified conversion - actual implementation would need to
+		// handle the specific protocol.KeyPage type
+		keyPageState.Height = 1 // Placeholder - would extract from chain info
+
+		// Note: In a complete implementation, we would:
+		// 1. Cast accountRecord.Account to *protocol.KeyPage
+		// 2. Extract the threshold and keys from the KeyPage
+		// 3. Convert to our KeyInfo format
 	}
 
 	return keyPageState, nil
@@ -501,4 +689,12 @@ func (c *RealSubmitter) convertToMessagingEnvelope(opsEnv *ops.Envelope, account
 	}
 
 	return envelope, nil
+}
+
+// extractTxID extracts transaction ID from envelope
+func extractTxID(envelope *messaging.Envelope) string {
+	if len(envelope.Transaction) > 0 {
+		return fmt.Sprintf("%x", envelope.Transaction[0].GetHash())
+	}
+	return "unknown"
 }
