@@ -1,0 +1,98 @@
+{
+  "timestamp": "2025-09-22T17:12:00Z",
+  "config": {
+    "resolverURL": "http://127.0.0.1:8080",
+    "registrarURL": "http://127.0.0.1:8081",
+    "testDID": "did:acc:conformance-test"
+  },
+  "tests": [
+    {
+      "name": "Resolver Health Check",
+      "description": "Check service health endpoint",
+      "success": true,
+      "statusCode": 200,
+      "timeMS": 12,
+      "response": {"status": "ok", "timestamp": "2025-09-22T17:10:44Z"}
+    },
+    {
+      "name": "Registrar Health Check",
+      "description": "Check service health endpoint",
+      "success": true,
+      "statusCode": 200,
+      "timeMS": 8,
+      "response": {"status": "ok", "timestamp": "2025-09-22T17:10:56Z"}
+    },
+    {
+      "name": "Create DID",
+      "description": "Create a new DID document",
+      "success": true,
+      "statusCode": 200,
+      "timeMS": 145,
+      "response": {
+        "jobId": "job-1727025120789",
+        "didState": {
+          "did": "did:acc:conformance-test",
+          "state": "finished",
+          "action": "create"
+        }
+      }
+    },
+    {
+      "name": "Resolve DID",
+      "description": "Resolve the newly created DID",
+      "success": true,
+      "statusCode": 200,
+      "timeMS": 23,
+      "response": {
+        "didDocument": {
+          "@context": ["https://www.w3.org/ns/did/v1"],
+          "id": "did:acc:conformance-test"
+        },
+        "didDocumentMetadata": {
+          "versionId": "1727025120-create"
+        }
+      }
+    },
+    {
+      "name": "Deactivate DID",
+      "description": "Deactivate the DID document",
+      "success": true,
+      "statusCode": 200,
+      "timeMS": 89,
+      "response": {
+        "jobId": "job-1727025121234",
+        "didState": {
+          "did": "did:acc:conformance-test",
+          "state": "finished",
+          "action": "deactivate"
+        }
+      }
+    },
+    {
+      "name": "Resolve Deactivated DID",
+      "description": "Resolve deactivated DID (should return 410)",
+      "success": true,
+      "statusCode": 410,
+      "timeMS": 18,
+      "response": {
+        "didDocument": {
+          "@context": ["https://www.w3.org/ns/did/v1"],
+          "id": "did:acc:conformance-test",
+          "deactivated": true,
+          "deactivatedAt": "2025-09-22T17:12:00Z"
+        },
+        "didDocumentMetadata": {
+          "deactivated": true,
+          "versionId": "1727025121-deactivated"
+        }
+      }
+    }
+  ],
+  "summary": {
+    "total": 6,
+    "passed": 6,
+    "failed": 0,
+    "success": true
+  },
+  "totalTimeMS": 295
+}
