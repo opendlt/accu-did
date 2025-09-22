@@ -67,8 +67,25 @@ func TestUpdateHandler_Update(t *testing.T) {
 		assert.Equal(t, "finished", response.DIDState.State)
 		assert.Equal(t, "update", response.DIDState.Action)
 		assert.NotEmpty(t, response.DIDRegistrationMetadata.VersionID)
+		assert.Contains(t, response.DIDRegistrationMetadata.VersionID, "-update")
 		assert.NotEmpty(t, response.DIDRegistrationMetadata.ContentHash)
 		assert.NotEmpty(t, response.DIDRegistrationMetadata.TxID)
+
+		// Verify versionId was injected into document
+		mockClient := accClient.(*acc.MockClient)
+		require.NotNil(t, mockClient.LastWriteData)
+
+		var doc map[string]interface{}
+		err = json.Unmarshal(mockClient.LastWriteData, &doc)
+		require.NoError(t, err)
+
+		// Should have versionId injected when missing
+		assert.Contains(t, doc, "versionId")
+		versionID := doc["versionId"].(string)
+		assert.Contains(t, versionID, "-update")
+
+		// Should ensure id field matches DID
+		assert.Equal(t, "did:acc:alice", doc["id"])
 	})
 
 	// Test invalid requests

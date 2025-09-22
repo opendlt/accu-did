@@ -47,8 +47,23 @@ func TestDeactivateHandler_Deactivate(t *testing.T) {
 		assert.Equal(t, "finished", response.DIDState.State)
 		assert.Equal(t, "deactivate", response.DIDState.Action)
 		assert.NotEmpty(t, response.DIDRegistrationMetadata.VersionID)
+		assert.Contains(t, response.DIDRegistrationMetadata.VersionID, "-deactivated")
 		assert.NotEmpty(t, response.DIDRegistrationMetadata.ContentHash)
 		assert.NotEmpty(t, response.DIDRegistrationMetadata.TxID)
+
+		// Verify canonical tombstone structure was created
+		mockClient := accClient.(*acc.MockClient)
+		require.NotNil(t, mockClient.LastWriteData)
+
+		var tombstone map[string]interface{}
+		err = json.Unmarshal(mockClient.LastWriteData, &tombstone)
+		require.NoError(t, err)
+
+		// Check canonical tombstone fields
+		assert.Equal(t, []interface{}{"https://www.w3.org/ns/did/v1"}, tombstone["@context"])
+		assert.Equal(t, "did:acc:alice", tombstone["id"])
+		assert.Equal(t, true, tombstone["deactivated"])
+		assert.Contains(t, tombstone, "deactivatedAt")
 	})
 
 	// Test invalid requests
