@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -8,7 +10,6 @@ import (
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
 	"github.com/opendlt/accu-did/registrar-go/internal/api"
-	"github.com/opendlt/accu-did/registrar-go/internal/ops"
 	"github.com/opendlt/accu-did/registrar-go/internal/policy"
 )
 
@@ -50,27 +51,31 @@ func (h *DeactivateHandler) Deactivate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get required key page for authorization
-	requiredKeyPage, err := h.authPolicy.GetRequiredKeyPage(req.DID)
+	_, err := h.authPolicy.GetRequiredKeyPage(req.DID)
 	if err != nil {
 		h.writeError(w, "invalidDid", err.Error(), http.StatusBadRequest, nil)
 		return
 	}
 
-	// Create deactivation document
+	// Create canonical deactivation tombstone
 	deactivationDoc := map[string]interface{}{
-		"@context":    []interface{}{"https://www.w3.org/ns/did/v1"},
-		"id":          req.DID,
-		"deactivated": true,
+		"@context":      []string{"https://www.w3.org/ns/did/v1"},
+		"id":            req.DID,
+		"deactivated":   true,
+		"deactivatedAt": time.Now().UTC().Format(time.RFC3339),
 	}
 
-	// For deactivation, we should get the previous version ID
-	// In a real implementation, this would query the current DID document
-	previousVersionID := h.getPreviousVersionID(req.DID)
+	// Add optional reason if provided in the request
+	if req.Options != nil {
+		if reason, ok := req.Options["reason"].(string); ok && reason != "" {
+			deactivationDoc["reason"] = reason
+		}
+	}
 
-	// Build envelope
-	envelope, err := ops.BuildEnvelope(deactivationDoc, requiredKeyPage, previousVersionID)
+	// Convert to JSON for writing
+	deactivationData, err := json.Marshal(deactivationDoc)
 	if err != nil {
-		h.writeError(w, "internalError", "Failed to build envelope", http.StatusInternalServerError, nil)
+		h.writeError(w, "internalError", "Failed to marshal deactivation document", http.StatusInternalServerError, nil)
 		return
 	}
 
@@ -81,12 +86,15 @@ func (h *DeactivateHandler) Deactivate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Submit to Accumulate
-	txID, err := h.accClient.SubmitWriteData(dataAccountURL, envelope)
+	// Submit deactivation tombstone to Accumulate
+	txID, err := h.accClient.WriteDataEntry(dataAccountURL, deactivationData)
 	if err != nil {
-		h.writeError(w, "internalError", "Failed to submit transaction", http.StatusInternalServerError, nil)
+		h.writeError(w, "internalError", "Failed to submit deactivation transaction", http.StatusInternalServerError, nil)
 		return
 	}
+
+	// Generate version ID for this deactivation
+	versionID := fmt.Sprintf("%d-deactivated", time.Now().Unix())
 
 	// Build response
 	response := DeactivateResponse{
@@ -97,13 +105,13 @@ func (h *DeactivateHandler) Deactivate(w http.ResponseWriter, r *http.Request) {
 			Action: "deactivate",
 		},
 		DIDRegistrationMetadata: DIDRegistrationMetadata{
-			VersionID:   envelope.Meta.VersionID,
-			ContentHash: envelope.GetContentHash(),
+			VersionID:   versionID,
+			ContentHash: h.calculateContentHash(deactivationData),
 			TxID:        txID,
 		},
 		DIDDocumentMetadata: DIDDocumentMetadata{
-			Created:   envelope.Meta.Timestamp, // In real implementation, this would be the original creation time
-			VersionID: envelope.Meta.VersionID,
+			Created:   time.Now().UTC(), // Use current time for deactivation
+			VersionID: versionID,
 		},
 	}
 
@@ -140,6 +148,12 @@ func (h *DeactivateHandler) getPreviousVersionID(did string) string {
 // generateJobID generates a job ID for tracking the operation
 func (h *DeactivateHandler) generateJobID() string {
 	return fmt.Sprintf("job-%d", time.Now().UnixNano())
+}
+
+// calculateContentHash calculates the SHA256 hash of content
+func (h *DeactivateHandler) calculateContentHash(data []byte) string {
+	hash := sha256.Sum256(data)
+	return hex.EncodeToString(hash[:])
 }
 
 // writeError writes an error response

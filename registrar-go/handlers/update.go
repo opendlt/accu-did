@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -8,7 +10,6 @@ import (
 
 	"github.com/opendlt/accu-did/registrar-go/internal/acc"
 	"github.com/opendlt/accu-did/registrar-go/internal/api"
-	"github.com/opendlt/accu-did/registrar-go/internal/ops"
 	"github.com/opendlt/accu-did/registrar-go/internal/policy"
 )
 
@@ -58,22 +59,25 @@ func (h *UpdateHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Get required key page for authorization
-	requiredKeyPage, err := h.authPolicy.GetRequiredKeyPage(req.DID)
+	_, err := h.authPolicy.GetRequiredKeyPage(req.DID)
 	if err != nil {
 		h.writeError(w, "invalidDid", err.Error(), http.StatusBadRequest, nil)
 		return
 	}
 
-	// For updates, we should get the previous version ID
-	// In a real implementation, this would query the current DID document
-	previousVersionID := h.getPreviousVersionID(req.DID)
-
-	// Build envelope
-	envelope, err := ops.BuildEnvelope(req.DIDDocument, requiredKeyPage, previousVersionID)
-	if err != nil {
-		h.writeError(w, "internalError", "Failed to build envelope", http.StatusInternalServerError, nil)
-		return
+	// Optional version bump: add versionId if missing
+	didDoc := req.DIDDocument
+	if didDoc == nil {
+		didDoc = make(map[string]interface{})
 	}
+
+	// Add versionId if not present
+	if _, hasVersion := didDoc["versionId"]; !hasVersion {
+		didDoc["versionId"] = fmt.Sprintf("%d-update", time.Now().Unix())
+	}
+
+	// Ensure id field matches the DID
+	didDoc["id"] = req.DID
 
 	// Get data account URL using safe helper
 	dataAccountURL, err := policy.DIDToDataAccountURL(req.DID)
@@ -82,12 +86,22 @@ func (h *UpdateHandler) Update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Submit to Accumulate
-	txID, err := h.accClient.SubmitWriteData(dataAccountURL, envelope)
+	// Convert DID document to JSON for writing
+	didDocData, err := json.Marshal(didDoc)
 	if err != nil {
-		h.writeError(w, "internalError", "Failed to submit transaction", http.StatusInternalServerError, nil)
+		h.writeError(w, "internalError", "Failed to marshal DID document", http.StatusInternalServerError, nil)
 		return
 	}
+
+	// Submit to Accumulate
+	txID, err := h.accClient.WriteDataEntry(dataAccountURL, didDocData)
+	if err != nil {
+		h.writeError(w, "internalError", "Failed to submit update transaction", http.StatusInternalServerError, nil)
+		return
+	}
+
+	// Generate version ID for this update
+	versionID := fmt.Sprintf("%d-update", time.Now().Unix())
 
 	// Build response
 	response := UpdateResponse{
@@ -98,13 +112,13 @@ func (h *UpdateHandler) Update(w http.ResponseWriter, r *http.Request) {
 			Action: "update",
 		},
 		DIDRegistrationMetadata: DIDRegistrationMetadata{
-			VersionID:   envelope.Meta.VersionID,
-			ContentHash: envelope.GetContentHash(),
+			VersionID:   versionID,
+			ContentHash: h.calculateContentHash(didDocData),
 			TxID:        txID,
 		},
 		DIDDocumentMetadata: DIDDocumentMetadata{
-			Created:   envelope.Meta.Timestamp, // In real implementation, this would be the original creation time
-			VersionID: envelope.Meta.VersionID,
+			Created:   time.Now().UTC(), // In real implementation, this would be the original creation time
+			VersionID: versionID,
 		},
 	}
 
@@ -159,6 +173,12 @@ func (h *UpdateHandler) getPreviousVersionID(did string) string {
 // generateJobID generates a job ID for tracking the operation
 func (h *UpdateHandler) generateJobID() string {
 	return fmt.Sprintf("job-%d", time.Now().UnixNano())
+}
+
+// calculateContentHash calculates the SHA256 hash of content
+func (h *UpdateHandler) calculateContentHash(data []byte) string {
+	hash := sha256.Sum256(data)
+	return hex.EncodeToString(hash[:])
 }
 
 // writeError writes an error response
