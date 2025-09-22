@@ -64,7 +64,33 @@ Before running create requests:
 4. **Update DID** - Add a service to the DID document
 5. **Resolve DID** - Verify update worked (service present)
 6. **Deactivate DID** - Tombstone the DID
-7. **Resolve DID** - Verify deactivation (status 410 or deactivated:true)
+7. **Resolve Deactivated DID** - Verify deactivation (status 410 Gone with deactivation metadata)
+
+### Example 410 Deactivated Response
+
+When a DID has been deactivated, the resolver returns:
+
+**Status:** `410 Gone`
+**Headers:** `Content-Type: application/did+json`
+
+```json
+{
+  "didDocument": {
+    "@context": ["https://www.w3.org/ns/did/v1"],
+    "id": "did:acc:beastmode.acme",
+    "deactivated": true,
+    "deactivatedAt": "2024-01-15T10:30:00Z"
+  },
+  "didDocumentMetadata": {
+    "deactivated": true,
+    "versionId": "1705329000-deactivated",
+    "contentHash": "8f434346648f6b96df89dda901c5176b10e6d8b9b1ee1e6e6e5e8e3d5c7c2e1a"
+  },
+  "didResolutionMetadata": {
+    "contentType": "application/did+json"
+  }
+}
+```
 
 ## Environment Variables
 
@@ -74,6 +100,17 @@ Before running create requests:
 | `REGISTRAR_URL` | `http://127.0.0.1:8081` | Registrar service endpoint |
 | `DID` | `did:acc:beastmode.acme` | Test DID identifier |
 | `ACC_NODE_URL` | `http://127.0.0.1:26660` | Accumulate node endpoint |
+| `API_KEY` | (optional) | Bearer token for authenticated requests |
+
+## Authentication
+
+For authenticated requests, set the `API_KEY` environment variable and use the `X-API-Key` header:
+
+```
+X-API-Key: Bearer {{API_KEY}}
+```
+
+Some registrar endpoints may require authentication depending on configuration.
 
 ## Notes
 
@@ -82,3 +119,4 @@ Before running create requests:
 - Replace the placeholder public key before running create operations
 - Ensure Accumulate devnet is running for REAL mode testing
 - Use FAKE mode for offline testing without blockchain dependency
+- Check for 410 Gone responses when testing deactivated DIDs
