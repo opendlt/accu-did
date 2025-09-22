@@ -10,6 +10,8 @@ require (
 	gitlab.com/accumulatenetwork/accumulate v1.5.0
 )
 
+require golang.org/x/time v0.0.0-20210220033141-f8bda1e9f3ba // indirect
+
 require (
 	github.com/AccumulateNetwork/jsonrpc2/v15 v15.0.0-20220517212445-953ad957e040 // indirect
 	github.com/btcsuite/btcd v0.22.1 // indirect
