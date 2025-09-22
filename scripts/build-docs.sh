@@ -1,24 +1,29 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+MODE="${1:-npx}"
+
 ROOT="$(cd "$(dirname "$0")/.."; pwd)"
 SPEC_DIR="$ROOT/docs/spec/openapi"
 SITE_DIR="$ROOT/docs/site"
 mkdir -p "$SITE_DIR"
 
-build_one () {
-  local y="$1"; local h="$2"
-  if command -v docker >/dev/null 2>&1; then
-    docker run --rm -v "$ROOT":/work -w /work redocly/redoc build -o "$h" "$y"
-  else
-    npx --yes @redocly/cli build-docs "$y" --output "$h"
-  fi
-}
+if [ "$MODE" = "npx" ]; then
+  echo "Building docs with npx..."
+  npx --yes @redocly/cli build-docs "$SPEC_DIR/resolver.yaml" --output "$SITE_DIR/resolver.html"
+  npx --yes @redocly/cli build-docs "$SPEC_DIR/registrar.yaml" --output "$SITE_DIR/registrar.html"
+elif [ "$MODE" = "docker" ]; then
+  echo "Building docs with Docker..."
+  docker run --rm -v "$ROOT":/work -w /work redocly/redoc build -o "$SITE_DIR/resolver.html" "$SPEC_DIR/resolver.yaml"
+  docker run --rm -v "$ROOT":/work -w /work redocly/redoc build -o "$SITE_DIR/registrar.html" "$SPEC_DIR/registrar.yaml"
+else
+  echo "Error: Only 'npx' and 'docker' modes are supported"
+  exit 1
+fi
 
-build_one "$SPEC_DIR/resolver.yaml"  "$SITE_DIR/resolver.html"
-build_one "$SPEC_DIR/registrar.yaml" "$SITE_DIR/registrar.html"
-
+# Copy supporting files
 cp -f "$ROOT/docs/spec/diagrams/"*.mmd "$SITE_DIR" 2>/dev/null || true
 cp -f "$ROOT/docs/spec/method.md" "$SITE_DIR" 2>/dev/null || true
-cp -f "$ROOT/docs/site/index.template.html" "$ROOT/docs/site/index.html"
-echo "✅ Docs built at $SITE_DIR"
+cp -f "$ROOT/docs/site/index.template.html" "$ROOT/docs/site/index.html" 2>/dev/null || true
+
+echo "[OK] Docs built at $SITE_DIR"

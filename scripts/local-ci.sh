@@ -13,9 +13,22 @@ echo -e "${CYAN}🚀 Starting local CI build...${NC}"
 ROOT_DIR="$(cd "$(dirname "$0")/.."; pwd)"
 FAILED=0
 
+# Ensure go is in PATH (container compatibility)
+if ! command -v go >/dev/null 2>&1; then
+    if [ -f "/usr/local/go/bin/go" ]; then
+        export PATH="/usr/local/go/bin:$PATH"
+    fi
+fi
+
+# Sync go.work if it exists
+if [ -f "$ROOT_DIR/go.work" ]; then
+    echo -e "\n${YELLOW}🔄 Syncing go.work...${NC}"
+    go work sync || true
+fi
+
 # Test resolver-go
 echo -e "\n${YELLOW}📋 Testing resolver-go...${NC}"
-(cd "$ROOT_DIR/resolver-go" && go test ./... -v) || {
+(cd "$ROOT_DIR/resolver-go" && go mod tidy && go test ./... -count=1) || {
     echo -e "${RED}❌ Resolver tests failed${NC}"
     FAILED=1
 }
@@ -23,7 +36,7 @@ echo -e "\n${YELLOW}📋 Testing resolver-go...${NC}"
 
 # Test registrar-go
 echo -e "\n${YELLOW}📋 Testing registrar-go...${NC}"
-(cd "$ROOT_DIR/registrar-go" && go test ./... -v) || {
+(cd "$ROOT_DIR/registrar-go" && go mod tidy && go test ./... -count=1) || {
     echo -e "${RED}❌ Registrar tests failed${NC}"
     FAILED=1
 }
@@ -31,7 +44,7 @@ echo -e "\n${YELLOW}📋 Testing registrar-go...${NC}"
 
 # Build documentation
 echo -e "\n${YELLOW}📚 Building documentation...${NC}"
-if bash "$ROOT_DIR/scripts/build-docs.sh"; then
+if bash "$ROOT_DIR/scripts/build-docs.sh" npx; then
     echo -e "${GREEN}✅ Documentation built${NC}"
 else
     echo -e "${RED}❌ Documentation build failed${NC}"
@@ -64,7 +77,7 @@ fi
 # Summary
 echo -e "\n${CYAN}$(printf '=%.0s' {1..60})${NC}"
 if [ $FAILED -eq 0 ]; then
-    echo -e "${GREEN}✅ LOCAL CI PASSED${NC}"
+    echo -e "${GREEN}[OK] LOCAL CI PASSED${NC}"
     exit 0
 else
     echo -e "${RED}❌ LOCAL CI FAILED${NC}"
