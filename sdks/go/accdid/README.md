@@ -314,6 +314,161 @@ With coverage:
 go test -cover ./...
 ```
 
+## Integration Tests (Devnet)
+
+The SDK includes comprehensive integration tests that run against a live Accumulate devnet, providing end-to-end validation of the complete DID lifecycle.
+
+### Prerequisites
+
+1. **Start Local Devnet:**
+   ```bash
+   # From repository root
+   make devnet-up
+   ```
+
+2. **Start DID Services in REAL Mode:**
+   ```bash
+   # From repository root
+   make services-up
+   ```
+
+3. **Verify Services are Running:**
+   ```bash
+   # Check devnet status
+   make devnet-status
+
+   # Check service health
+   curl http://localhost:8080/healthz  # Resolver
+   curl http://localhost:8081/healthz  # Registrar
+   ```
+
+### Running Integration Tests
+
+**Via Make (Unix/Linux):**
+```bash
+make test-int          # Basic integration tests
+make test-int-verbose  # Verbose output
+```
+
+**Via PowerShell (Windows):**
+```bash
+scripts\integration.ps1           # Basic tests
+scripts\integration.ps1 -Verbose  # Verbose output
+```
+
+**Manual Execution:**
+```bash
+cd sdks/go/accdid
+export ACC_NODE_URL=http://127.0.0.1:26656
+export RESOLVER_URL=http://127.0.0.1:8080
+export REGISTRAR_URL=http://127.0.0.1:8081
+go test -v -tags=integration ./integration
+```
+
+### What the Tests Do
+
+The integration tests execute the complete DID lifecycle:
+
+1. **Health Checks** - Verify resolver and registrar services are responding
+2. **404 Verification** - Confirm non-existent DID returns proper error
+3. **Register DID** - Create a new DID with complete document
+4. **Resolve (200)** - Verify successful resolution with valid document
+5. **Update (Patch)** - Add service endpoint via JSON patch
+6. **Resolve Again** - Verify update was applied
+7. **Deactivate** - Mark DID as deactivated with tombstone
+8. **Resolve (410 Gone)** - Verify deactivation returns proper error
+9. **Idempotency Test** - Test duplicate operations with same key
+
+### Environment Variables
+
+The integration tests respect these environment variables:
+
+| Variable | Default | Purpose |
+|----------|---------|---------|
+| `ACC_NODE_URL` | *(required)* | Accumulate devnet RPC endpoint |
+| `RESOLVER_URL` | `http://127.0.0.1:8080` | DID resolver service |
+| `REGISTRAR_URL` | `http://127.0.0.1:8081` | DID registrar service |
+| `ACC_FAUCET_URL` | *(optional)* | Devnet faucet endpoint for funding |
+| `LITE_ACCOUNT_URL` | *(optional)* | Lite account for faucet funding |
+| `ACCU_API_KEY` | *(optional)* | API key for authentication |
+| `IDEMPOTENCY_KEY` | *(optional)* | Fixed key for idempotency tests |
+
+### Optional Faucet Funding
+
+If both `ACC_FAUCET_URL` and `LITE_ACCOUNT_URL` are set, the tests will attempt to fund the lite account before running:
+
+```bash
+export ACC_FAUCET_URL="http://127.0.0.1:26659/get"
+export LITE_ACCOUNT_URL="acc://your-lite-account-hex"
+scripts\integration.ps1
+```
+
+### Troubleshooting
+
+**Services Not Healthy:**
+- Verify devnet is running: `make devnet-status`
+- Check service logs for errors
+- Ensure ports 8080, 8081, 26656 are not blocked
+
+**Insufficient Credits:**
+- Use faucet funding (devnet/testnet)
+- Verify lite account has sufficient credits
+- Check ADI creation requirements (~10 credits)
+
+**Wrong Ports/URLs:**
+- Verify `ACC_NODE_URL` matches devnet output
+- Check resolver/registrar are in REAL mode
+- Confirm port forwarding if using containers
+
+**Tests Skip or Fail:**
+- Tests skip if `ACC_NODE_URL` not set (indicates FAKE mode)
+- Services must be healthy before tests run
+- Each test creates unique DIDs to avoid conflicts
+
+### Sample Output
+
+```
+[INFO] Integration test configuration:
+[INFO]   Resolver URL: http://127.0.0.1:8080
+[INFO]   Registrar URL: http://127.0.0.1:8081
+[INFO]   Accumulate Node: http://127.0.0.1:26656
+
+[INFO] Waiting for services to be healthy...
+[INFO] Both services are healthy
+
+[INFO] Testing DID: did:acc:it1640995200000000000
+
+[INFO] Step 1: Verify DID does not exist (expect 404)
+[INFO] ✓ DID does not exist yet
+
+[INFO] Step 2: Register new DID
+[INFO] ✓ DID registered successfully (txID: a1b2c3...)
+
+[INFO] Step 3: Resolve DID (expect 200)
+[INFO] ✓ DID resolved successfully (id: did:acc:it1640995200000000000)
+
+[INFO] Step 4: Update DID (add service)
+[INFO] ✓ DID updated successfully (txID: d4e5f6...)
+
+[INFO] Step 5: Resolve DID again (verify update)
+[INFO] ✓ Service found in updated DID document: 1 services
+
+[INFO] Step 6: Deactivate DID
+[INFO] ✓ DID deactivated successfully (txID: g7h8i9...)
+
+[INFO] Step 7: Resolve deactivated DID (expect 410 Gone)
+[INFO] ✓ Deactivated DID returns expected error
+
+[INFO] === Integration Test Summary ===
+[INFO] DID: did:acc:it1640995200000000000
+[INFO] Register txID: a1b2c3d4e5f6789...
+[INFO] Update txID: d4e5f6g7h8i9012...
+[INFO] Deactivate txID: g7h8i9j0k1l2345...
+[INFO] ✓ All integration test steps completed successfully
+
+PASS
+```
+
 ## Examples
 
 See the [examples](examples/) directory for complete working examples:
