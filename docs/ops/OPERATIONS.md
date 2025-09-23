@@ -698,6 +698,140 @@ git push origin main
 git push origin v0.2.0
 ```
 
+## 8. Backlog Triage via TODO Scanner
+
+The repository includes a comprehensive TODO scanner for tracking technical debt and work items across the codebase.
+
+### Quick Scan
+
+**Recommended command:**
+```bash
+make todo-scan
+```
+
+**Alternative execution methods:**
+```bash
+# Docker (cross-platform)
+docker compose -f docker-compose.dev.yml run --rm dev 'go run tools/todoscan/main.go .'
+
+# Linux/Unix shell script
+./scripts/todo-scan.sh
+
+# Windows PowerShell script
+.\scripts\todo-scan.ps1
+
+# Direct Go execution (requires local Go installation)
+go run tools/todoscan/main.go .
+```
+
+### TODO Markers Detected
+
+The scanner searches for these patterns (case-insensitive):
+
+| Tag | Purpose | Priority |
+|-----|---------|----------|
+| `TODO` | General work items | Medium |
+| `FIXME` | Known bugs/issues | High |
+| `XXX` | Code requiring attention | High |
+| `HACK` | Temporary workarounds | Medium |
+| `STUB` | Placeholder implementations | Medium |
+| `TBA/TBD` | Items to be added/determined | Low |
+| `NOTIMPL` | Missing implementations | High |
+| `PANIC("TODO")` | Critical unimplemented paths | Critical |
+
+### Report Outputs
+
+Reports are generated in `./reports/`:
+
+- **`todo-report.json`** - Machine-readable data with full context
+- **`todo-report.md`** - Human-readable report with code excerpts
+- **`todo-report.csv`** - Spreadsheet-compatible format for analysis
+
+### Operational Workflows
+
+**Weekly Maintenance:**
+```bash
+# 1. Run scan during sprint planning
+make todo-scan
+
+# 2. Review critical items
+grep -E "(FIXME|XXX|PANIC)" reports/todo-report.md
+
+# 3. Check implementation gaps
+grep -E "(NOTIMPL|STUB)" reports/todo-report.md
+
+# 4. Monitor technical debt
+grep -E "(HACK)" reports/todo-report.md
+```
+
+**Component-Specific Analysis:**
+```bash
+# Resolver issues
+jq '.items[] | select(.path | startswith("resolver-go/"))' reports/todo-report.json
+
+# Registrar issues
+jq '.items[] | select(.path | startswith("registrar-go/"))' reports/todo-report.json
+
+# Documentation tasks
+jq '.items[] | select(.path | startswith("docs/"))' reports/todo-report.json
+
+# Universal driver issues
+jq '.items[] | select(.path | startswith("drivers/"))' reports/todo-report.json
+```
+
+**Trend Analysis:**
+```bash
+# Compare counts over time
+echo "$(date): $(jq '.totalCount' reports/todo-report.json)" >> reports/todo-trend.log
+
+# Tag distribution
+jq '.summary.countsByTag' reports/todo-report.json
+
+# Directory breakdown
+jq '.summary.countsByDir' reports/todo-report.json
+```
+
+### Integration with Issue Tracking
+
+**Escalation Criteria:**
+- **FIXME/XXX items**: Convert to GitHub issues if affecting operations
+- **NOTIMPL items**: Add to `spec/BACKLOG.md` if blocking features
+- **PANIC items**: Address immediately - these indicate critical gaps
+- **HACK items**: Schedule proper implementation in upcoming sprints
+
+**Automation Integration:**
+```yaml
+# Example CI check
+- name: TODO Scanner
+  run: make todo-scan
+
+- name: Alert on Critical TODOs
+  run: |
+    if jq -e '.items[] | select(.tag == "PANIC" or .tag == "FIXME")' reports/todo-report.json > /dev/null; then
+      echo "::warning::Critical TODOs found - review required"
+      jq '.items[] | select(.tag == "PANIC" or .tag == "FIXME")' reports/todo-report.json
+    fi
+```
+
+### Best Practices
+
+**TODO Creation Guidelines:**
+- Include brief context: `// TODO: add rate limiting for /resolve endpoint`
+- Reference issues when applicable: `// TODO(#123): implement batch resolution`
+- Use appropriate tags: `FIXME` for bugs, `TODO` for features
+- Avoid generic comments: prefer `TODO: validate DID format` over `TODO: fix this`
+
+**Cleanup Workflow:**
+1. **Monthly review**: Run scanner and categorize items by urgency
+2. **Sprint planning**: Convert high-priority TODOs to formal tasks
+3. **Refactoring sprints**: Dedicate time to address HACK items
+4. **Release preparation**: Ensure no PANIC items in production code
+
+**Reporting:**
+- Include TODO count trends in sprint retrospectives
+- Track resolution rate of TODO items over time
+- Use TODO density (items per KLOC) as code quality metric
+
 ### Distribution Artifacts
 
 After `make release-local` completes, these artifacts are available:

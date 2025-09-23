@@ -97,7 +97,7 @@ ci:
 # Container-based development targets (RECOMMENDED)
 # ========================================================================
 
-.PHONY: dev-shell test-all ci-local dev-up dev-down check-imports conformance perf help lint test-race vet qa dist-clean binaries-local images-local sbom-local scan-local docs-archive release-local sdk-test sdk-merge-spec example-sdk
+.PHONY: dev-shell test-all ci-local dev-up dev-down check-imports conformance perf help lint test-race vet qa dist-clean binaries-local images-local sbom-local scan-local docs-archive release-local sdk-test sdk-merge-spec example-sdk todo-scan
 
 dev-shell:
 	@echo "🐳 Starting development container shell..."
@@ -224,6 +224,32 @@ example-sdk:
 	@echo "🚀 Running SDK example..."
 	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "cd sdks/go/accdid/examples/basic && go mod init example 2>/dev/null || true && go mod edit -replace github.com/opendlt/accu-did/sdks/go/accdid=../.. && go mod tidy && go run main.go"'
 
+# ========================================================================
+# TODO Scanner
+# ========================================================================
+
+todo-scan:
+	@echo "🔍 Scanning repository for TODO markers..."
+	@mkdir -p reports
+	@if command -v docker >/dev/null 2>&1 && test -f docker-compose.dev.yml; then \
+		docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "go run tools/todoscan/main.go . && echo \"\" && echo \"📊 Quick Summary:\" && test -f reports/todo-report.json && jq -r \".totalCount,(.summary.countsByTag | to_entries[] | \\\"  - \\(.key): \\(.value)\\\")\" reports/todo-report.json || echo \"Reports generated in ./reports/\""'; \
+	elif command -v go >/dev/null 2>&1 && test -f tools/todoscan/main.go; then \
+		go run tools/todoscan/main.go .; \
+		echo ""; \
+		echo "📊 Quick Summary:"; \
+		if command -v jq >/dev/null 2>&1 && test -f reports/todo-report.json; then \
+			jq -r '.totalCount,(.summary.countsByTag | to_entries[] | "  - \(.key): \(.value)")' reports/todo-report.json; \
+		else \
+			echo "Reports generated in ./reports/"; \
+		fi; \
+	else \
+		echo "❌ Neither Docker+docker-compose.dev.yml nor Go+todoscan found"; \
+		echo "Please ensure either:"; \
+		echo "  1. Docker is available with docker-compose.dev.yml, OR"; \
+		echo "  2. Go is installed locally with tools/todoscan/main.go"; \
+		exit 1; \
+	fi
+
 help:
 	@echo "📖 Accumulate DID Development Guide"
 	@echo ""
@@ -251,6 +277,9 @@ help:
 	@echo "  sdk-test        - Run Go SDK tests in container"
 	@echo "  sdk-merge-spec  - Merge OpenAPI specs for SDK generation"
 	@echo "  example-sdk     - Run SDK example in container"
+	@echo ""
+	@echo "🔍 Code analysis:"
+	@echo "  todo-scan       - Scan repository for TODO/FIXME/XXX markers"
 	@echo ""
 	@echo "🔍 Static analysis (requires local tools):"
 	@echo "  lint           - Run golangci-lint"
