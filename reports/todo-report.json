@@ -1,0 +1,4485 @@
+{
+  "generatedAt": "2025-09-23T10:52:52.0521038Z",
+  "repoPath": ".",
+  "gitShaShort": "df90a6a",
+  "summary": {
+    "countsByTag": {
+      "DEPRECATED": 4,
+      "FIXME": 19,
+      "HACK": 12,
+      "NOTIMPLEMENTED": 10,
+      "STUB": 16,
+      "TBA": 5,
+      "TBD": 7,
+      "TODO": 490,
+      "XXX": 13
+    },
+    "countsByDir": {
+      ".claude": 1,
+      "docs": 60,
+      "drivers": 1,
+      "registrar-go": 1,
+      "resolver-go": 2,
+      "root": 64,
+      "scripts": 43,
+      "spec": 367,
+      "tools": 37
+    },
+    "countsByFile": {
+      ".claude\\memory\\CLAUDE.md": 1,
+      "CLAUDE.md": 52,
+      "Makefile": 12,
+      "docs\\ops\\OPERATIONS.md": 58,
+      "docs\\site\\method.md": 1,
+      "docs\\spec\\method.md": 1,
+      "drivers\\uniregistrar-go\\smoke.ps1": 1,
+      "registrar-go\\internal\\acc\\submit.go": 1,
+      "resolver-go\\internal\\acc\\client.go": 1,
+      "resolver-go\\internal\\resolve\\deterministic_test.go": 1,
+      "scripts\\todo-scan.ps1": 24,
+      "scripts\\todo-scan.sh": 19,
+      "spec\\BACKLOG.md": 6,
+      "spec\\PARITY-RESOLVER-REGISTRAR.md": 109,
+      "spec\\PARITY-SPEC-RESOLVER.md": 96,
+      "spec\\PARITY-UNI-DRIVERS.md": 156,
+      "tools\\todoscan\\main.go": 37
+    }
+  },
+  "items": [
+    {
+      "path": ".claude\\memory\\CLAUDE.md",
+      "line": 265,
+      "tag": "STUB",
+      "text": "- [ ] Offline Accumulate client stub",
+      "contextBefore": "- [ ] Table-driven tests with goldens"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 195,
+      "tag": "TODO",
+      "text": "## Backlog Triage via TODO Scanner"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 197,
+      "tag": "TODO",
+      "text": "The repository includes a comprehensive TODO scanner that helps track technical debt and work items across the codebase."
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 199,
+      "tag": "TODO",
+      "text": "### Running TODO Scans"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 203,
+      "tag": "TODO",
+      "text": "make todo-scan",
+      "contextBefore": "```bash",
+      "contextAfter": "```"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 209,
+      "tag": "TODO",
+      "text": "./scripts/todo-scan.sh",
+      "contextBefore": "# Linux/Docker (recommended)"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 212,
+      "tag": "TODO",
+      "text": ".\\scripts\\todo-scan.ps1",
+      "contextBefore": "# Windows PowerShell"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 218,
+      "tag": "TODO",
+      "text": "### TODO Patterns Detected"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 221,
+      "tag": "TODO",
+      "text": "- **TODO**: General work items",
+      "contextBefore": "The scanner looks for these markers (case-insensitive):",
+      "contextAfter": "- **FIXME**: Bugs that need fixing"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 222,
+      "tag": "FIXME",
+      "text": "- **FIXME**: Bugs that need fixing",
+      "contextBefore": "- **TODO**: General work items",
+      "contextAfter": "- **XXX**: Code that needs attention"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 223,
+      "tag": "XXX",
+      "text": "- **XXX**: Code that needs attention",
+      "contextBefore": "- **FIXME**: Bugs that need fixing",
+      "contextAfter": "- **HACK**: Temporary workarounds"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 224,
+      "tag": "HACK",
+      "text": "- **HACK**: Temporary workarounds",
+      "contextBefore": "- **XXX**: Code that needs attention",
+      "contextAfter": "- **STUB**: Placeholder implementations"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 225,
+      "tag": "STUB",
+      "text": "- **STUB**: Placeholder implementations",
+      "contextBefore": "- **HACK**: Temporary workarounds",
+      "contextAfter": "- **TBA/TBD**: To be added/determined"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 226,
+      "tag": "TBA",
+      "text": "- **TBA/TBD**: To be added/determined",
+      "contextBefore": "- **STUB**: Placeholder implementations",
+      "contextAfter": "- **NOTIMPL/NOTIMPLEMENTED**: Missing implementations"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 226,
+      "tag": "TBD",
+      "text": "- **TBA/TBD**: To be added/determined",
+      "contextBefore": "- **STUB**: Placeholder implementations",
+      "contextAfter": "- **NOTIMPL/NOTIMPLEMENTED**: Missing implementations"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 227,
+      "tag": "NOTIMPLEMENTED",
+      "text": "- **NOTIMPL/NOTIMPLEMENTED**: Missing implementations",
+      "contextBefore": "- **TBA/TBD**: To be added/determined",
+      "contextAfter": "- **PANIC(\"TODO\")**: Critical unimplemented paths"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 227,
+      "tag": "NOTIMPLEMENTED",
+      "text": "- **NOTIMPL/NOTIMPLEMENTED**: Missing implementations",
+      "contextBefore": "- **TBA/TBD**: To be added/determined",
+      "contextAfter": "- **PANIC(\"TODO\")**: Critical unimplemented paths"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 228,
+      "tag": "TODO",
+      "text": "- **PANIC(\"TODO\")**: Critical unimplemented paths",
+      "contextBefore": "- **NOTIMPL/NOTIMPLEMENTED**: Missing implementations",
+      "contextAfter": "- **@deprecated/DEPRECATED**: Deprecated code"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 228,
+      "tag": "TODO",
+      "text": "- **PANIC(\"TODO\")**: Critical unimplemented paths",
+      "contextBefore": "- **NOTIMPL/NOTIMPLEMENTED**: Missing implementations",
+      "contextAfter": "- **@deprecated/DEPRECATED**: Deprecated code"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 229,
+      "tag": "DEPRECATED",
+      "text": "- **@deprecated/DEPRECATED**: Deprecated code",
+      "contextBefore": "- **PANIC(\"TODO\")**: Critical unimplemented paths"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 234,
+      "tag": "TODO",
+      "text": "- **todo-report.json**: Machine-readable data for automation",
+      "contextBefore": "Reports are generated in `./reports/`:",
+      "contextAfter": "- **todo-report.md**: Human-readable report with code excerpts"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 235,
+      "tag": "TODO",
+      "text": "- **todo-report.md**: Human-readable report with code excerpts",
+      "contextBefore": "- **todo-report.json**: Machine-readable data for automation",
+      "contextAfter": "- **todo-report.csv**: Spreadsheet-compatible format"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 236,
+      "tag": "TODO",
+      "text": "- **todo-report.csv**: Spreadsheet-compatible format",
+      "contextBefore": "- **todo-report.md**: Human-readable report with code excerpts"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 243,
+      "tag": "FIXME",
+      "text": "grep -E \"(FIXME|XXX|PANIC)\" reports/todo-report.md",
+      "contextBefore": "# High-priority items"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 243,
+      "tag": "XXX",
+      "text": "grep -E \"(FIXME|XXX|PANIC)\" reports/todo-report.md",
+      "contextBefore": "# High-priority items"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 243,
+      "tag": "TODO",
+      "text": "grep -E \"(FIXME|XXX|PANIC)\" reports/todo-report.md",
+      "contextBefore": "# High-priority items"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 246,
+      "tag": "TODO",
+      "text": "grep -E \"(TODO|NOTIMPL|STUB)\" reports/todo-report.md",
+      "contextBefore": "# Implementation gaps"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 246,
+      "tag": "NOTIMPLEMENTED",
+      "text": "grep -E \"(TODO|NOTIMPL|STUB)\" reports/todo-report.md",
+      "contextBefore": "# Implementation gaps"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 246,
+      "tag": "STUB",
+      "text": "grep -E \"(TODO|NOTIMPL|STUB)\" reports/todo-report.md",
+      "contextBefore": "# Implementation gaps"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 246,
+      "tag": "TODO",
+      "text": "grep -E \"(TODO|NOTIMPL|STUB)\" reports/todo-report.md",
+      "contextBefore": "# Implementation gaps"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 249,
+      "tag": "HACK",
+      "text": "grep -E \"(HACK|DEPRECATED)\" reports/todo-report.md",
+      "contextBefore": "# Technical debt",
+      "contextAfter": "```"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 249,
+      "tag": "TODO",
+      "text": "grep -E \"(HACK|DEPRECATED)\" reports/todo-report.md",
+      "contextBefore": "# Technical debt",
+      "contextAfter": "```"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 255,
+      "tag": "TODO",
+      "text": "grep \"resolver-go\" reports/todo-report.md",
+      "contextBefore": "# Resolver issues"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 258,
+      "tag": "TODO",
+      "text": "grep \"registrar-go\" reports/todo-report.md",
+      "contextBefore": "# Registrar issues"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 261,
+      "tag": "TODO",
+      "text": "grep \"docs/\" reports/todo-report.md",
+      "contextBefore": "# Documentation tasks",
+      "contextAfter": "```"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 267,
+      "tag": "TODO",
+      "text": "jq '.summary.countsByTag' reports/todo-report.json",
+      "contextBefore": "# Count by tag"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 270,
+      "tag": "TODO",
+      "text": "jq '.items[] | select(.path | startswith(\"resolver-go/\"))' reports/todo-report.json",
+      "contextBefore": "# Items in specific directory"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 273,
+      "tag": "FIXME",
+      "text": "jq '.items[] | select(.tag == \"FIXME\" or .tag == \"XXX\")' reports/todo-report.json",
+      "contextBefore": "# High-priority items with context",
+      "contextAfter": "```"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 273,
+      "tag": "XXX",
+      "text": "jq '.items[] | select(.tag == \"FIXME\" or .tag == \"XXX\")' reports/todo-report.json",
+      "contextBefore": "# High-priority items with context",
+      "contextAfter": "```"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 273,
+      "tag": "TODO",
+      "text": "jq '.items[] | select(.tag == \"FIXME\" or .tag == \"XXX\")' reports/todo-report.json",
+      "contextBefore": "# High-priority items with context",
+      "contextAfter": "```"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 279,
+      "tag": "TODO",
+      "text": "1. **Weekly scans**: Run `make todo-scan` during sprint planning",
+      "contextBefore": "**Recommended workflow:**",
+      "contextAfter": "2. **Triage new items**: Review `todo-report.md` for high-priority issues"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 280,
+      "tag": "TODO",
+      "text": "2. **Triage new items**: Review `todo-report.md` for high-priority issues",
+      "contextBefore": "1. **Weekly scans**: Run `make todo-scan` during sprint planning",
+      "contextAfter": "3. **Convert to issues**: Move critical TODOs into GitHub issues or `spec/BACKLOG.md`"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 288,
+      "tag": "TODO",
+      "text": "run: make todo-scan",
+      "contextBefore": "- name: Scan TODOs",
+      "contextAfter": "- name: Check for critical TODOs"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 291,
+      "tag": "FIXME",
+      "text": "if grep -q \"PANIC\\|FIXME\" reports/todo-report.md; then",
+      "contextBefore": "run: |",
+      "contextAfter": "echo \"⚠️ Critical TODOs found - review required\""
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 291,
+      "tag": "TODO",
+      "text": "if grep -q \"PANIC\\|FIXME\" reports/todo-report.md; then",
+      "contextBefore": "run: |",
+      "contextAfter": "echo \"⚠️ Critical TODOs found - review required\""
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 293,
+      "tag": "TODO",
+      "text": "cat reports/todo-report.md",
+      "contextBefore": "echo \"⚠️ Critical TODOs found - review required\"",
+      "contextAfter": "fi"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 299,
+      "tag": "TODO",
+      "text": "**TODO lifecycle management:**",
+      "contextAfter": "1. **New TODOs**: Use specific tags (TODO for features, FIXME for bugs)"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 300,
+      "tag": "TODO",
+      "text": "1. **New TODOs**: Use specific tags (TODO for features, FIXME for bugs)",
+      "contextBefore": "**TODO lifecycle management:**",
+      "contextAfter": "2. **Context required**: Include brief description of what needs to be done"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 300,
+      "tag": "FIXME",
+      "text": "1. **New TODOs**: Use specific tags (TODO for features, FIXME for bugs)",
+      "contextBefore": "**TODO lifecycle management:**",
+      "contextAfter": "2. **Context required**: Include brief description of what needs to be done"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 306,
+      "tag": "TODO",
+      "text": "- Use `TODO` for planned features or improvements",
+      "contextBefore": "**Tag guidelines:**",
+      "contextAfter": "- Use `FIXME` for known bugs or issues"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 307,
+      "tag": "FIXME",
+      "text": "- Use `FIXME` for known bugs or issues",
+      "contextBefore": "- Use `TODO` for planned features or improvements",
+      "contextAfter": "- Use `HACK` for temporary workarounds that need proper solutions"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 308,
+      "tag": "HACK",
+      "text": "- Use `HACK` for temporary workarounds that need proper solutions",
+      "contextBefore": "- Use `FIXME` for known bugs or issues",
+      "contextAfter": "- Use `DEPRECATED` when phasing out code"
+    },
+    {
+      "path": "CLAUDE.md",
+      "line": 310,
+      "tag": "XXX",
+      "text": "- Avoid `XXX` except for urgent attention-required items",
+      "contextBefore": "- Use `DEPRECATED` when phasing out code"
+    },
+    {
+      "path": "Makefile",
+      "line": 100,
+      "tag": "TODO",
+      "text": ".PHONY: dev-shell test-all ci-local dev-up dev-down check-imports conformance perf help lint test-race vet qa dist-clean binaries-local images-local sbom-local scan-local docs-archive release-local sdk-test sdk-merge-spec example-sdk todo-scan"
+    },
+    {
+      "path": "Makefile",
+      "line": 228,
+      "tag": "TODO",
+      "text": "# TODO Scanner",
+      "contextBefore": "# ========================================================================",
+      "contextAfter": "# ========================================================================"
+    },
+    {
+      "path": "Makefile",
+      "line": 231,
+      "tag": "TODO",
+      "text": "todo-scan:",
+      "contextAfter": "@echo \"🔍 Scanning repository for TODO markers...\""
+    },
+    {
+      "path": "Makefile",
+      "line": 232,
+      "tag": "TODO",
+      "text": "@echo \"🔍 Scanning repository for TODO markers...\"",
+      "contextBefore": "todo-scan:",
+      "contextAfter": "@mkdir -p reports"
+    },
+    {
+      "path": "Makefile",
+      "line": 235,
+      "tag": "TODO",
+      "text": "docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc \"go run tools/todoscan/main.go . \u0026\u0026 echo \\\"\\\" \u0026\u0026 echo \\\"📊 Quick Summary:\\\" \u0026\u0026 test -f reports/todo-report.json \u0026\u0026 jq -r \\\".totalCount,(.summary.countsByTag | to_entries[] | \\\\\\\"  - \\\\(.key): \\\\(.value)\\\\\\\")\\\" reports/todo-report.json || echo \\\"Reports generated in ./reports/\\\"\"'; \\",
+      "contextBefore": "@if command -v docker \u003e/dev/null 2\u003e\u00261 \u0026\u0026 test -f docker-compose.dev.yml; then \\",
+      "contextAfter": "elif command -v go \u003e/dev/null 2\u003e\u00261 \u0026\u0026 test -f tools/todoscan/main.go; then \\"
+    },
+    {
+      "path": "Makefile",
+      "line": 235,
+      "tag": "TODO",
+      "text": "docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc \"go run tools/todoscan/main.go . \u0026\u0026 echo \\\"\\\" \u0026\u0026 echo \\\"📊 Quick Summary:\\\" \u0026\u0026 test -f reports/todo-report.json \u0026\u0026 jq -r \\\".totalCount,(.summary.countsByTag | to_entries[] | \\\\\\\"  - \\\\(.key): \\\\(.value)\\\\\\\")\\\" reports/todo-report.json || echo \\\"Reports generated in ./reports/\\\"\"'; \\",
+      "contextBefore": "@if command -v docker \u003e/dev/null 2\u003e\u00261 \u0026\u0026 test -f docker-compose.dev.yml; then \\",
+      "contextAfter": "elif command -v go \u003e/dev/null 2\u003e\u00261 \u0026\u0026 test -f tools/todoscan/main.go; then \\"
+    },
+    {
+      "path": "Makefile",
+      "line": 240,
+      "tag": "TODO",
+      "text": "if command -v jq \u003e/dev/null 2\u003e\u00261 \u0026\u0026 test -f reports/todo-report.json; then \\",
+      "contextBefore": "echo \"📊 Quick Summary:\"; \\",
+      "contextAfter": "jq -r '.totalCount,(.summary.countsByTag | to_entries[] | \"  - \\(.key): \\(.value)\")' reports/todo-report.json; \\"
+    },
+    {
+      "path": "Makefile",
+      "line": 241,
+      "tag": "TODO",
+      "text": "jq -r '.totalCount,(.summary.countsByTag | to_entries[] | \"  - \\(.key): \\(.value)\")' reports/todo-report.json; \\",
+      "contextBefore": "if command -v jq \u003e/dev/null 2\u003e\u00261 \u0026\u0026 test -f reports/todo-report.json; then \\",
+      "contextAfter": "else \\"
+    },
+    {
+      "path": "Makefile",
+      "line": 282,
+      "tag": "TODO",
+      "text": "@echo \"  todo-scan       - Scan repository for TODO/FIXME/XXX markers\"",
+      "contextBefore": "@echo \"🔍 Code analysis:\"",
+      "contextAfter": "@echo \"\""
+    },
+    {
+      "path": "Makefile",
+      "line": 282,
+      "tag": "TODO",
+      "text": "@echo \"  todo-scan       - Scan repository for TODO/FIXME/XXX markers\"",
+      "contextBefore": "@echo \"🔍 Code analysis:\"",
+      "contextAfter": "@echo \"\""
+    },
+    {
+      "path": "Makefile",
+      "line": 282,
+      "tag": "FIXME",
+      "text": "@echo \"  todo-scan       - Scan repository for TODO/FIXME/XXX markers\"",
+      "contextBefore": "@echo \"🔍 Code analysis:\"",
+      "contextAfter": "@echo \"\""
+    },
+    {
+      "path": "Makefile",
+      "line": 282,
+      "tag": "XXX",
+      "text": "@echo \"  todo-scan       - Scan repository for TODO/FIXME/XXX markers\"",
+      "contextBefore": "@echo \"🔍 Code analysis:\"",
+      "contextAfter": "@echo \"\""
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 701,
+      "tag": "TODO",
+      "text": "## 8. Backlog Triage via TODO Scanner"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 703,
+      "tag": "TODO",
+      "text": "The repository includes a comprehensive TODO scanner for tracking technical debt and work items across the codebase."
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 709,
+      "tag": "TODO",
+      "text": "make todo-scan",
+      "contextBefore": "```bash",
+      "contextAfter": "```"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 718,
+      "tag": "TODO",
+      "text": "./scripts/todo-scan.sh",
+      "contextBefore": "# Linux/Unix shell script"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 721,
+      "tag": "TODO",
+      "text": ".\\scripts\\todo-scan.ps1",
+      "contextBefore": "# Windows PowerShell script"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 727,
+      "tag": "TODO",
+      "text": "### TODO Markers Detected"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 733,
+      "tag": "TODO",
+      "text": "| `TODO` | General work items | Medium |",
+      "contextBefore": "|-----|---------|----------|",
+      "contextAfter": "| `FIXME` | Known bugs/issues | High |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 734,
+      "tag": "FIXME",
+      "text": "| `FIXME` | Known bugs/issues | High |",
+      "contextBefore": "| `TODO` | General work items | Medium |",
+      "contextAfter": "| `XXX` | Code requiring attention | High |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 735,
+      "tag": "XXX",
+      "text": "| `XXX` | Code requiring attention | High |",
+      "contextBefore": "| `FIXME` | Known bugs/issues | High |",
+      "contextAfter": "| `HACK` | Temporary workarounds | Medium |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 736,
+      "tag": "HACK",
+      "text": "| `HACK` | Temporary workarounds | Medium |",
+      "contextBefore": "| `XXX` | Code requiring attention | High |",
+      "contextAfter": "| `STUB` | Placeholder implementations | Medium |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 737,
+      "tag": "STUB",
+      "text": "| `STUB` | Placeholder implementations | Medium |",
+      "contextBefore": "| `HACK` | Temporary workarounds | Medium |",
+      "contextAfter": "| `TBA/TBD` | Items to be added/determined | Low |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 738,
+      "tag": "TBA",
+      "text": "| `TBA/TBD` | Items to be added/determined | Low |",
+      "contextBefore": "| `STUB` | Placeholder implementations | Medium |",
+      "contextAfter": "| `NOTIMPL` | Missing implementations | High |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 738,
+      "tag": "TBD",
+      "text": "| `TBA/TBD` | Items to be added/determined | Low |",
+      "contextBefore": "| `STUB` | Placeholder implementations | Medium |",
+      "contextAfter": "| `NOTIMPL` | Missing implementations | High |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 739,
+      "tag": "NOTIMPLEMENTED",
+      "text": "| `NOTIMPL` | Missing implementations | High |",
+      "contextBefore": "| `TBA/TBD` | Items to be added/determined | Low |",
+      "contextAfter": "| `PANIC(\"TODO\")` | Critical unimplemented paths | Critical |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 740,
+      "tag": "TODO",
+      "text": "| `PANIC(\"TODO\")` | Critical unimplemented paths | Critical |",
+      "contextBefore": "| `NOTIMPL` | Missing implementations | High |",
+      "contextAfter": "| `@deprecated` | Deprecated code | Medium |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 740,
+      "tag": "TODO",
+      "text": "| `PANIC(\"TODO\")` | Critical unimplemented paths | Critical |",
+      "contextBefore": "| `NOTIMPL` | Missing implementations | High |",
+      "contextAfter": "| `@deprecated` | Deprecated code | Medium |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 741,
+      "tag": "DEPRECATED",
+      "text": "| `@deprecated` | Deprecated code | Medium |",
+      "contextBefore": "| `PANIC(\"TODO\")` | Critical unimplemented paths | Critical |"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 747,
+      "tag": "TODO",
+      "text": "- **`todo-report.json`** - Machine-readable data with full context",
+      "contextAfter": "- **`todo-report.md`** - Human-readable report with code excerpts"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 748,
+      "tag": "TODO",
+      "text": "- **`todo-report.md`** - Human-readable report with code excerpts",
+      "contextBefore": "- **`todo-report.json`** - Machine-readable data with full context",
+      "contextAfter": "- **`todo-report.csv`** - Spreadsheet-compatible format for analysis"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 749,
+      "tag": "TODO",
+      "text": "- **`todo-report.csv`** - Spreadsheet-compatible format for analysis",
+      "contextBefore": "- **`todo-report.md`** - Human-readable report with code excerpts"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 756,
+      "tag": "TODO",
+      "text": "make todo-scan",
+      "contextBefore": "# 1. Run scan during sprint planning"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 759,
+      "tag": "FIXME",
+      "text": "grep -E \"(FIXME|XXX|PANIC)\" reports/todo-report.md",
+      "contextBefore": "# 2. Review critical items"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 759,
+      "tag": "XXX",
+      "text": "grep -E \"(FIXME|XXX|PANIC)\" reports/todo-report.md",
+      "contextBefore": "# 2. Review critical items"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 759,
+      "tag": "TODO",
+      "text": "grep -E \"(FIXME|XXX|PANIC)\" reports/todo-report.md",
+      "contextBefore": "# 2. Review critical items"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 762,
+      "tag": "NOTIMPLEMENTED",
+      "text": "grep -E \"(NOTIMPL|STUB)\" reports/todo-report.md",
+      "contextBefore": "# 3. Check implementation gaps"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 762,
+      "tag": "STUB",
+      "text": "grep -E \"(NOTIMPL|STUB)\" reports/todo-report.md",
+      "contextBefore": "# 3. Check implementation gaps"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 762,
+      "tag": "TODO",
+      "text": "grep -E \"(NOTIMPL|STUB)\" reports/todo-report.md",
+      "contextBefore": "# 3. Check implementation gaps"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 765,
+      "tag": "HACK",
+      "text": "grep -E \"(HACK|DEPRECATED)\" reports/todo-report.md",
+      "contextBefore": "# 4. Monitor technical debt",
+      "contextAfter": "```"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 765,
+      "tag": "TODO",
+      "text": "grep -E \"(HACK|DEPRECATED)\" reports/todo-report.md",
+      "contextBefore": "# 4. Monitor technical debt",
+      "contextAfter": "```"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 771,
+      "tag": "TODO",
+      "text": "jq '.items[] | select(.path | startswith(\"resolver-go/\"))' reports/todo-report.json",
+      "contextBefore": "# Resolver issues"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 774,
+      "tag": "TODO",
+      "text": "jq '.items[] | select(.path | startswith(\"registrar-go/\"))' reports/todo-report.json",
+      "contextBefore": "# Registrar issues"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 777,
+      "tag": "TODO",
+      "text": "jq '.items[] | select(.path | startswith(\"docs/\"))' reports/todo-report.json",
+      "contextBefore": "# Documentation tasks"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 780,
+      "tag": "TODO",
+      "text": "jq '.items[] | select(.path | startswith(\"drivers/\"))' reports/todo-report.json",
+      "contextBefore": "# Universal driver issues",
+      "contextAfter": "```"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 786,
+      "tag": "TODO",
+      "text": "echo \"$(date): $(jq '.totalCount' reports/todo-report.json)\" \u003e\u003e reports/todo-trend.log",
+      "contextBefore": "# Compare counts over time"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 786,
+      "tag": "TODO",
+      "text": "echo \"$(date): $(jq '.totalCount' reports/todo-report.json)\" \u003e\u003e reports/todo-trend.log",
+      "contextBefore": "# Compare counts over time"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 789,
+      "tag": "TODO",
+      "text": "jq '.summary.countsByTag' reports/todo-report.json",
+      "contextBefore": "# Tag distribution"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 792,
+      "tag": "TODO",
+      "text": "jq '.summary.countsByDir' reports/todo-report.json",
+      "contextBefore": "# Directory breakdown",
+      "contextAfter": "```"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 798,
+      "tag": "FIXME",
+      "text": "- **FIXME/XXX items**: Convert to GitHub issues if affecting operations",
+      "contextBefore": "**Escalation Criteria:**",
+      "contextAfter": "- **NOTIMPL items**: Add to `spec/BACKLOG.md` if blocking features"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 798,
+      "tag": "XXX",
+      "text": "- **FIXME/XXX items**: Convert to GitHub issues if affecting operations",
+      "contextBefore": "**Escalation Criteria:**",
+      "contextAfter": "- **NOTIMPL items**: Add to `spec/BACKLOG.md` if blocking features"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 799,
+      "tag": "NOTIMPLEMENTED",
+      "text": "- **NOTIMPL items**: Add to `spec/BACKLOG.md` if blocking features",
+      "contextBefore": "- **FIXME/XXX items**: Convert to GitHub issues if affecting operations",
+      "contextAfter": "- **PANIC items**: Address immediately - these indicate critical gaps"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 801,
+      "tag": "HACK",
+      "text": "- **HACK items**: Schedule proper implementation in upcoming sprints",
+      "contextBefore": "- **PANIC items**: Address immediately - these indicate critical gaps"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 806,
+      "tag": "TODO",
+      "text": "- name: TODO Scanner",
+      "contextBefore": "# Example CI check",
+      "contextAfter": "run: make todo-scan"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 807,
+      "tag": "TODO",
+      "text": "run: make todo-scan",
+      "contextBefore": "- name: TODO Scanner"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 811,
+      "tag": "FIXME",
+      "text": "if jq -e '.items[] | select(.tag == \"PANIC\" or .tag == \"FIXME\")' reports/todo-report.json \u003e /dev/null; then",
+      "contextBefore": "run: |",
+      "contextAfter": "echo \"::warning::Critical TODOs found - review required\""
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 811,
+      "tag": "TODO",
+      "text": "if jq -e '.items[] | select(.tag == \"PANIC\" or .tag == \"FIXME\")' reports/todo-report.json \u003e /dev/null; then",
+      "contextBefore": "run: |",
+      "contextAfter": "echo \"::warning::Critical TODOs found - review required\""
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 813,
+      "tag": "FIXME",
+      "text": "jq '.items[] | select(.tag == \"PANIC\" or .tag == \"FIXME\")' reports/todo-report.json",
+      "contextBefore": "echo \"::warning::Critical TODOs found - review required\"",
+      "contextAfter": "fi"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 813,
+      "tag": "TODO",
+      "text": "jq '.items[] | select(.tag == \"PANIC\" or .tag == \"FIXME\")' reports/todo-report.json",
+      "contextBefore": "echo \"::warning::Critical TODOs found - review required\"",
+      "contextAfter": "fi"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 819,
+      "tag": "TODO",
+      "text": "**TODO Creation Guidelines:**",
+      "contextAfter": "- Include brief context: `// TODO: add rate limiting for /resolve endpoint`"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 820,
+      "tag": "TODO",
+      "text": "- Include brief context: `// TODO: add rate limiting for /resolve endpoint`",
+      "contextBefore": "**TODO Creation Guidelines:**",
+      "contextAfter": "- Reference issues when applicable: `// TODO(#123): implement batch resolution`"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 821,
+      "tag": "TODO",
+      "text": "- Reference issues when applicable: `// TODO(#123): implement batch resolution`",
+      "contextBefore": "- Include brief context: `// TODO: add rate limiting for /resolve endpoint`",
+      "contextAfter": "- Use appropriate tags: `FIXME` for bugs, `TODO` for features"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 822,
+      "tag": "FIXME",
+      "text": "- Use appropriate tags: `FIXME` for bugs, `TODO` for features",
+      "contextBefore": "- Reference issues when applicable: `// TODO(#123): implement batch resolution`",
+      "contextAfter": "- Avoid generic comments: prefer `TODO: validate DID format` over `TODO: fix this`"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 822,
+      "tag": "TODO",
+      "text": "- Use appropriate tags: `FIXME` for bugs, `TODO` for features",
+      "contextBefore": "- Reference issues when applicable: `// TODO(#123): implement batch resolution`",
+      "contextAfter": "- Avoid generic comments: prefer `TODO: validate DID format` over `TODO: fix this`"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 823,
+      "tag": "TODO",
+      "text": "- Avoid generic comments: prefer `TODO: validate DID format` over `TODO: fix this`",
+      "contextBefore": "- Use appropriate tags: `FIXME` for bugs, `TODO` for features"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 823,
+      "tag": "TODO",
+      "text": "- Avoid generic comments: prefer `TODO: validate DID format` over `TODO: fix this`",
+      "contextBefore": "- Use appropriate tags: `FIXME` for bugs, `TODO` for features"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 828,
+      "tag": "HACK",
+      "text": "3. **Refactoring sprints**: Dedicate time to address HACK items",
+      "contextBefore": "2. **Sprint planning**: Convert high-priority TODOs to formal tasks",
+      "contextAfter": "4. **Release preparation**: Ensure no PANIC items in production code"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 832,
+      "tag": "TODO",
+      "text": "- Include TODO count trends in sprint retrospectives",
+      "contextBefore": "**Reporting:**",
+      "contextAfter": "- Track resolution rate of TODO items over time"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 833,
+      "tag": "TODO",
+      "text": "- Track resolution rate of TODO items over time",
+      "contextBefore": "- Include TODO count trends in sprint retrospectives",
+      "contextAfter": "- Use TODO density (items per KLOC) as code quality metric"
+    },
+    {
+      "path": "docs\\ops\\OPERATIONS.md",
+      "line": 834,
+      "tag": "TODO",
+      "text": "- Use TODO density (items per KLOC) as code quality metric",
+      "contextBefore": "- Track resolution rate of TODO items over time"
+    },
+    {
+      "path": "docs\\site\\method.md",
+      "line": 319,
+      "tag": "TBD",
+      "text": "**Next Review:** TBD based on implementation feedback",
+      "contextBefore": "**Last Updated:** 2024-01-21"
+    },
+    {
+      "path": "docs\\spec\\method.md",
+      "line": 319,
+      "tag": "TBD",
+      "text": "**Next Review:** TBD based on implementation feedback",
+      "contextBefore": "**Last Updated:** 2024-01-21"
+    },
+    {
+      "path": "drivers\\uniregistrar-go\\smoke.ps1",
+      "line": 109,
+      "tag": "STUB",
+      "text": "# Optional: Test update and deactivate with stub requests",
+      "contextAfter": "Write-Host \"`n=====================================\" -ForegroundColor Cyan"
+    },
+    {
+      "path": "registrar-go\\internal\\acc\\submit.go",
+      "line": 681,
+      "tag": "TODO",
+      "text": "// TODO: Implement proper conversion based on:",
+      "contextAfter": "// 1. ops.Envelope structure"
+    },
+    {
+      "path": "resolver-go\\internal\\acc\\client.go",
+      "line": 338,
+      "tag": "TODO",
+      "text": "// TODO: Implement proper record to envelope conversion based on actual API types",
+      "contextBefore": "// For now, return a basic envelope structure",
+      "contextAfter": "envelope := Envelope{"
+    },
+    {
+      "path": "resolver-go\\internal\\resolve\\deterministic_test.go",
+      "line": 138,
+      "tag": "STUB",
+      "text": "// Minimal stub for tests",
+      "contextBefore": "func (m *DeterministicMockClient) GetKeyPageState(u string) (acc.KeyPageState, error) {",
+      "contextAfter": "return acc.KeyPageState{URL: u, Threshold: 1}, nil"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 1,
+      "tag": "TODO",
+      "text": "# TODO Scanner - Windows PowerShell Wrapper",
+      "contextAfter": "# Scans the repository for TODO, FIXME, XXX, HACK, and other markers"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 2,
+      "tag": "TODO",
+      "text": "# Scans the repository for TODO, FIXME, XXX, HACK, and other markers",
+      "contextBefore": "# TODO Scanner - Windows PowerShell Wrapper",
+      "contextAfter": "# Generates reports in JSON, Markdown, and CSV formats"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 2,
+      "tag": "FIXME",
+      "text": "# Scans the repository for TODO, FIXME, XXX, HACK, and other markers",
+      "contextBefore": "# TODO Scanner - Windows PowerShell Wrapper",
+      "contextAfter": "# Generates reports in JSON, Markdown, and CSV formats"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 2,
+      "tag": "XXX",
+      "text": "# Scans the repository for TODO, FIXME, XXX, HACK, and other markers",
+      "contextBefore": "# TODO Scanner - Windows PowerShell Wrapper",
+      "contextAfter": "# Generates reports in JSON, Markdown, and CSV formats"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 2,
+      "tag": "HACK",
+      "text": "# Scans the repository for TODO, FIXME, XXX, HACK, and other markers",
+      "contextBefore": "# TODO Scanner - Windows PowerShell Wrapper",
+      "contextAfter": "# Generates reports in JSON, Markdown, and CSV formats"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 23,
+      "tag": "TODO",
+      "text": "TODO Scanner for Accumulate DID Repository",
+      "contextBefore": "Write-Host @\""
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 26,
+      "tag": "TODO",
+      "text": ".\\todo-scan.ps1 [RepoPath] [OPTIONS]",
+      "contextBefore": "USAGE:"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 35,
+      "tag": "TODO",
+      "text": ".\\todo-scan.ps1                                    # Scan current directory",
+      "contextBefore": "EXAMPLES:",
+      "contextAfter": ".\\todo-scan.ps1 C:\\path\\to\\repo                   # Scan specific repository"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 36,
+      "tag": "TODO",
+      "text": ".\\todo-scan.ps1 C:\\path\\to\\repo                   # Scan specific repository",
+      "contextBefore": ".\\todo-scan.ps1                                    # Scan current directory",
+      "contextAfter": ".\\todo-scan.ps1 -UseDocker yes                    # Force Docker usage"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 37,
+      "tag": "TODO",
+      "text": ".\\todo-scan.ps1 -UseDocker yes                    # Force Docker usage",
+      "contextBefore": ".\\todo-scan.ps1 C:\\path\\to\\repo                   # Scan specific repository",
+      "contextAfter": ".\\todo-scan.ps1 -UseDocker no                     # Force local Go usage"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 38,
+      "tag": "TODO",
+      "text": ".\\todo-scan.ps1 -UseDocker no                     # Force local Go usage",
+      "contextBefore": ".\\todo-scan.ps1 -UseDocker yes                    # Force Docker usage"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 42,
+      "tag": "TODO",
+      "text": "- todo-report.json     # Machine-readable JSON",
+      "contextBefore": "Reports are generated in: .\\reports\\",
+      "contextAfter": "- todo-report.md       # Human-readable Markdown"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 43,
+      "tag": "TODO",
+      "text": "- todo-report.md       # Human-readable Markdown",
+      "contextBefore": "- todo-report.json     # Machine-readable JSON",
+      "contextAfter": "- todo-report.csv      # Spreadsheet-compatible CSV"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 44,
+      "tag": "TODO",
+      "text": "- todo-report.csv      # Spreadsheet-compatible CSV",
+      "contextBefore": "- todo-report.md       # Human-readable Markdown"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 100,
+      "tag": "TODO",
+      "text": "Write-StatusMessage \"🔍\" \"Running TODO scanner locally...\" \"Blue\"",
+      "contextBefore": "function Invoke-LocalScan {"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 133,
+      "tag": "TODO",
+      "text": "Write-StatusMessage \"🐳\" \"Running TODO scanner in Docker...\" \"Blue\"",
+      "contextBefore": "function Invoke-DockerScan {"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 148,
+      "tag": "TODO",
+      "text": "echo 'Running TODO scanner...'",
+      "contextBefore": "$command = @\"",
+      "contextAfter": "if [[ -f tools/todoscan/main.go ]]; then"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 175,
+      "tag": "TODO",
+      "text": "echo 'Running TODO scanner...'",
+      "contextBefore": "if [[ -f tools/todoscan/main.go ]]; then",
+      "contextAfter": "go run tools/todoscan/main.go ."
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 194,
+      "tag": "TODO",
+      "text": "$jsonFile = Join-Path $outputDir \"todo-report.json\"",
+      "contextBefore": "$outputDir = Join-Path $RepoPath \"reports\"",
+      "contextAfter": "$mdFile = Join-Path $outputDir \"todo-report.md\""
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 195,
+      "tag": "TODO",
+      "text": "$mdFile = Join-Path $outputDir \"todo-report.md\"",
+      "contextBefore": "$jsonFile = Join-Path $outputDir \"todo-report.json\"",
+      "contextAfter": "$csvFile = Join-Path $outputDir \"todo-report.csv\""
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 196,
+      "tag": "TODO",
+      "text": "$csvFile = Join-Path $outputDir \"todo-report.csv\"",
+      "contextBefore": "$mdFile = Join-Path $outputDir \"todo-report.md\""
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 206,
+      "tag": "TODO",
+      "text": "Write-StatusMessage \"📊\" \"Found $totalCount TODO items\" \"Blue\"",
+      "contextBefore": "$totalCount = $report.totalCount"
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 239,
+      "tag": "TODO",
+      "text": "Write-Host \"  - Filter by tag: Select-String 'TODO' $mdFile\"",
+      "contextBefore": "Write-Host \"  - Process JSON programmatically: $jsonFile\"",
+      "contextAfter": "Write-Host \"  - Filter by directory: Select-String 'resolver-go' $mdFile\""
+    },
+    {
+      "path": "scripts\\todo-scan.ps1",
+      "line": 249,
+      "tag": "TODO",
+      "text": "Write-StatusMessage \"🔍\" \"TODO Scanner for Accumulate DID Repository\" \"Blue\"",
+      "contextAfter": "Write-StatusMessage \"📂\" \"Repository: $RepoPath\" \"Blue\""
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 3,
+      "tag": "TODO",
+      "text": "# TODO Scanner - Linux/Docker Wrapper",
+      "contextBefore": "#",
+      "contextAfter": "# Scans the repository for TODO, FIXME, XXX, HACK, and other markers"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 4,
+      "tag": "TODO",
+      "text": "# Scans the repository for TODO, FIXME, XXX, HACK, and other markers",
+      "contextBefore": "# TODO Scanner - Linux/Docker Wrapper",
+      "contextAfter": "# Generates reports in JSON, Markdown, and CSV formats"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 4,
+      "tag": "FIXME",
+      "text": "# Scans the repository for TODO, FIXME, XXX, HACK, and other markers",
+      "contextBefore": "# TODO Scanner - Linux/Docker Wrapper",
+      "contextAfter": "# Generates reports in JSON, Markdown, and CSV formats"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 4,
+      "tag": "XXX",
+      "text": "# Scans the repository for TODO, FIXME, XXX, HACK, and other markers",
+      "contextBefore": "# TODO Scanner - Linux/Docker Wrapper",
+      "contextAfter": "# Generates reports in JSON, Markdown, and CSV formats"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 4,
+      "tag": "HACK",
+      "text": "# Scans the repository for TODO, FIXME, XXX, HACK, and other markers",
+      "contextBefore": "# TODO Scanner - Linux/Docker Wrapper",
+      "contextAfter": "# Generates reports in JSON, Markdown, and CSV formats"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 27,
+      "tag": "TODO",
+      "text": "Scans a repository for TODO markers and generates reports."
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 43,
+      "tag": "TODO",
+      "text": "- todo-report.json         # Machine-readable JSON",
+      "contextBefore": "Reports are generated in: ./reports/",
+      "contextAfter": "- todo-report.md          # Human-readable Markdown"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 44,
+      "tag": "TODO",
+      "text": "- todo-report.md          # Human-readable Markdown",
+      "contextBefore": "- todo-report.json         # Machine-readable JSON",
+      "contextAfter": "- todo-report.csv         # Spreadsheet-compatible CSV"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 45,
+      "tag": "TODO",
+      "text": "- todo-report.csv         # Spreadsheet-compatible CSV",
+      "contextBefore": "- todo-report.md          # Human-readable Markdown",
+      "contextAfter": "EOF"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 75,
+      "tag": "TODO",
+      "text": "echo -e \"${BLUE}🔍${NC} Running TODO scanner locally...\"",
+      "contextBefore": "run_local() {"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 93,
+      "tag": "TODO",
+      "text": "echo -e \"${BLUE}🐳${NC} Running TODO scanner in Docker...\"",
+      "contextBefore": "run_docker() {"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 103,
+      "tag": "TODO",
+      "text": "echo 'Running TODO scanner...'",
+      "contextBefore": "docker-compose -f docker-compose.dev.yml run --rm dev bash -c \"",
+      "contextAfter": "if [[ -f tools/todoscan/main.go ]]; then"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 122,
+      "tag": "TODO",
+      "text": "echo 'Running TODO scanner...'",
+      "contextBefore": "if [[ -f tools/todoscan/main.go ]]; then",
+      "contextAfter": "go run tools/todoscan/main.go ."
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 133,
+      "tag": "TODO",
+      "text": "local json_file=\"$OUTPUT_DIR/todo-report.json\"",
+      "contextBefore": "print_results() {",
+      "contextAfter": "local md_file=\"$OUTPUT_DIR/todo-report.md\""
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 134,
+      "tag": "TODO",
+      "text": "local md_file=\"$OUTPUT_DIR/todo-report.md\"",
+      "contextBefore": "local json_file=\"$OUTPUT_DIR/todo-report.json\"",
+      "contextAfter": "local csv_file=\"$OUTPUT_DIR/todo-report.csv\""
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 135,
+      "tag": "TODO",
+      "text": "local csv_file=\"$OUTPUT_DIR/todo-report.csv\"",
+      "contextBefore": "local md_file=\"$OUTPUT_DIR/todo-report.md\""
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 143,
+      "tag": "TODO",
+      "text": "echo -e \"${BLUE}📊${NC} Found ${YELLOW}$total_count${NC} TODO items\"",
+      "contextBefore": "local total_count=$(jq -r '.totalCount // 0' \"$json_file\" 2\u003e/dev/null || echo \"unknown\")"
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 168,
+      "tag": "TODO",
+      "text": "echo \"  - Filter by tag: grep 'TODO' $md_file\"",
+      "contextBefore": "echo \"  - Process JSON programmatically: $json_file\"",
+      "contextAfter": "echo \"  - Filter by directory: grep 'resolver-go' $md_file\""
+    },
+    {
+      "path": "scripts\\todo-scan.sh",
+      "line": 181,
+      "tag": "TODO",
+      "text": "echo -e \"${BLUE}🔍${NC} TODO Scanner for Accumulate DID Repository\"",
+      "contextAfter": "echo -e \"${BLUE}📂${NC} Repository: $REPO_PATH\""
+    },
+    {
+      "path": "spec\\BACKLOG.md",
+      "line": 41,
+      "tag": "STUB",
+      "text": "| R-004 | Create Accumulate client stub | resolver-go | ✅ DONE | Resolver Builder | internal/acc/client.go + mock.go implemented |",
+      "contextBefore": "| R-003 | Implement canonical JSON | resolver-go | 🟡 IN-PROGRESS | Resolver Builder | internal/canon/json.go exists, hash tests failing |",
+      "contextAfter": "| R-005 | Implement DID resolution logic | resolver-go | ✅ DONE | Resolver Builder | Deterministic resolver with full algorithm |"
+    },
+    {
+      "path": "spec\\BACKLOG.md",
+      "line": 70,
+      "tag": "STUB",
+      "text": "| G-004 | Create Accumulate client stub | registrar-go | ✅ DONE | Registrar Builder | internal/acc/submit.go + mock.go |",
+      "contextBefore": "| G-003 | Implement auth policy v1 | registrar-go | ✅ DONE | Registrar Builder | internal/policy/v1.go with acc://\u003cadi\u003e/book/1 |",
+      "contextAfter": "| G-005 | Implement registration logic | registrar-go | ✅ DONE | Registrar Builder | Complete create/update/deactivate workflows |"
+    },
+    {
+      "path": "spec\\BACKLOG.md",
+      "line": 133,
+      "tag": "STUB",
+      "text": "| D-006 | Write didcomm.md stub | docs/interop | ✅ DONE | Interop Engineer | docs/interop/didcomm.md exists |",
+      "contextBefore": "|----|------|-----------|--------|----------|-------|",
+      "contextAfter": "| D-007 | Write sd-jwt.md stub | docs/interop | ✅ DONE | Interop Engineer | docs/interop/sd-jwt.md exists |"
+    },
+    {
+      "path": "spec\\BACKLOG.md",
+      "line": 134,
+      "tag": "STUB",
+      "text": "| D-007 | Write sd-jwt.md stub | docs/interop | ✅ DONE | Interop Engineer | docs/interop/sd-jwt.md exists |",
+      "contextBefore": "| D-006 | Write didcomm.md stub | docs/interop | ✅ DONE | Interop Engineer | docs/interop/didcomm.md exists |",
+      "contextAfter": "| D-008 | Write bbs.md stub | docs/interop | ✅ DONE | Interop Engineer | docs/interop/bbs.md exists |"
+    },
+    {
+      "path": "spec\\BACKLOG.md",
+      "line": 135,
+      "tag": "STUB",
+      "text": "| D-008 | Write bbs.md stub | docs/interop | ✅ DONE | Interop Engineer | docs/interop/bbs.md exists |",
+      "contextBefore": "| D-007 | Write sd-jwt.md stub | docs/interop | ✅ DONE | Interop Engineer | docs/interop/sd-jwt.md exists |"
+    },
+    {
+      "path": "spec\\BACKLOG.md",
+      "line": 185,
+      "tag": "STUB",
+      "text": "- Use stub clients for offline development",
+      "contextBefore": "### Mitigation",
+      "contextAfter": "- Implement multiple canonical JSON options"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 12,
+      "tag": "TODO",
+      "text": "| **@context** | Must validate and return | Must validate on input | ❌ TODO |",
+      "contextBefore": "|---------|------------------|-------------------|-------------------|",
+      "contextAfter": "| **id** | Must match resolved DID | Must match registration DID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 13,
+      "tag": "TODO",
+      "text": "| **id** | Must match resolved DID | Must match registration DID | ❌ TODO |",
+      "contextBefore": "| **@context** | Must validate and return | Must validate on input | ❌ TODO |",
+      "contextAfter": "| **controller** | Return as stored | Validate controller format | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 14,
+      "tag": "TODO",
+      "text": "| **controller** | Return as stored | Validate controller format | ❌ TODO |",
+      "contextBefore": "| **id** | Must match resolved DID | Must match registration DID | ❌ TODO |",
+      "contextAfter": "| **verificationMethod** | Return with full details | Validate VM structure | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 15,
+      "tag": "TODO",
+      "text": "| **verificationMethod** | Return with full details | Validate VM structure | ❌ TODO |",
+      "contextBefore": "| **controller** | Return as stored | Validate controller format | ❌ TODO |",
+      "contextAfter": "| **authentication** | Return reference/embed | Validate references exist | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 16,
+      "tag": "TODO",
+      "text": "| **authentication** | Return reference/embed | Validate references exist | ❌ TODO |",
+      "contextBefore": "| **verificationMethod** | Return with full details | Validate VM structure | ❌ TODO |",
+      "contextAfter": "| **assertionMethod** | Return reference/embed | Validate references exist | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 17,
+      "tag": "TODO",
+      "text": "| **assertionMethod** | Return reference/embed | Validate references exist | ❌ TODO |",
+      "contextBefore": "| **authentication** | Return reference/embed | Validate references exist | ❌ TODO |",
+      "contextAfter": "| **service** | Return service endpoints | Validate service format | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 18,
+      "tag": "TODO",
+      "text": "| **service** | Return service endpoints | Validate service format | ❌ TODO |",
+      "contextBefore": "| **assertionMethod** | Return reference/embed | Validate references exist | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 24,
+      "tag": "TODO",
+      "text": "| **type** | \"AccumulateKeyPage\" | Must be \"AccumulateKeyPage\" | ❌ TODO |",
+      "contextBefore": "|----------|----------------|-----------------|-------------------|",
+      "contextAfter": "| **keyPageUrl** | Return as \"acc://...\" | Validate \"acc://...\" format | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 25,
+      "tag": "TODO",
+      "text": "| **keyPageUrl** | Return as \"acc://...\" | Validate \"acc://...\" format | ❌ TODO |",
+      "contextBefore": "| **type** | \"AccumulateKeyPage\" | Must be \"AccumulateKeyPage\" | ❌ TODO |",
+      "contextAfter": "| **threshold** | Return as number | Validate positive integer | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 26,
+      "tag": "TODO",
+      "text": "| **threshold** | Return as number | Validate positive integer | ❌ TODO |",
+      "contextBefore": "| **keyPageUrl** | Return as \"acc://...\" | Validate \"acc://...\" format | ❌ TODO |",
+      "contextAfter": "| **controller** | Return DID reference | Validate matches DID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 27,
+      "tag": "TODO",
+      "text": "| **controller** | Return DID reference | Validate matches DID | ❌ TODO |",
+      "contextBefore": "| **threshold** | Return as number | Validate positive integer | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 33,
+      "tag": "TODO",
+      "text": "| **versionId** | From stored metadata | Generate on create/update | ❌ TODO |",
+      "contextBefore": "|-------|----------------|---------------------|-------------------|",
+      "contextAfter": "| **created** | First version timestamp | Set on create | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 34,
+      "tag": "TODO",
+      "text": "| **created** | First version timestamp | Set on create | ❌ TODO |",
+      "contextBefore": "| **versionId** | From stored metadata | Generate on create/update | ❌ TODO |",
+      "contextAfter": "| **updated** | Latest version timestamp | Set on update | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 35,
+      "tag": "TODO",
+      "text": "| **updated** | Latest version timestamp | Set on update | ❌ TODO |",
+      "contextBefore": "| **created** | First version timestamp | Set on create | ❌ TODO |",
+      "contextAfter": "| **deactivated** | Boolean from document | Set on deactivate | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 36,
+      "tag": "TODO",
+      "text": "| **deactivated** | Boolean from document | Set on deactivate | ❌ TODO |",
+      "contextBefore": "| **updated** | Latest version timestamp | Set on update | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 44,
+      "tag": "TODO",
+      "text": "| **Key Ordering** | Lexicographic sort | Lexicographic sort | ❌ TODO |",
+      "contextBefore": "|------|------------------------|-------------------------|--------|",
+      "contextAfter": "| **Whitespace** | No extra whitespace | No extra whitespace | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 45,
+      "tag": "TODO",
+      "text": "| **Whitespace** | No extra whitespace | No extra whitespace | ❌ TODO |",
+      "contextBefore": "| **Key Ordering** | Lexicographic sort | Lexicographic sort | ❌ TODO |",
+      "contextAfter": "| **Number Format** | No trailing zeros | No trailing zeros | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 46,
+      "tag": "TODO",
+      "text": "| **Number Format** | No trailing zeros | No trailing zeros | ❌ TODO |",
+      "contextBefore": "| **Whitespace** | No extra whitespace | No extra whitespace | ❌ TODO |",
+      "contextAfter": "| **String Escaping** | Minimal escaping | Minimal escaping | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 47,
+      "tag": "TODO",
+      "text": "| **String Escaping** | Minimal escaping | Minimal escaping | ❌ TODO |",
+      "contextBefore": "| **Number Format** | No trailing zeros | No trailing zeros | ❌ TODO |",
+      "contextAfter": "| **Duplicate Keys** | Reject on parse | Reject on validation | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 48,
+      "tag": "TODO",
+      "text": "| **Duplicate Keys** | Reject on parse | Reject on validation | ❌ TODO |",
+      "contextBefore": "| **String Escaping** | Minimal escaping | Minimal escaping | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 54,
+      "tag": "TODO",
+      "text": "| **Algorithm** | SHA-256 | SHA-256 | ❌ TODO |",
+      "contextBefore": "|--------|----------|-----------|-------------------|",
+      "contextAfter": "| **Input Format** | Canonical JSON | Canonical JSON | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 55,
+      "tag": "TODO",
+      "text": "| **Input Format** | Canonical JSON | Canonical JSON | ❌ TODO |",
+      "contextBefore": "| **Algorithm** | SHA-256 | SHA-256 | ❌ TODO |",
+      "contextAfter": "| **Output Format** | \"sha256:...\" | \"sha256:...\" | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 56,
+      "tag": "TODO",
+      "text": "| **Output Format** | \"sha256:...\" | \"sha256:...\" | ❌ TODO |",
+      "contextBefore": "| **Input Format** | Canonical JSON | Canonical JSON | ❌ TODO |",
+      "contextAfter": "| **Verification** | Compare stored hash | Generate content hash | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 57,
+      "tag": "TODO",
+      "text": "| **Verification** | Compare stored hash | Generate content hash | ❌ TODO |",
+      "contextBefore": "| **Output Format** | \"sha256:...\" | \"sha256:...\" | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 65,
+      "tag": "TODO",
+      "text": "| **Case Sensitivity** | Convert to lowercase | Convert to lowercase | ❌ TODO |",
+      "contextBefore": "|------|----------------------|------------------------|--------|",
+      "contextAfter": "| **Trailing Dots** | Remove trailing dots | Remove trailing dots | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 66,
+      "tag": "TODO",
+      "text": "| **Trailing Dots** | Remove trailing dots | Remove trailing dots | ❌ TODO |",
+      "contextBefore": "| **Case Sensitivity** | Convert to lowercase | Convert to lowercase | ❌ TODO |",
+      "contextAfter": "| **Query Parameters** | Preserve order | N/A (not used) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 67,
+      "tag": "TODO",
+      "text": "| **Query Parameters** | Preserve order | N/A (not used) | ❌ TODO |",
+      "contextBefore": "| **Trailing Dots** | Remove trailing dots | Remove trailing dots | ❌ TODO |",
+      "contextAfter": "| **Fragments** | Preserve as-is | Validate if present | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 68,
+      "tag": "TODO",
+      "text": "| **Fragments** | Preserve as-is | Validate if present | ❌ TODO |",
+      "contextBefore": "| **Query Parameters** | Preserve order | N/A (not used) | ❌ TODO |",
+      "contextAfter": "| **Path Components** | Support dereferencing | Validate but don't use | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 69,
+      "tag": "TODO",
+      "text": "| **Path Components** | Support dereferencing | Validate but don't use | ❌ TODO |",
+      "contextBefore": "| **Fragments** | Preserve as-is | Validate if present | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 75,
+      "tag": "TODO",
+      "text": "| **Character Set** | [a-zA-Z0-9.-_] | [a-zA-Z0-9.-_] | ❌ TODO |",
+      "contextBefore": "|----------------|----------|-----------|--------|",
+      "contextAfter": "| **Dot Placement** | No leading/trailing | No leading/trailing | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 76,
+      "tag": "TODO",
+      "text": "| **Dot Placement** | No leading/trailing | No leading/trailing | ❌ TODO |",
+      "contextBefore": "| **Character Set** | [a-zA-Z0-9.-_] | [a-zA-Z0-9.-_] | ❌ TODO |",
+      "contextAfter": "| **Length Limits** | Accumulate limits | Accumulate limits | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 77,
+      "tag": "TODO",
+      "text": "| **Length Limits** | Accumulate limits | Accumulate limits | ❌ TODO |",
+      "contextBefore": "| **Dot Placement** | No leading/trailing | No leading/trailing | ❌ TODO |",
+      "contextAfter": "| **Reserved Names** | Check reserved list | Check reserved list | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 78,
+      "tag": "TODO",
+      "text": "| **Reserved Names** | Check reserved list | Check reserved list | ❌ TODO |",
+      "contextBefore": "| **Length Limits** | Accumulate limits | Accumulate limits | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 86,
+      "tag": "TODO",
+      "text": "| **DID Not Found** | `notFound` (404) | `notFound` (404) | ❌ TODO |",
+      "contextBefore": "|----------------|----------------|-----------------|--------|",
+      "contextAfter": "| **Invalid DID Syntax** | `invalidDid` (400) | `invalidDid` (400) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 87,
+      "tag": "TODO",
+      "text": "| **Invalid DID Syntax** | `invalidDid` (400) | `invalidDid` (400) | ❌ TODO |",
+      "contextBefore": "| **DID Not Found** | `notFound` (404) | `notFound` (404) | ❌ TODO |",
+      "contextAfter": "| **Deactivated DID** | `deactivated` (410) | `conflict` (409) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 88,
+      "tag": "TODO",
+      "text": "| **Deactivated DID** | `deactivated` (410) | `conflict` (409) | ❌ TODO |",
+      "contextBefore": "| **Invalid DID Syntax** | `invalidDid` (400) | `invalidDid` (400) | ❌ TODO |",
+      "contextAfter": "| **Unauthorized** | N/A | `unauthorized` (403) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 89,
+      "tag": "TODO",
+      "text": "| **Unauthorized** | N/A | `unauthorized` (403) | ❌ TODO |",
+      "contextBefore": "| **Deactivated DID** | `deactivated` (410) | `conflict` (409) | ❌ TODO |",
+      "contextAfter": "| **Invalid Document** | N/A | `invalidDocument` (400) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 90,
+      "tag": "TODO",
+      "text": "| **Invalid Document** | N/A | `invalidDocument` (400) | ❌ TODO |",
+      "contextBefore": "| **Unauthorized** | N/A | `unauthorized` (403) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 96,
+      "tag": "TODO",
+      "text": "| **error** | Error code string | Error code string | ❌ TODO |",
+      "contextBefore": "|-------|----------|-----------|-------------------|",
+      "contextAfter": "| **message** | Human readable | Human readable | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 97,
+      "tag": "TODO",
+      "text": "| **message** | Human readable | Human readable | ❌ TODO |",
+      "contextBefore": "| **error** | Error code string | Error code string | ❌ TODO |",
+      "contextAfter": "| **details** | Additional context | Additional context | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 98,
+      "tag": "TODO",
+      "text": "| **details** | Additional context | Additional context | ❌ TODO |",
+      "contextBefore": "| **message** | Human readable | Human readable | ❌ TODO |",
+      "contextAfter": "| **requestId** | Request identifier | Request identifier | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 99,
+      "tag": "TODO",
+      "text": "| **requestId** | Request identifier | Request identifier | ❌ TODO |",
+      "contextBefore": "| **details** | Additional context | Additional context | ❌ TODO |",
+      "contextAfter": "| **timestamp** | ISO 8601 | ISO 8601 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 100,
+      "tag": "TODO",
+      "text": "| **timestamp** | ISO 8601 | ISO 8601 | ❌ TODO |",
+      "contextBefore": "| **requestId** | Request identifier | Request identifier | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 108,
+      "tag": "TODO",
+      "text": "| **Required Fields** | Validate structure | Validate required | ❌ TODO |",
+      "contextBefore": "|------------|---------------------|---------------------|--------|",
+      "contextAfter": "| **Field Types** | Type checking | Type checking | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 109,
+      "tag": "TODO",
+      "text": "| **Field Types** | Type checking | Type checking | ❌ TODO |",
+      "contextBefore": "| **Required Fields** | Validate structure | Validate required | ❌ TODO |",
+      "contextAfter": "| **Value Constraints** | Range/format checks | Range/format checks | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 110,
+      "tag": "TODO",
+      "text": "| **Value Constraints** | Range/format checks | Range/format checks | ❌ TODO |",
+      "contextBefore": "| **Field Types** | Type checking | Type checking | ❌ TODO |",
+      "contextAfter": "| **Cross-field Validation** | Referential integrity | Referential integrity | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 111,
+      "tag": "TODO",
+      "text": "| **Cross-field Validation** | Referential integrity | Referential integrity | ❌ TODO |",
+      "contextBefore": "| **Value Constraints** | Range/format checks | Range/format checks | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 117,
+      "tag": "TODO",
+      "text": "| **ID Format** | Must be valid URI | Must be valid URI | ❌ TODO |",
+      "contextBefore": "|-------|----------|-----------|--------|",
+      "contextAfter": "| **Type Support** | Support AccumulateKeyPage | Support AccumulateKeyPage | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 118,
+      "tag": "TODO",
+      "text": "| **Type Support** | Support AccumulateKeyPage | Support AccumulateKeyPage | ❌ TODO |",
+      "contextBefore": "| **ID Format** | Must be valid URI | Must be valid URI | ❌ TODO |",
+      "contextAfter": "| **Controller Match** | Must match DID | Must match DID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 119,
+      "tag": "TODO",
+      "text": "| **Controller Match** | Must match DID | Must match DID | ❌ TODO |",
+      "contextBefore": "| **Type Support** | Support AccumulateKeyPage | Support AccumulateKeyPage | ❌ TODO |",
+      "contextAfter": "| **Required Properties** | Complete structure | Complete structure | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 120,
+      "tag": "TODO",
+      "text": "| **Required Properties** | Complete structure | Complete structure | ❌ TODO |",
+      "contextBefore": "| **Controller Match** | Must match DID | Must match DID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 128,
+      "tag": "TODO",
+      "text": "| **Key Page URL** | Validate format | Enforce auth policy | ❌ TODO |",
+      "contextBefore": "|--------|----------|-----------|--------|",
+      "contextAfter": "| **Expected Location** | `acc://\u003cadi\u003e/book/1` | `acc://\u003cadi\u003e/book/1` | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 129,
+      "tag": "TODO",
+      "text": "| **Expected Location** | `acc://\u003cadi\u003e/book/1` | `acc://\u003cadi\u003e/book/1` | ❌ TODO |",
+      "contextBefore": "| **Key Page URL** | Validate format | Enforce auth policy | ❌ TODO |",
+      "contextAfter": "| **Threshold Check** | N/A (read-only) | Verify signature threshold | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 130,
+      "tag": "TODO",
+      "text": "| **Threshold Check** | N/A (read-only) | Verify signature threshold | ❌ TODO |",
+      "contextBefore": "| **Expected Location** | `acc://\u003cadi\u003e/book/1` | `acc://\u003cadi\u003e/book/1` | ❌ TODO |",
+      "contextAfter": "| **Authorization** | N/A | Validate against policy | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 131,
+      "tag": "TODO",
+      "text": "| **Authorization** | N/A | Validate against policy | ❌ TODO |",
+      "contextBefore": "| **Threshold Check** | N/A (read-only) | Verify signature threshold | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 137,
+      "tag": "TODO",
+      "text": "| **contentType** | Parse if present | Set to \"application/did+ld+json\" | ❌ TODO |",
+      "contextBefore": "|-------|----------------------|---------------------|--------|",
+      "contextAfter": "| **document** | Extract DID document | Wrap DID document | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 138,
+      "tag": "TODO",
+      "text": "| **document** | Extract DID document | Wrap DID document | ❌ TODO |",
+      "contextBefore": "| **contentType** | Parse if present | Set to \"application/did+ld+json\" | ❌ TODO |",
+      "contextAfter": "| **meta.versionId** | Use for metadata | Generate unique ID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 139,
+      "tag": "TODO",
+      "text": "| **meta.versionId** | Use for metadata | Generate unique ID | ❌ TODO |",
+      "contextBefore": "| **document** | Extract DID document | Wrap DID document | ❌ TODO |",
+      "contextAfter": "| **meta.timestamp** | Use for updated field | Set current time | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 140,
+      "tag": "TODO",
+      "text": "| **meta.timestamp** | Use for updated field | Set current time | ❌ TODO |",
+      "contextBefore": "| **meta.versionId** | Use for metadata | Generate unique ID | ❌ TODO |",
+      "contextAfter": "| **meta.authorKeyPage** | Validate authority | Set from auth policy | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 141,
+      "tag": "TODO",
+      "text": "| **meta.authorKeyPage** | Validate authority | Set from auth policy | ❌ TODO |",
+      "contextBefore": "| **meta.timestamp** | Use for updated field | Set current time | ❌ TODO |",
+      "contextAfter": "| **meta.proof** | Verify integrity | Generate proof data | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 142,
+      "tag": "TODO",
+      "text": "| **meta.proof** | Verify integrity | Generate proof data | ❌ TODO |",
+      "contextBefore": "| **meta.authorKeyPage** | Validate authority | Set from auth policy | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 150,
+      "tag": "TODO",
+      "text": "| **Format** | Parse timestamp-hash | Generate timestamp-hash | ❌ TODO |",
+      "contextBefore": "|-----------|----------|-----------|--------|",
+      "contextAfter": "| **Timestamp** | Extract Unix timestamp | Use current Unix timestamp | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 151,
+      "tag": "TODO",
+      "text": "| **Timestamp** | Extract Unix timestamp | Use current Unix timestamp | ❌ TODO |",
+      "contextBefore": "| **Format** | Parse timestamp-hash | Generate timestamp-hash | ❌ TODO |",
+      "contextAfter": "| **Hash Prefix** | Extract first 8 chars | Use first 8 chars of hash | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 152,
+      "tag": "TODO",
+      "text": "| **Hash Prefix** | Extract first 8 chars | Use first 8 chars of hash | ❌ TODO |",
+      "contextBefore": "| **Timestamp** | Extract Unix timestamp | Use current Unix timestamp | ❌ TODO |",
+      "contextAfter": "| **Uniqueness** | Assume unique | Ensure uniqueness | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 153,
+      "tag": "TODO",
+      "text": "| **Uniqueness** | Assume unique | Ensure uniqueness | ❌ TODO |",
+      "contextBefore": "| **Hash Prefix** | Extract first 8 chars | Use first 8 chars of hash | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 159,
+      "tag": "TODO",
+      "text": "| **Storage Model** | Read append-only | Write append-only | ❌ TODO |",
+      "contextBefore": "|--------|----------|-----------|--------|",
+      "contextAfter": "| **Version Time** | Support ?versionTime query | N/A | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 160,
+      "tag": "TODO",
+      "text": "| **Version Time** | Support ?versionTime query | N/A | ❌ TODO |",
+      "contextBefore": "| **Storage Model** | Read append-only | Write append-only | ❌ TODO |",
+      "contextAfter": "| **Latest Version** | Default to latest | Create new version | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 161,
+      "tag": "TODO",
+      "text": "| **Latest Version** | Default to latest | Create new version | ❌ TODO |",
+      "contextBefore": "| **Version Time** | Support ?versionTime query | N/A | ❌ TODO |",
+      "contextAfter": "| **Previous Version** | Link to previous | Set previousVersionId | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 162,
+      "tag": "TODO",
+      "text": "| **Previous Version** | Link to previous | Set previousVersionId | ❌ TODO |",
+      "contextBefore": "| **Latest Version** | Default to latest | Create new version | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 170,
+      "tag": "TODO",
+      "text": "| **application/did+ld+json** | Default output | Default input | ❌ TODO |",
+      "contextBefore": "|--------|----------|-----------|--------|",
+      "contextAfter": "| **application/ld+json** | Alternative output | Alternative input | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 171,
+      "tag": "TODO",
+      "text": "| **application/ld+json** | Alternative output | Alternative input | ❌ TODO |",
+      "contextBefore": "| **application/did+ld+json** | Default output | Default input | ❌ TODO |",
+      "contextAfter": "| **application/json** | Fallback output | Fallback input | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 172,
+      "tag": "TODO",
+      "text": "| **application/json** | Fallback output | Fallback input | ❌ TODO |",
+      "contextBefore": "| **application/ld+json** | Alternative output | Alternative input | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 178,
+      "tag": "TODO",
+      "text": "| **Accept** | Respect client preference | N/A | ❌ TODO |",
+      "contextBefore": "|--------|------------------|-------------------|--------|",
+      "contextAfter": "| **Content-Type** | Set appropriate type | Validate input type | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 179,
+      "tag": "TODO",
+      "text": "| **Content-Type** | Set appropriate type | Validate input type | ❌ TODO |",
+      "contextBefore": "| **Accept** | Respect client preference | N/A | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 187,
+      "tag": "TODO",
+      "text": "| **Valid Documents** | Use for resolution | Use for creation | ❌ TODO |",
+      "contextBefore": "|---------------|----------------|-----------------|--------|",
+      "contextAfter": "| **Invalid Documents** | Return errors | Reject creation | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 188,
+      "tag": "TODO",
+      "text": "| **Invalid Documents** | Return errors | Reject creation | ❌ TODO |",
+      "contextBefore": "| **Valid Documents** | Use for resolution | Use for creation | ❌ TODO |",
+      "contextAfter": "| **Edge Cases** | Handle gracefully | Validate properly | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 189,
+      "tag": "TODO",
+      "text": "| **Edge Cases** | Handle gracefully | Validate properly | ❌ TODO |",
+      "contextBefore": "| **Invalid Documents** | Return errors | Reject creation | ❌ TODO |",
+      "contextAfter": "| **Canonical JSON** | Parse correctly | Generate correctly | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 190,
+      "tag": "TODO",
+      "text": "| **Canonical JSON** | Parse correctly | Generate correctly | ❌ TODO |",
+      "contextBefore": "| **Edge Cases** | Handle gracefully | Validate properly | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 196,
+      "tag": "TODO",
+      "text": "| **Create → Resolve** | Register then resolve same document | ❌ TODO |",
+      "contextBefore": "|------|-------------|--------|",
+      "contextAfter": "| **Update → Resolve** | Update then resolve latest version | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 197,
+      "tag": "TODO",
+      "text": "| **Update → Resolve** | Update then resolve latest version | ❌ TODO |",
+      "contextBefore": "| **Create → Resolve** | Register then resolve same document | ❌ TODO |",
+      "contextAfter": "| **Deactivate → Resolve** | Deactivate then resolve shows deactivated | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 198,
+      "tag": "TODO",
+      "text": "| **Deactivate → Resolve** | Deactivate then resolve shows deactivated | ❌ TODO |",
+      "contextBefore": "| **Update → Resolve** | Update then resolve latest version | ❌ TODO |",
+      "contextAfter": "| **Version History** | Create multiple versions, resolve each | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 199,
+      "tag": "TODO",
+      "text": "| **Version History** | Create multiple versions, resolve each | ❌ TODO |",
+      "contextBefore": "| **Deactivate → Resolve** | Deactivate then resolve shows deactivated | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 207,
+      "tag": "TODO",
+      "text": "| **API URL** | Same endpoint | Same endpoint | ❌ TODO |",
+      "contextBefore": "|---------|----------|-----------|--------|",
+      "contextAfter": "| **Timeout** | Read timeout | Write timeout | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 208,
+      "tag": "TODO",
+      "text": "| **Timeout** | Read timeout | Write timeout | ❌ TODO |",
+      "contextBefore": "| **API URL** | Same endpoint | Same endpoint | ❌ TODO |",
+      "contextAfter": "| **Retry Policy** | Read retries | Write retries | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 209,
+      "tag": "TODO",
+      "text": "| **Retry Policy** | Read retries | Write retries | ❌ TODO |",
+      "contextBefore": "| **Timeout** | Read timeout | Write timeout | ❌ TODO |",
+      "contextAfter": "| **Authentication** | API credentials | API credentials | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 210,
+      "tag": "TODO",
+      "text": "| **Authentication** | API credentials | API credentials | ❌ TODO |",
+      "contextBefore": "| **Retry Policy** | Read retries | Write retries | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 216,
+      "tag": "TODO",
+      "text": "| **Max Document Size** | Same limit | Same limit | ❌ TODO |",
+      "contextBefore": "|---------|----------|-----------|--------|",
+      "contextAfter": "| **Max Array Length** | Same limit | Same limit | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 217,
+      "tag": "TODO",
+      "text": "| **Max Array Length** | Same limit | Same limit | ❌ TODO |",
+      "contextBefore": "| **Max Document Size** | Same limit | Same limit | ❌ TODO |",
+      "contextAfter": "| **Allowed VM Types** | Same types | Same types | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 218,
+      "tag": "TODO",
+      "text": "| **Allowed VM Types** | Same types | Same types | ❌ TODO |",
+      "contextBefore": "| **Max Array Length** | Same limit | Same limit | ❌ TODO |",
+      "contextAfter": "| **Service Endpoint Limits** | Same limits | Same limits | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 219,
+      "tag": "TODO",
+      "text": "| **Service Endpoint Limits** | Same limits | Same limits | ❌ TODO |",
+      "contextBefore": "| **Allowed VM Types** | Same types | Same types | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 227,
+      "tag": "TODO",
+      "text": "| **Request Count** | Track resolutions | Track operations | ❌ TODO |",
+      "contextBefore": "|--------|----------|-----------|--------|",
+      "contextAfter": "| **Error Rate** | Track resolution errors | Track operation errors | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 228,
+      "tag": "TODO",
+      "text": "| **Error Rate** | Track resolution errors | Track operation errors | ❌ TODO |",
+      "contextBefore": "| **Request Count** | Track resolutions | Track operations | ❌ TODO |",
+      "contextAfter": "| **Latency** | Resolution time | Operation time | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 229,
+      "tag": "TODO",
+      "text": "| **Latency** | Resolution time | Operation time | ❌ TODO |",
+      "contextBefore": "| **Error Rate** | Track resolution errors | Track operation errors | ❌ TODO |",
+      "contextAfter": "| **Accumulate Calls** | API call count | API call count | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 230,
+      "tag": "TODO",
+      "text": "| **Accumulate Calls** | API call count | API call count | ❌ TODO |",
+      "contextBefore": "| **Latency** | Resolution time | Operation time | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 237,
+      "tag": "TODO",
+      "text": "| **Accumulate Connectivity** | Test API connection | Test API connection | ❌ TODO |",
+      "contextBefore": "| **Service Health** | Return 200 OK | Return 200 OK | ✅ DONE |",
+      "contextAfter": "| **Database Connectivity** | N/A (stateless) | N/A (stateless) | ✅ N/A |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 246,
+      "tag": "TODO",
+      "text": "| **Create → Resolve** | Registrar creates, resolver resolves | ❌ TODO |",
+      "contextBefore": "|---------------|-------------|--------|",
+      "contextAfter": "| **Update → Resolve** | Registrar updates, resolver gets latest | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 247,
+      "tag": "TODO",
+      "text": "| **Update → Resolve** | Registrar updates, resolver gets latest | ❌ TODO |",
+      "contextBefore": "| **Create → Resolve** | Registrar creates, resolver resolves | ❌ TODO |",
+      "contextAfter": "| **Deactivate → Resolve** | Registrar deactivates, resolver shows status | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 248,
+      "tag": "TODO",
+      "text": "| **Deactivate → Resolve** | Registrar deactivates, resolver shows status | ❌ TODO |",
+      "contextBefore": "| **Update → Resolve** | Registrar updates, resolver gets latest | ❌ TODO |",
+      "contextAfter": "| **Error Consistency** | Both services return same errors for same inputs | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 249,
+      "tag": "TODO",
+      "text": "| **Error Consistency** | Both services return same errors for same inputs | ❌ TODO |",
+      "contextBefore": "| **Deactivate → Resolve** | Registrar deactivates, resolver shows status | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 255,
+      "tag": "TODO",
+      "text": "| **Canonical Equivalence** | Same document canonicalizes identically | ❌ TODO |",
+      "contextBefore": "|------|-------------|--------|",
+      "contextAfter": "| **Hash Verification** | Registrar hash matches resolver verification | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 256,
+      "tag": "TODO",
+      "text": "| **Hash Verification** | Registrar hash matches resolver verification | ❌ TODO |",
+      "contextBefore": "| **Canonical Equivalence** | Same document canonicalizes identically | ❌ TODO |",
+      "contextAfter": "| **Metadata Alignment** | Generated metadata matches resolved metadata | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 257,
+      "tag": "TODO",
+      "text": "| **Metadata Alignment** | Generated metadata matches resolved metadata | ❌ TODO |",
+      "contextBefore": "| **Hash Verification** | Registrar hash matches resolver verification | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 265,
+      "tag": "TODO",
+      "text": "| **Error Codes** | List all errors | List all errors | ❌ TODO |",
+      "contextBefore": "|---------|---------------|----------------|--------|",
+      "contextAfter": "| **Request Format** | N/A | Document structure | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 266,
+      "tag": "TODO",
+      "text": "| **Request Format** | N/A | Document structure | ❌ TODO |",
+      "contextBefore": "| **Error Codes** | List all errors | List all errors | ❌ TODO |",
+      "contextAfter": "| **Response Format** | Document structure | Document structure | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 267,
+      "tag": "TODO",
+      "text": "| **Response Format** | Document structure | Document structure | ❌ TODO |",
+      "contextBefore": "| **Request Format** | N/A | Document structure | ❌ TODO |",
+      "contextAfter": "| **Examples** | Valid requests/responses | Valid requests/responses | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 268,
+      "tag": "TODO",
+      "text": "| **Examples** | Valid requests/responses | Valid requests/responses | ❌ TODO |",
+      "contextBefore": "| **Response Format** | Document structure | Document structure | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 274,
+      "tag": "TODO",
+      "text": "| **Basic Usage** | Resolution example | Creation example | ❌ TODO |",
+      "contextBefore": "|--------------|----------|-----------|--------|",
+      "contextAfter": "| **Error Handling** | Error response example | Error response example | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 275,
+      "tag": "TODO",
+      "text": "| **Error Handling** | Error response example | Error response example | ❌ TODO |",
+      "contextBefore": "| **Basic Usage** | Resolution example | Creation example | ❌ TODO |",
+      "contextAfter": "| **Advanced Features** | Version time example | Update example | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-RESOLVER-REGISTRAR.md",
+      "line": 276,
+      "tag": "TODO",
+      "text": "| **Advanced Features** | Version time example | Update example | ❌ TODO |",
+      "contextBefore": "| **Error Handling** | Error response example | Error response example | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 12,
+      "tag": "TODO",
+      "text": "| **DID URL Dereferencing** | [DID Core §7](https://www.w3.org/TR/did-core/#did-url-dereferencing) | ❌ TODO | Must support path, query, fragment |",
+      "contextBefore": "|-------------|---------------|----------------------|-------|",
+      "contextAfter": "| **Resolution Result Format** | [DID Core §7.1](https://www.w3.org/TR/did-core/#did-resolution-result) | ❌ TODO | didDocument, didDocumentMetadata, didResolutionMetadata |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 13,
+      "tag": "TODO",
+      "text": "| **Resolution Result Format** | [DID Core §7.1](https://www.w3.org/TR/did-core/#did-resolution-result) | ❌ TODO | didDocument, didDocumentMetadata, didResolutionMetadata |",
+      "contextBefore": "| **DID URL Dereferencing** | [DID Core §7](https://www.w3.org/TR/did-core/#did-url-dereferencing) | ❌ TODO | Must support path, query, fragment |",
+      "contextAfter": "| **Content Type Handling** | [DID Core §7.1.2](https://www.w3.org/TR/did-core/#did-resolution-metadata) | ❌ TODO | application/did+ld+json default |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 14,
+      "tag": "TODO",
+      "text": "| **Content Type Handling** | [DID Core §7.1.2](https://www.w3.org/TR/did-core/#did-resolution-metadata) | ❌ TODO | application/did+ld+json default |",
+      "contextBefore": "| **Resolution Result Format** | [DID Core §7.1](https://www.w3.org/TR/did-core/#did-resolution-result) | ❌ TODO | didDocument, didDocumentMetadata, didResolutionMetadata |",
+      "contextAfter": "| **Error Handling** | [DID Core §7.1.2](https://www.w3.org/TR/did-core/#did-resolution-metadata) | ❌ TODO | Standard error codes |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 15,
+      "tag": "TODO",
+      "text": "| **Error Handling** | [DID Core §7.1.2](https://www.w3.org/TR/did-core/#did-resolution-metadata) | ❌ TODO | Standard error codes |",
+      "contextBefore": "| **Content Type Handling** | [DID Core §7.1.2](https://www.w3.org/TR/did-core/#did-resolution-metadata) | ❌ TODO | application/did+ld+json default |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 21,
+      "tag": "TODO",
+      "text": "| **Created Timestamp** | [DID Core §7.3](https://www.w3.org/TR/did-core/#did-document-metadata) | ❌ TODO | ISO 8601 format |",
+      "contextBefore": "|-------------|---------------|----------------------|-------|",
+      "contextAfter": "| **Updated Timestamp** | [DID Core §7.3](https://www.w3.org/TR/did-core/#did-document-metadata) | ❌ TODO | ISO 8601 format |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 22,
+      "tag": "TODO",
+      "text": "| **Updated Timestamp** | [DID Core §7.3](https://www.w3.org/TR/did-core/#did-document-metadata) | ❌ TODO | ISO 8601 format |",
+      "contextBefore": "| **Created Timestamp** | [DID Core §7.3](https://www.w3.org/TR/did-core/#did-document-metadata) | ❌ TODO | ISO 8601 format |",
+      "contextAfter": "| **Version ID** | [DID Core §7.3](https://www.w3.org/TR/did-core/#did-document-metadata) | ❌ TODO | Unique version identifier |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 23,
+      "tag": "TODO",
+      "text": "| **Version ID** | [DID Core §7.3](https://www.w3.org/TR/did-core/#did-document-metadata) | ❌ TODO | Unique version identifier |",
+      "contextBefore": "| **Updated Timestamp** | [DID Core §7.3](https://www.w3.org/TR/did-core/#did-document-metadata) | ❌ TODO | ISO 8601 format |",
+      "contextAfter": "| **Deactivated Flag** | [DID Core §7.3](https://www.w3.org/TR/did-core/#did-document-metadata) | ❌ TODO | Boolean deactivation status |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 24,
+      "tag": "TODO",
+      "text": "| **Deactivated Flag** | [DID Core §7.3](https://www.w3.org/TR/did-core/#did-document-metadata) | ❌ TODO | Boolean deactivation status |",
+      "contextBefore": "| **Version ID** | [DID Core §7.3](https://www.w3.org/TR/did-core/#did-document-metadata) | ❌ TODO | Unique version identifier |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 32,
+      "tag": "TODO",
+      "text": "| **Method Name** | did-acc-method.md §3 | ❌ TODO | Must accept \"did:acc:\" prefix |",
+      "contextBefore": "|-------------|---------------|----------------------|--------------|",
+      "contextAfter": "| **ADI Name Format** | did-acc-method.md §3.1 | ❌ TODO | Validate ADI syntax rules |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 33,
+      "tag": "TODO",
+      "text": "| **ADI Name Format** | did-acc-method.md §3.1 | ❌ TODO | Validate ADI syntax rules |",
+      "contextBefore": "| **Method Name** | did-acc-method.md §3 | ❌ TODO | Must accept \"did:acc:\" prefix |",
+      "contextAfter": "| **Case Insensitive** | did-acc-method.md §6.1 | ❌ TODO | Normalize to lowercase |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 34,
+      "tag": "TODO",
+      "text": "| **Case Insensitive** | did-acc-method.md §6.1 | ❌ TODO | Normalize to lowercase |",
+      "contextBefore": "| **ADI Name Format** | did-acc-method.md §3.1 | ❌ TODO | Validate ADI syntax rules |",
+      "contextAfter": "| **URL Components** | did-acc-method.md §3.2 | ❌ TODO | Support path, query, fragment |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 35,
+      "tag": "TODO",
+      "text": "| **URL Components** | did-acc-method.md §3.2 | ❌ TODO | Support path, query, fragment |",
+      "contextBefore": "| **Case Insensitive** | did-acc-method.md §6.1 | ❌ TODO | Normalize to lowercase |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 41,
+      "tag": "TODO",
+      "text": "| **Data Account Lookup** | did-acc-method.md §4.2 | ❌ TODO | Query acc://\u003cadi\u003e/data/did |",
+      "contextBefore": "|-------------|---------------|----------------------|--------------|",
+      "contextAfter": "| **Version Time Support** | did-acc-method.md §4.2 | ❌ TODO | ?versionTime parameter |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 42,
+      "tag": "TODO",
+      "text": "| **Version Time Support** | did-acc-method.md §4.2 | ❌ TODO | ?versionTime parameter |",
+      "contextBefore": "| **Data Account Lookup** | did-acc-method.md §4.2 | ❌ TODO | Query acc://\u003cadi\u003e/data/did |",
+      "contextAfter": "| **Latest Version Default** | did-acc-method.md §4.2 | ❌ TODO | Return most recent if no versionTime |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 43,
+      "tag": "TODO",
+      "text": "| **Latest Version Default** | did-acc-method.md §4.2 | ❌ TODO | Return most recent if no versionTime |",
+      "contextBefore": "| **Version Time Support** | did-acc-method.md §4.2 | ❌ TODO | ?versionTime parameter |",
+      "contextAfter": "| **Deactivated Handling** | did-acc-method.md §4.4 | ❌ TODO | Check deactivated field |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 44,
+      "tag": "TODO",
+      "text": "| **Deactivated Handling** | did-acc-method.md §4.4 | ❌ TODO | Check deactivated field |",
+      "contextBefore": "| **Latest Version Default** | did-acc-method.md §4.2 | ❌ TODO | Return most recent if no versionTime |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 50,
+      "tag": "TODO",
+      "text": "| **Type Recognition** | did-acc-method.md §5.1 | ❌ TODO | Handle AccumulateKeyPage type |",
+      "contextBefore": "|-------------|---------------|----------------------|--------------|",
+      "contextAfter": "| **Key Page URL** | did-acc-method.md §5.1 | ❌ TODO | Validate keyPageUrl format |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 51,
+      "tag": "TODO",
+      "text": "| **Key Page URL** | did-acc-method.md §5.1 | ❌ TODO | Validate keyPageUrl format |",
+      "contextBefore": "| **Type Recognition** | did-acc-method.md §5.1 | ❌ TODO | Handle AccumulateKeyPage type |",
+      "contextAfter": "| **Threshold Property** | did-acc-method.md §5.1 | ❌ TODO | Include threshold value |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 52,
+      "tag": "TODO",
+      "text": "| **Threshold Property** | did-acc-method.md §5.1 | ❌ TODO | Include threshold value |",
+      "contextBefore": "| **Key Page URL** | did-acc-method.md §5.1 | ❌ TODO | Validate keyPageUrl format |",
+      "contextAfter": "| **Controller Validation** | did-acc-method.md §5.1 | ❌ TODO | Verify controller matches DID |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 53,
+      "tag": "TODO",
+      "text": "| **Controller Validation** | did-acc-method.md §5.1 | ❌ TODO | Verify controller matches DID |",
+      "contextBefore": "| **Threshold Property** | did-acc-method.md §5.1 | ❌ TODO | Include threshold value |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 61,
+      "tag": "TODO",
+      "text": "| **Key Ordering** | Rules.md §2.2 | ❌ TODO | Lexicographic order |",
+      "contextBefore": "|-------------|---------------|----------------------|--------------|",
+      "contextAfter": "| **No Whitespace** | Rules.md §2.2 | ❌ TODO | Compact representation |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 62,
+      "tag": "TODO",
+      "text": "| **No Whitespace** | Rules.md §2.2 | ❌ TODO | Compact representation |",
+      "contextBefore": "| **Key Ordering** | Rules.md §2.2 | ❌ TODO | Lexicographic order |",
+      "contextAfter": "| **Number Format** | Rules.md §2.2 | ❌ TODO | No trailing zeros |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 63,
+      "tag": "TODO",
+      "text": "| **Number Format** | Rules.md §2.2 | ❌ TODO | No trailing zeros |",
+      "contextBefore": "| **No Whitespace** | Rules.md §2.2 | ❌ TODO | Compact representation |",
+      "contextAfter": "| **String Escaping** | Rules.md §2.2 | ❌ TODO | Minimal escaping |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 64,
+      "tag": "TODO",
+      "text": "| **String Escaping** | Rules.md §2.2 | ❌ TODO | Minimal escaping |",
+      "contextBefore": "| **Number Format** | Rules.md §2.2 | ❌ TODO | No trailing zeros |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 70,
+      "tag": "TODO",
+      "text": "| **SHA-256 Algorithm** | Rules.md §3 | ❌ TODO | Use SHA-256 for all hashes |",
+      "contextBefore": "|-------------|---------------|----------------------|--------------|",
+      "contextAfter": "| **Hash Format** | Rules.md §3.3 | ❌ TODO | \"sha256:\" prefix |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 71,
+      "tag": "TODO",
+      "text": "| **Hash Format** | Rules.md §3.3 | ❌ TODO | \"sha256:\" prefix |",
+      "contextBefore": "| **SHA-256 Algorithm** | Rules.md §3 | ❌ TODO | Use SHA-256 for all hashes |",
+      "contextAfter": "| **Content Integrity** | Rules.md §3 | ❌ TODO | Verify stored vs computed hash |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 72,
+      "tag": "TODO",
+      "text": "| **Content Integrity** | Rules.md §3 | ❌ TODO | Verify stored vs computed hash |",
+      "contextBefore": "| **Hash Format** | Rules.md §3.3 | ❌ TODO | \"sha256:\" prefix |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 78,
+      "tag": "TODO",
+      "text": "| **Case Normalization** | Rules.md §8.1 | ❌ TODO | `did:acc:ALICE` → `did:acc:alice` |",
+      "contextBefore": "|-------------|---------------|----------------------|-------------|",
+      "contextAfter": "| **Trailing Dot Removal** | Rules.md §8.1 | ❌ TODO | `did:acc:alice.` → `did:acc:alice` |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 79,
+      "tag": "TODO",
+      "text": "| **Trailing Dot Removal** | Rules.md §8.1 | ❌ TODO | `did:acc:alice.` → `did:acc:alice` |",
+      "contextBefore": "| **Case Normalization** | Rules.md §8.1 | ❌ TODO | `did:acc:ALICE` → `did:acc:alice` |",
+      "contextAfter": "| **Query Preservation** | Rules.md §8.1 | ❌ TODO | Maintain parameter order |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 80,
+      "tag": "TODO",
+      "text": "| **Query Preservation** | Rules.md §8.1 | ❌ TODO | Maintain parameter order |",
+      "contextBefore": "| **Trailing Dot Removal** | Rules.md §8.1 | ❌ TODO | `did:acc:alice.` → `did:acc:alice` |",
+      "contextAfter": "| **Fragment Preservation** | Rules.md §8.1 | ❌ TODO | Keep fragment as-is |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 81,
+      "tag": "TODO",
+      "text": "| **Fragment Preservation** | Rules.md §8.1 | ❌ TODO | Keep fragment as-is |",
+      "contextBefore": "| **Query Preservation** | Rules.md §8.1 | ❌ TODO | Maintain parameter order |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 89,
+      "tag": "TODO",
+      "text": "| `notFound` | 404 | did-acc-method.md §8.1 | ❌ TODO |",
+      "contextBefore": "|------------|-------------|---------------|----------------------|",
+      "contextAfter": "| `deactivated` | 410 | did-acc-method.md §8.1 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 90,
+      "tag": "TODO",
+      "text": "| `deactivated` | 410 | did-acc-method.md §8.1 | ❌ TODO |",
+      "contextBefore": "| `notFound` | 404 | did-acc-method.md §8.1 | ❌ TODO |",
+      "contextAfter": "| `invalidDid` | 400 | did-acc-method.md §8.1 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 91,
+      "tag": "TODO",
+      "text": "| `invalidDid` | 400 | did-acc-method.md §8.1 | ❌ TODO |",
+      "contextBefore": "| `deactivated` | 410 | did-acc-method.md §8.1 | ❌ TODO |",
+      "contextAfter": "| `versionNotFound` | 404 | did-acc-method.md §8.1 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 92,
+      "tag": "TODO",
+      "text": "| `versionNotFound` | 404 | did-acc-method.md §8.1 | ❌ TODO |",
+      "contextBefore": "| `invalidDid` | 400 | did-acc-method.md §8.1 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 98,
+      "tag": "TODO",
+      "text": "| `error` | string | ✅ | ❌ TODO |",
+      "contextBefore": "|-------|------|----------|----------------------|",
+      "contextAfter": "| `message` | string | ✅ | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 99,
+      "tag": "TODO",
+      "text": "| `message` | string | ✅ | ❌ TODO |",
+      "contextBefore": "| `error` | string | ✅ | ❌ TODO |",
+      "contextAfter": "| `details` | object | ❌ | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 100,
+      "tag": "TODO",
+      "text": "| `details` | object | ❌ | ❌ TODO |",
+      "contextBefore": "| `message` | string | ✅ | ❌ TODO |",
+      "contextAfter": "| `requestId` | string | ❌ | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 101,
+      "tag": "TODO",
+      "text": "| `requestId` | string | ❌ | ❌ TODO |",
+      "contextBefore": "| `details` | object | ❌ | ❌ TODO |",
+      "contextAfter": "| `timestamp` | string | ❌ | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 102,
+      "tag": "TODO",
+      "text": "| `timestamp` | string | ❌ | ❌ TODO |",
+      "contextBefore": "| `requestId` | string | ❌ | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 110,
+      "tag": "TODO",
+      "text": "| **GET /resolve** | Core endpoint | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|---------|-------------|----------------------|---------------|",
+      "contextAfter": "| **DID Parameter** | ?did=did:acc:alice | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 110,
+      "tag": "TODO",
+      "text": "| **GET /resolve** | Core endpoint | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|---------|-------------|----------------------|---------------|",
+      "contextAfter": "| **DID Parameter** | ?did=did:acc:alice | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 111,
+      "tag": "TODO",
+      "text": "| **DID Parameter** | ?did=did:acc:alice | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **GET /resolve** | Core endpoint | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Version Time** | ?versionTime=2024-01-01T00:00:00Z | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 111,
+      "tag": "TODO",
+      "text": "| **DID Parameter** | ?did=did:acc:alice | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **GET /resolve** | Core endpoint | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Version Time** | ?versionTime=2024-01-01T00:00:00Z | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 112,
+      "tag": "TODO",
+      "text": "| **Version Time** | ?versionTime=2024-01-01T00:00:00Z | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **DID Parameter** | ?did=did:acc:alice | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Accept Header** | Content type negotiation | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 112,
+      "tag": "TODO",
+      "text": "| **Version Time** | ?versionTime=2024-01-01T00:00:00Z | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **DID Parameter** | ?did=did:acc:alice | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Accept Header** | Content type negotiation | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 113,
+      "tag": "TODO",
+      "text": "| **Accept Header** | Content type negotiation | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Version Time** | ?versionTime=2024-01-01T00:00:00Z | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **CORS Support** | Cross-origin requests | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 113,
+      "tag": "TODO",
+      "text": "| **Accept Header** | Content type negotiation | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Version Time** | ?versionTime=2024-01-01T00:00:00Z | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **CORS Support** | Cross-origin requests | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 114,
+      "tag": "TODO",
+      "text": "| **CORS Support** | Cross-origin requests | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Accept Header** | Content type negotiation | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 114,
+      "tag": "TODO",
+      "text": "| **CORS Support** | Cross-origin requests | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Accept Header** | Content type negotiation | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 120,
+      "tag": "TODO",
+      "text": "| **GET /health** | Service health check | ✅ DONE | ❌ TODO |",
+      "contextBefore": "|---------|-------------|----------------------|---------------|",
+      "contextAfter": "| **Status Response** | JSON status format | ✅ DONE | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 121,
+      "tag": "TODO",
+      "text": "| **Status Response** | JSON status format | ✅ DONE | ❌ TODO |",
+      "contextBefore": "| **GET /health** | Service health check | ✅ DONE | ❌ TODO |",
+      "contextAfter": "| **Dependency Checks** | Accumulate connectivity | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 122,
+      "tag": "TODO",
+      "text": "| **Dependency Checks** | Accumulate connectivity | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Status Response** | JSON status format | ✅ DONE | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 122,
+      "tag": "TODO",
+      "text": "| **Dependency Checks** | Accumulate connectivity | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Status Response** | JSON status format | ✅ DONE | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 130,
+      "tag": "TODO",
+      "text": "| **Uppercase DID** | `did:acc:ALICE` | `did:acc:alice` | ❌ TODO |",
+      "contextBefore": "|-----------|-------|----------------|----------------------|",
+      "contextAfter": "| **Mixed Case** | `did:acc:Alice.Org` | `did:acc:alice.org` | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 131,
+      "tag": "TODO",
+      "text": "| **Mixed Case** | `did:acc:Alice.Org` | `did:acc:alice.org` | ❌ TODO |",
+      "contextBefore": "| **Uppercase DID** | `did:acc:ALICE` | `did:acc:alice` | ❌ TODO |",
+      "contextAfter": "| **Trailing Dot** | `did:acc:alice.` | `did:acc:alice` | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 132,
+      "tag": "TODO",
+      "text": "| **Trailing Dot** | `did:acc:alice.` | `did:acc:alice` | ❌ TODO |",
+      "contextBefore": "| **Mixed Case** | `did:acc:Alice.Org` | `did:acc:alice.org` | ❌ TODO |",
+      "contextAfter": "| **Query Parameters** | `did:acc:alice?versionTime=...` | Preserved | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 133,
+      "tag": "TODO",
+      "text": "| **Query Parameters** | `did:acc:alice?versionTime=...` | Preserved | ❌ TODO |",
+      "contextBefore": "| **Trailing Dot** | `did:acc:alice.` | `did:acc:alice` | ❌ TODO |",
+      "contextAfter": "| **Fragment** | `did:acc:alice#key-1` | Preserved | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 134,
+      "tag": "TODO",
+      "text": "| **Fragment** | `did:acc:alice#key-1` | Preserved | ❌ TODO |",
+      "contextBefore": "| **Query Parameters** | `did:acc:alice?versionTime=...` | Preserved | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 140,
+      "tag": "TODO",
+      "text": "| **Basic Resolution** | Resolve existing DID | ❌ TODO |",
+      "contextBefore": "|-----------|-------------|----------------------|",
+      "contextAfter": "| **Version Time** | Resolve at specific time | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 141,
+      "tag": "TODO",
+      "text": "| **Version Time** | Resolve at specific time | ❌ TODO |",
+      "contextBefore": "| **Basic Resolution** | Resolve existing DID | ❌ TODO |",
+      "contextAfter": "| **Not Found** | Non-existent DID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 142,
+      "tag": "TODO",
+      "text": "| **Not Found** | Non-existent DID | ❌ TODO |",
+      "contextBefore": "| **Version Time** | Resolve at specific time | ❌ TODO |",
+      "contextAfter": "| **Deactivated** | Deactivated DID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 143,
+      "tag": "TODO",
+      "text": "| **Deactivated** | Deactivated DID | ❌ TODO |",
+      "contextBefore": "| **Not Found** | Non-existent DID | ❌ TODO |",
+      "contextAfter": "| **Invalid DID** | Malformed DID syntax | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 144,
+      "tag": "TODO",
+      "text": "| **Invalid DID** | Malformed DID syntax | ❌ TODO |",
+      "contextBefore": "| **Deactivated** | Deactivated DID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 150,
+      "tag": "TODO",
+      "text": "| **Resolution Latency** | \u003c100ms (cached) | Benchmark tests | ❌ TODO |",
+      "contextBefore": "|--------|--------|--------------------|----------------------|",
+      "contextAfter": "| **Resolution Latency** | \u003c500ms (uncached) | Benchmark tests | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 151,
+      "tag": "TODO",
+      "text": "| **Resolution Latency** | \u003c500ms (uncached) | Benchmark tests | ❌ TODO |",
+      "contextBefore": "| **Resolution Latency** | \u003c100ms (cached) | Benchmark tests | ❌ TODO |",
+      "contextAfter": "| **Concurrent Requests** | 1000 req/s | Load testing | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 152,
+      "tag": "TODO",
+      "text": "| **Concurrent Requests** | 1000 req/s | Load testing | ❌ TODO |",
+      "contextBefore": "| **Resolution Latency** | \u003c500ms (uncached) | Benchmark tests | ❌ TODO |",
+      "contextAfter": "| **Memory Usage** | \u003c100MB baseline | Profiling | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 153,
+      "tag": "TODO",
+      "text": "| **Memory Usage** | \u003c100MB baseline | Profiling | ❌ TODO |",
+      "contextBefore": "| **Concurrent Requests** | 1000 req/s | Load testing | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 159,
+      "tag": "TODO",
+      "text": "| **Input Validation** | ❌ TODO | Fuzzing tests |",
+      "contextBefore": "|-------------|----------------------|---------------------|",
+      "contextAfter": "| **XSS Prevention** | ❌ TODO | Security scan |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 160,
+      "tag": "TODO",
+      "text": "| **XSS Prevention** | ❌ TODO | Security scan |",
+      "contextBefore": "| **Input Validation** | ❌ TODO | Fuzzing tests |",
+      "contextAfter": "| **DoS Protection** | ❌ TODO | Rate limiting |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 161,
+      "tag": "TODO",
+      "text": "| **DoS Protection** | ❌ TODO | Rate limiting |",
+      "contextBefore": "| **XSS Prevention** | ❌ TODO | Security scan |",
+      "contextAfter": "| **Content Integrity** | ❌ TODO | Hash verification |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 162,
+      "tag": "TODO",
+      "text": "| **Content Integrity** | ❌ TODO | Hash verification |",
+      "contextBefore": "| **DoS Protection** | ❌ TODO | Rate limiting |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 170,
+      "tag": "TODO",
+      "text": "| **API Client** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|---------|----------------------|---------------|",
+      "contextAfter": "| **Data Account Queries** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 170,
+      "tag": "TODO",
+      "text": "| **API Client** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|---------|----------------------|---------------|",
+      "contextAfter": "| **Data Account Queries** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 171,
+      "tag": "TODO",
+      "text": "| **Data Account Queries** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **API Client** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Error Handling** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 171,
+      "tag": "TODO",
+      "text": "| **Data Account Queries** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **API Client** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Error Handling** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 172,
+      "tag": "TODO",
+      "text": "| **Error Handling** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Data Account Queries** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Retry Logic** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 172,
+      "tag": "TODO",
+      "text": "| **Error Handling** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Data Account Queries** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Retry Logic** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 173,
+      "tag": "TODO",
+      "text": "| **Retry Logic** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Error Handling** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Circuit Breaker** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 173,
+      "tag": "TODO",
+      "text": "| **Retry Logic** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Error Handling** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Circuit Breaker** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 174,
+      "tag": "TODO",
+      "text": "| **Circuit Breaker** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Retry Logic** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 174,
+      "tag": "TODO",
+      "text": "| **Circuit Breaker** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Retry Logic** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 180,
+      "tag": "TODO",
+      "text": "| **Mock Client** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|---------|----------------------|---------------|",
+      "contextAfter": "| **Golden File Tests** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 180,
+      "tag": "TODO",
+      "text": "| **Mock Client** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|---------|----------------------|---------------|",
+      "contextAfter": "| **Golden File Tests** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 181,
+      "tag": "TODO",
+      "text": "| **Golden File Tests** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Mock Client** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Test Vector Validation** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 181,
+      "tag": "TODO",
+      "text": "| **Golden File Tests** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Mock Client** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Test Vector Validation** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 182,
+      "tag": "TODO",
+      "text": "| **Test Vector Validation** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Golden File Tests** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 182,
+      "tag": "TODO",
+      "text": "| **Test Vector Validation** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Golden File Tests** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 188,
+      "tag": "TODO",
+      "text": "| **API Documentation** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|----------|----------------------|----------------|",
+      "contextAfter": "| **Usage Examples** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 188,
+      "tag": "TODO",
+      "text": "| **API Documentation** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|----------|----------------------|----------------|",
+      "contextAfter": "| **Usage Examples** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 189,
+      "tag": "TODO",
+      "text": "| **Usage Examples** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **API Documentation** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Error Responses** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 189,
+      "tag": "TODO",
+      "text": "| **Usage Examples** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **API Documentation** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Error Responses** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 190,
+      "tag": "TODO",
+      "text": "| **Error Responses** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Usage Examples** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Configuration Guide** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 190,
+      "tag": "TODO",
+      "text": "| **Error Responses** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Usage Examples** | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Configuration Guide** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 191,
+      "tag": "TODO",
+      "text": "| **Configuration Guide** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Error Responses** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-SPEC-RESOLVER.md",
+      "line": 191,
+      "tag": "TODO",
+      "text": "| **Configuration Guide** | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Error Responses** | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 12,
+      "tag": "TODO",
+      "text": "| **Endpoint Path** | GET /1.0/identifiers/{did} | ❌ TODO | Must match exact path |",
+      "contextBefore": "|-------------|---------------|----------------------|-------|",
+      "contextAfter": "| **Method Support** | GET only | ❌ TODO | No other HTTP methods |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 13,
+      "tag": "TODO",
+      "text": "| **Method Support** | GET only | ❌ TODO | No other HTTP methods |",
+      "contextBefore": "| **Endpoint Path** | GET /1.0/identifiers/{did} | ❌ TODO | Must match exact path |",
+      "contextAfter": "| **DID Parameter** | Path parameter | ❌ TODO | Extract from URL path |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 14,
+      "tag": "TODO",
+      "text": "| **DID Parameter** | Path parameter | ❌ TODO | Extract from URL path |",
+      "contextBefore": "| **Method Support** | GET only | ❌ TODO | No other HTTP methods |",
+      "contextAfter": "| **Response Format** | Universal format | ❌ TODO | Must match Universal spec |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 15,
+      "tag": "TODO",
+      "text": "| **Response Format** | Universal format | ❌ TODO | Must match Universal spec |",
+      "contextBefore": "| **DID Parameter** | Path parameter | ❌ TODO | Extract from URL path |",
+      "contextAfter": "| **Content Type** | application/did+resolution-result+json | ❌ TODO | Default content type |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 16,
+      "tag": "TODO",
+      "text": "| **Content Type** | application/did+resolution-result+json | ❌ TODO | Default content type |",
+      "contextBefore": "| **Response Format** | Universal format | ❌ TODO | Must match Universal spec |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 22,
+      "tag": "TODO",
+      "text": "| **DID Validation** | Validate DID syntax | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|---------|----------------|----------------------|---------------|",
+      "contextAfter": "| **Method Filtering** | Only handle did:acc | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 22,
+      "tag": "TODO",
+      "text": "| **DID Validation** | Validate DID syntax | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|---------|----------------|----------------------|---------------|",
+      "contextAfter": "| **Method Filtering** | Only handle did:acc | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 23,
+      "tag": "TODO",
+      "text": "| **Method Filtering** | Only handle did:acc | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **DID Validation** | Validate DID syntax | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Accept Header** | Support content negotiation | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 23,
+      "tag": "TODO",
+      "text": "| **Method Filtering** | Only handle did:acc | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **DID Validation** | Validate DID syntax | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Accept Header** | Support content negotiation | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 24,
+      "tag": "TODO",
+      "text": "| **Accept Header** | Support content negotiation | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Method Filtering** | Only handle did:acc | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Query Parameters** | Pass through to core resolver | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 24,
+      "tag": "TODO",
+      "text": "| **Accept Header** | Support content negotiation | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Method Filtering** | Only handle did:acc | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Query Parameters** | Pass through to core resolver | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 25,
+      "tag": "TODO",
+      "text": "| **Query Parameters** | Pass through to core resolver | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Accept Header** | Support content negotiation | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 25,
+      "tag": "TODO",
+      "text": "| **Query Parameters** | Pass through to core resolver | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Accept Header** | Support content negotiation | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 31,
+      "tag": "TODO",
+      "text": "| **didDocument** | Direct inclusion | Same | ❌ TODO |",
+      "contextBefore": "|-------|------------------|---------------------|----------------|",
+      "contextAfter": "| **didDocumentMetadata** | Universal format | Same structure | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 32,
+      "tag": "TODO",
+      "text": "| **didDocumentMetadata** | Universal format | Same structure | ❌ TODO |",
+      "contextBefore": "| **didDocument** | Direct inclusion | Same | ❌ TODO |",
+      "contextAfter": "| **didResolutionMetadata** | Universal format | Compatible | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 33,
+      "tag": "TODO",
+      "text": "| **didResolutionMetadata** | Universal format | Compatible | ❌ TODO |",
+      "contextBefore": "| **didDocumentMetadata** | Universal format | Same structure | ❌ TODO |",
+      "contextAfter": "| **@context** | Universal context | Convert if needed | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 34,
+      "tag": "TODO",
+      "text": "| **@context** | Universal context | Convert if needed | ❌ TODO |",
+      "contextBefore": "| **didResolutionMetadata** | Universal format | Compatible | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 42,
+      "tag": "TODO",
+      "text": "| **/1.0/create** | POST | Create new DID | ❌ TODO |",
+      "contextBefore": "|----------|--------|----------------|----------------------|",
+      "contextAfter": "| **/1.0/update** | POST | Update existing DID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 43,
+      "tag": "TODO",
+      "text": "| **/1.0/update** | POST | Update existing DID | ❌ TODO |",
+      "contextBefore": "| **/1.0/create** | POST | Create new DID | ❌ TODO |",
+      "contextAfter": "| **/1.0/deactivate** | POST | Deactivate DID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 44,
+      "tag": "TODO",
+      "text": "| **/1.0/deactivate** | POST | Deactivate DID | ❌ TODO |",
+      "contextBefore": "| **/1.0/update** | POST | Update existing DID | ❌ TODO |",
+      "contextAfter": "| **/1.0/resolve** | GET | Optional resolution | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 45,
+      "tag": "TODO",
+      "text": "| **/1.0/resolve** | GET | Optional resolution | ❌ TODO |",
+      "contextBefore": "| **/1.0/deactivate** | POST | Deactivate DID | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 53,
+      "tag": "TODO",
+      "text": "| **method** | Query parameter \"acc\" | Internal routing | ❌ TODO |",
+      "contextBefore": "|-------|------------------|----------------------|----------------|",
+      "contextAfter": "| **options** | Universal options | Convert to internal | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 54,
+      "tag": "TODO",
+      "text": "| **options** | Universal options | Convert to internal | ❌ TODO |",
+      "contextBefore": "| **method** | Query parameter \"acc\" | Internal routing | ❌ TODO |",
+      "contextAfter": "| **secret** | Universal secret format | Map to auth | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 55,
+      "tag": "TODO",
+      "text": "| **secret** | Universal secret format | Map to auth | ❌ TODO |",
+      "contextBefore": "| **options** | Universal options | Convert to internal | ❌ TODO |",
+      "contextAfter": "| **didDocument** | Universal format | Same | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 56,
+      "tag": "TODO",
+      "text": "| **didDocument** | Universal format | Same | ❌ TODO |",
+      "contextBefore": "| **secret** | Universal secret format | Map to auth | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 62,
+      "tag": "TODO",
+      "text": "| **did** | DID to update | Same | ❌ TODO |",
+      "contextBefore": "|-------|------------------|----------------------|----------------|",
+      "contextAfter": "| **options** | Universal options | Convert to internal | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 63,
+      "tag": "TODO",
+      "text": "| **options** | Universal options | Convert to internal | ❌ TODO |",
+      "contextBefore": "| **did** | DID to update | Same | ❌ TODO |",
+      "contextAfter": "| **secret** | Auth credentials | Map to auth | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 64,
+      "tag": "TODO",
+      "text": "| **secret** | Auth credentials | Map to auth | ❌ TODO |",
+      "contextBefore": "| **options** | Universal options | Convert to internal | ❌ TODO |",
+      "contextAfter": "| **didDocument** | Updated document | Same | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 65,
+      "tag": "TODO",
+      "text": "| **didDocument** | Updated document | Same | ❌ TODO |",
+      "contextBefore": "| **secret** | Auth credentials | Map to auth | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 71,
+      "tag": "TODO",
+      "text": "| **did** | DID to deactivate | Same | ❌ TODO |",
+      "contextBefore": "|-------|------------------|----------------------|----------------|",
+      "contextAfter": "| **options** | Universal options | Convert to internal | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 72,
+      "tag": "TODO",
+      "text": "| **options** | Universal options | Convert to internal | ❌ TODO |",
+      "contextBefore": "| **did** | DID to deactivate | Same | ❌ TODO |",
+      "contextAfter": "| **secret** | Auth credentials | Map to auth | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 73,
+      "tag": "TODO",
+      "text": "| **secret** | Auth credentials | Map to auth | ❌ TODO |",
+      "contextBefore": "| **options** | Universal options | Convert to internal | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 81,
+      "tag": "TODO",
+      "text": "| **jobId** | Operation tracking | Generate UUID | ❌ TODO |",
+      "contextBefore": "|-------|------------------|----------------------|----------------|",
+      "contextAfter": "| **didState** | Current DID state | Map from internal | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 82,
+      "tag": "TODO",
+      "text": "| **didState** | Current DID state | Map from internal | ❌ TODO |",
+      "contextBefore": "| **jobId** | Operation tracking | Generate UUID | ❌ TODO |",
+      "contextAfter": "| **didRegistrationMetadata** | Operation metadata | Convert metadata | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 83,
+      "tag": "TODO",
+      "text": "| **didRegistrationMetadata** | Operation metadata | Convert metadata | ❌ TODO |",
+      "contextBefore": "| **didState** | Current DID state | Map from internal | ❌ TODO |",
+      "contextAfter": "| **didDocumentMetadata** | Document metadata | Same structure | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 84,
+      "tag": "TODO",
+      "text": "| **didDocumentMetadata** | Document metadata | Same structure | ❌ TODO |",
+      "contextBefore": "| **didRegistrationMetadata** | Operation metadata | Convert metadata | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 90,
+      "tag": "TODO",
+      "text": "| **invalidRequest** | Standard error | Map from 400 | ❌ TODO |",
+      "contextBefore": "|------------|------------------|-------------|----------------|",
+      "contextAfter": "| **unauthorized** | Standard error | Map from 403 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 91,
+      "tag": "TODO",
+      "text": "| **unauthorized** | Standard error | Map from 403 | ❌ TODO |",
+      "contextBefore": "| **invalidRequest** | Standard error | Map from 400 | ❌ TODO |",
+      "contextAfter": "| **conflict** | Standard error | Map from 409 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 92,
+      "tag": "TODO",
+      "text": "| **conflict** | Standard error | Map from 409 | ❌ TODO |",
+      "contextBefore": "| **unauthorized** | Standard error | Map from 403 | ❌ TODO |",
+      "contextAfter": "| **internalError** | Standard error | Map from 500 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 93,
+      "tag": "TODO",
+      "text": "| **internalError** | Standard error | Map from 500 | ❌ TODO |",
+      "contextBefore": "| **conflict** | Standard error | Map from 409 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 101,
+      "tag": "TODO",
+      "text": "| **Request Validation** | ❌ TODO | ❌ TODO | Validate Universal format |",
+      "contextBefore": "|---------|----------------------|---------------|-------|",
+      "contextAfter": "| **DID Extraction** | ❌ TODO | ❌ TODO | Extract from URL path |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 101,
+      "tag": "TODO",
+      "text": "| **Request Validation** | ❌ TODO | ❌ TODO | Validate Universal format |",
+      "contextBefore": "|---------|----------------------|---------------|-------|",
+      "contextAfter": "| **DID Extraction** | ❌ TODO | ❌ TODO | Extract from URL path |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 102,
+      "tag": "TODO",
+      "text": "| **DID Extraction** | ❌ TODO | ❌ TODO | Extract from URL path |",
+      "contextBefore": "| **Request Validation** | ❌ TODO | ❌ TODO | Validate Universal format |",
+      "contextAfter": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to resolver |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 102,
+      "tag": "TODO",
+      "text": "| **DID Extraction** | ❌ TODO | ❌ TODO | Extract from URL path |",
+      "contextBefore": "| **Request Validation** | ❌ TODO | ❌ TODO | Validate Universal format |",
+      "contextAfter": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to resolver |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 103,
+      "tag": "TODO",
+      "text": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to resolver |",
+      "contextBefore": "| **DID Extraction** | ❌ TODO | ❌ TODO | Extract from URL path |",
+      "contextAfter": "| **Response Mapping** | ❌ TODO | ❌ TODO | Convert to Universal format |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 103,
+      "tag": "TODO",
+      "text": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to resolver |",
+      "contextBefore": "| **DID Extraction** | ❌ TODO | ❌ TODO | Extract from URL path |",
+      "contextAfter": "| **Response Mapping** | ❌ TODO | ❌ TODO | Convert to Universal format |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 104,
+      "tag": "TODO",
+      "text": "| **Response Mapping** | ❌ TODO | ❌ TODO | Convert to Universal format |",
+      "contextBefore": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to resolver |",
+      "contextAfter": "| **Error Handling** | ❌ TODO | ❌ TODO | Map error codes |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 104,
+      "tag": "TODO",
+      "text": "| **Response Mapping** | ❌ TODO | ❌ TODO | Convert to Universal format |",
+      "contextBefore": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to resolver |",
+      "contextAfter": "| **Error Handling** | ❌ TODO | ❌ TODO | Map error codes |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 105,
+      "tag": "TODO",
+      "text": "| **Error Handling** | ❌ TODO | ❌ TODO | Map error codes |",
+      "contextBefore": "| **Response Mapping** | ❌ TODO | ❌ TODO | Convert to Universal format |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 105,
+      "tag": "TODO",
+      "text": "| **Error Handling** | ❌ TODO | ❌ TODO | Map error codes |",
+      "contextBefore": "| **Response Mapping** | ❌ TODO | ❌ TODO | Convert to Universal format |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 111,
+      "tag": "TODO",
+      "text": "| **Request Validation** | ❌ TODO | ❌ TODO | Validate Universal format |",
+      "contextBefore": "|---------|----------------------|---------------|-------|",
+      "contextAfter": "| **Method Filtering** | ❌ TODO | ❌ TODO | Only accept method=acc |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 111,
+      "tag": "TODO",
+      "text": "| **Request Validation** | ❌ TODO | ❌ TODO | Validate Universal format |",
+      "contextBefore": "|---------|----------------------|---------------|-------|",
+      "contextAfter": "| **Method Filtering** | ❌ TODO | ❌ TODO | Only accept method=acc |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 112,
+      "tag": "TODO",
+      "text": "| **Method Filtering** | ❌ TODO | ❌ TODO | Only accept method=acc |",
+      "contextBefore": "| **Request Validation** | ❌ TODO | ❌ TODO | Validate Universal format |",
+      "contextAfter": "| **Request Mapping** | ❌ TODO | ❌ TODO | Convert to core format |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 112,
+      "tag": "TODO",
+      "text": "| **Method Filtering** | ❌ TODO | ❌ TODO | Only accept method=acc |",
+      "contextBefore": "| **Request Validation** | ❌ TODO | ❌ TODO | Validate Universal format |",
+      "contextAfter": "| **Request Mapping** | ❌ TODO | ❌ TODO | Convert to core format |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 113,
+      "tag": "TODO",
+      "text": "| **Request Mapping** | ❌ TODO | ❌ TODO | Convert to core format |",
+      "contextBefore": "| **Method Filtering** | ❌ TODO | ❌ TODO | Only accept method=acc |",
+      "contextAfter": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to registrar |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 113,
+      "tag": "TODO",
+      "text": "| **Request Mapping** | ❌ TODO | ❌ TODO | Convert to core format |",
+      "contextBefore": "| **Method Filtering** | ❌ TODO | ❌ TODO | Only accept method=acc |",
+      "contextAfter": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to registrar |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 114,
+      "tag": "TODO",
+      "text": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to registrar |",
+      "contextBefore": "| **Request Mapping** | ❌ TODO | ❌ TODO | Convert to core format |",
+      "contextAfter": "| **Response Mapping** | ❌ TODO | ❌ TODO | Convert to Universal format |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 114,
+      "tag": "TODO",
+      "text": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to registrar |",
+      "contextBefore": "| **Request Mapping** | ❌ TODO | ❌ TODO | Convert to core format |",
+      "contextAfter": "| **Response Mapping** | ❌ TODO | ❌ TODO | Convert to Universal format |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 115,
+      "tag": "TODO",
+      "text": "| **Response Mapping** | ❌ TODO | ❌ TODO | Convert to Universal format |",
+      "contextBefore": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to registrar |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 115,
+      "tag": "TODO",
+      "text": "| **Response Mapping** | ❌ TODO | ❌ TODO | Convert to Universal format |",
+      "contextBefore": "| **Core Service Call** | ❌ TODO | ❌ TODO | HTTP client to registrar |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 126,
+      "tag": "TODO",
+      "text": "| **CORE_RESOLVER_URL** | Custom | ❌ TODO | http://resolver:8080 |",
+      "contextBefore": "| **UNIRESOLVER_DRIVER_DID_ACC_POOLVERSIONS** | N/A | ❌ N/A | N/A |",
+      "contextAfter": "| **CORE_REGISTRAR_URL** | Custom | ❌ TODO | http://registrar:8081 |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 127,
+      "tag": "TODO",
+      "text": "| **CORE_REGISTRAR_URL** | Custom | ❌ TODO | http://registrar:8081 |",
+      "contextBefore": "| **CORE_RESOLVER_URL** | Custom | ❌ TODO | http://resolver:8080 |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 133,
+      "tag": "TODO",
+      "text": "| **Port Exposure** | 8080 (resolver), 8081 (registrar) | ❌ TODO | Standard ports |",
+      "contextBefore": "|---------|-------------------|----------------------|-------|",
+      "contextAfter": "| **Health Checks** | /health endpoint | ❌ TODO | Docker health probes |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 134,
+      "tag": "TODO",
+      "text": "| **Health Checks** | /health endpoint | ❌ TODO | Docker health probes |",
+      "contextBefore": "| **Port Exposure** | 8080 (resolver), 8081 (registrar) | ❌ TODO | Standard ports |",
+      "contextAfter": "| **Labels** | Universal labels | ❌ TODO | Metadata labels |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 135,
+      "tag": "TODO",
+      "text": "| **Labels** | Universal labels | ❌ TODO | Metadata labels |",
+      "contextBefore": "| **Health Checks** | /health endpoint | ❌ TODO | Docker health probes |",
+      "contextAfter": "| **Network** | uni-resolver network | ❌ TODO | Network configuration |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 136,
+      "tag": "TODO",
+      "text": "| **Network** | uni-resolver network | ❌ TODO | Network configuration |",
+      "contextBefore": "| **Labels** | Universal labels | ❌ TODO | Metadata labels |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 144,
+      "tag": "TODO",
+      "text": "| **Base Image** | Lightweight (Alpine/scratch) | ❌ TODO | Image size check |",
+      "contextBefore": "|-------------|-------------------|----------------------|--------------|",
+      "contextAfter": "| **Multi-stage Build** | Build and runtime stages | ❌ TODO | Build optimization |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 145,
+      "tag": "TODO",
+      "text": "| **Multi-stage Build** | Build and runtime stages | ❌ TODO | Build optimization |",
+      "contextBefore": "| **Base Image** | Lightweight (Alpine/scratch) | ❌ TODO | Image size check |",
+      "contextAfter": "| **Security** | Non-root user | ❌ TODO | Security scan |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 146,
+      "tag": "TODO",
+      "text": "| **Security** | Non-root user | ❌ TODO | Security scan |",
+      "contextBefore": "| **Multi-stage Build** | Build and runtime stages | ❌ TODO | Build optimization |",
+      "contextAfter": "| **Labels** | Standard metadata | ❌ TODO | Label validation |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 147,
+      "tag": "TODO",
+      "text": "| **Labels** | Standard metadata | ❌ TODO | Label validation |",
+      "contextBefore": "| **Security** | Non-root user | ❌ TODO | Security scan |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 153,
+      "tag": "TODO",
+      "text": "| **Service Names** | driver-did-acc-* | ❌ TODO | Naming convention |",
+      "contextBefore": "|---------|-------------------|----------------------|-------|",
+      "contextAfter": "| **Network** | uni-resolver | ❌ TODO | Shared network |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 154,
+      "tag": "TODO",
+      "text": "| **Network** | uni-resolver | ❌ TODO | Shared network |",
+      "contextBefore": "| **Service Names** | driver-did-acc-* | ❌ TODO | Naming convention |",
+      "contextAfter": "| **Dependencies** | Core services | ❌ TODO | Service dependencies |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 155,
+      "tag": "TODO",
+      "text": "| **Dependencies** | Core services | ❌ TODO | Service dependencies |",
+      "contextBefore": "| **Network** | uni-resolver | ❌ TODO | Shared network |",
+      "contextAfter": "| **Environment** | Configuration vars | ❌ TODO | Env var passing |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 156,
+      "tag": "TODO",
+      "text": "| **Environment** | Configuration vars | ❌ TODO | Env var passing |",
+      "contextBefore": "| **Dependencies** | Core services | ❌ TODO | Service dependencies |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 164,
+      "tag": "TODO",
+      "text": "| **drivers.json** | ❌ TODO | Create entry | Driver metadata |",
+      "contextBefore": "|-------------|--------|----------------|-------|",
+      "contextAfter": "| **Pattern Matching** | ❌ TODO | did:acc:.* | DID pattern |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 165,
+      "tag": "TODO",
+      "text": "| **Pattern Matching** | ❌ TODO | did:acc:.* | DID pattern |",
+      "contextBefore": "| **drivers.json** | ❌ TODO | Create entry | Driver metadata |",
+      "contextAfter": "| **URL Configuration** | ❌ TODO | Driver endpoint | Service URL |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 166,
+      "tag": "TODO",
+      "text": "| **URL Configuration** | ❌ TODO | Driver endpoint | Service URL |",
+      "contextBefore": "| **Pattern Matching** | ❌ TODO | did:acc:.* | DID pattern |",
+      "contextAfter": "| **Test DID** | ❌ TODO | did:acc:alice | Sample for testing |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 167,
+      "tag": "TODO",
+      "text": "| **Test DID** | ❌ TODO | did:acc:alice | Sample for testing |",
+      "contextBefore": "| **URL Configuration** | ❌ TODO | Driver endpoint | Service URL |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 173,
+      "tag": "TODO",
+      "text": "| **Basic Resolution** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|-----------|-------------------|----------------------|----------|",
+      "contextAfter": "| **Error Handling** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 173,
+      "tag": "TODO",
+      "text": "| **Basic Resolution** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|-----------|-------------------|----------------------|----------|",
+      "contextAfter": "| **Error Handling** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 174,
+      "tag": "TODO",
+      "text": "| **Error Handling** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Basic Resolution** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Performance** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 174,
+      "tag": "TODO",
+      "text": "| **Error Handling** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Basic Resolution** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Performance** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 175,
+      "tag": "TODO",
+      "text": "| **Performance** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Error Handling** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Spec Compliance** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 175,
+      "tag": "TODO",
+      "text": "| **Performance** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Error Handling** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Spec Compliance** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 176,
+      "tag": "TODO",
+      "text": "| **Spec Compliance** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Performance** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 176,
+      "tag": "TODO",
+      "text": "| **Spec Compliance** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Performance** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 184,
+      "tag": "TODO",
+      "text": "| **drivers.json** | ❌ TODO | Create entry | Driver metadata |",
+      "contextBefore": "|-------------|--------|----------------|-------|",
+      "contextAfter": "| **Method Support** | ❌ TODO | acc | Method identifier |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 185,
+      "tag": "TODO",
+      "text": "| **Method Support** | ❌ TODO | acc | Method identifier |",
+      "contextBefore": "| **drivers.json** | ❌ TODO | Create entry | Driver metadata |",
+      "contextAfter": "| **Operations** | ❌ TODO | create,update,deactivate | Supported ops |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 186,
+      "tag": "TODO",
+      "text": "| **Operations** | ❌ TODO | create,update,deactivate | Supported ops |",
+      "contextBefore": "| **Method Support** | ❌ TODO | acc | Method identifier |",
+      "contextAfter": "| **Test Configuration** | ❌ TODO | Sample requests | Testing setup |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 187,
+      "tag": "TODO",
+      "text": "| **Test Configuration** | ❌ TODO | Sample requests | Testing setup |",
+      "contextBefore": "| **Operations** | ❌ TODO | create,update,deactivate | Supported ops |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 193,
+      "tag": "TODO",
+      "text": "| **Create Operation** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|-----------|-------------------|----------------------|----------|",
+      "contextAfter": "| **Update Operation** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 193,
+      "tag": "TODO",
+      "text": "| **Create Operation** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "|-----------|-------------------|----------------------|----------|",
+      "contextAfter": "| **Update Operation** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 194,
+      "tag": "TODO",
+      "text": "| **Update Operation** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Create Operation** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Deactivate Operation** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 194,
+      "tag": "TODO",
+      "text": "| **Update Operation** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Create Operation** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Deactivate Operation** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 195,
+      "tag": "TODO",
+      "text": "| **Deactivate Operation** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Update Operation** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Error Scenarios** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 195,
+      "tag": "TODO",
+      "text": "| **Deactivate Operation** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Update Operation** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextAfter": "| **Error Scenarios** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 196,
+      "tag": "TODO",
+      "text": "| **Error Scenarios** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Deactivate Operation** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 196,
+      "tag": "TODO",
+      "text": "| **Error Scenarios** | Standard test | ❌ TODO | ❌ TODO |",
+      "contextBefore": "| **Deactivate Operation** | Standard test | ❌ TODO | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 206,
+      "tag": "TODO",
+      "text": "| **didDocumentMetadata** | Universal metadata | Acc metadata | ❌ TODO |",
+      "contextBefore": "| **didDocument** | W3C DID Document | W3C DID Document | ✅ Compatible |",
+      "contextAfter": "| **didResolutionMetadata** | Universal metadata | Acc metadata | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 207,
+      "tag": "TODO",
+      "text": "| **didResolutionMetadata** | Universal metadata | Acc metadata | ❌ TODO |",
+      "contextBefore": "| **didDocumentMetadata** | Universal metadata | Acc metadata | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 213,
+      "tag": "TODO",
+      "text": "| **jobId** | UUID string | Generate UUID | ❌ TODO |",
+      "contextBefore": "|-------|------------------|------------|---------------------|",
+      "contextAfter": "| **didState** | DID state object | Map from internal | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 214,
+      "tag": "TODO",
+      "text": "| **didState** | DID state object | Map from internal | ❌ TODO |",
+      "contextBefore": "| **jobId** | UUID string | Generate UUID | ❌ TODO |",
+      "contextAfter": "| **didRegistrationMetadata** | Universal metadata | Convert | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 215,
+      "tag": "TODO",
+      "text": "| **didRegistrationMetadata** | Universal metadata | Convert | ❌ TODO |",
+      "contextBefore": "| **didState** | DID state object | Map from internal | ❌ TODO |",
+      "contextAfter": "| **didDocumentMetadata** | Universal metadata | Same | ✅ Compatible |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 224,
+      "tag": "TODO",
+      "text": "| `notFound` | `notFound` | 404 | ❌ TODO |",
+      "contextBefore": "|------------|-----------------|-------------|----------------|",
+      "contextAfter": "| `deactivated` | `deactivated` | 410 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 225,
+      "tag": "TODO",
+      "text": "| `deactivated` | `deactivated` | 410 | ❌ TODO |",
+      "contextBefore": "| `notFound` | `notFound` | 404 | ❌ TODO |",
+      "contextAfter": "| `invalidDid` | `invalidDid` | 400 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 226,
+      "tag": "TODO",
+      "text": "| `invalidDid` | `invalidDid` | 400 | ❌ TODO |",
+      "contextBefore": "| `deactivated` | `deactivated` | 410 | ❌ TODO |",
+      "contextAfter": "| `versionNotFound` | `versionNotFound` | 404 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 227,
+      "tag": "TODO",
+      "text": "| `versionNotFound` | `versionNotFound` | 404 | ❌ TODO |",
+      "contextBefore": "| `invalidDid` | `invalidDid` | 400 | ❌ TODO |",
+      "contextAfter": "| `internalError` | `internalError` | 500 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 228,
+      "tag": "TODO",
+      "text": "| `internalError` | `internalError` | 500 | ❌ TODO |",
+      "contextBefore": "| `versionNotFound` | `versionNotFound` | 404 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 234,
+      "tag": "TODO",
+      "text": "| `unauthorized` | `unauthorized` | 403 | ❌ TODO |",
+      "contextBefore": "|------------|-----------------|-------------|----------------|",
+      "contextAfter": "| `conflict` | `conflict` | 409 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 235,
+      "tag": "TODO",
+      "text": "| `conflict` | `conflict` | 409 | ❌ TODO |",
+      "contextBefore": "| `unauthorized` | `unauthorized` | 403 | ❌ TODO |",
+      "contextAfter": "| `invalidDocument` | `invalidRequest` | 400 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 236,
+      "tag": "TODO",
+      "text": "| `invalidDocument` | `invalidRequest` | 400 | ❌ TODO |",
+      "contextBefore": "| `conflict` | `conflict` | 409 | ❌ TODO |",
+      "contextAfter": "| `thresholdNotMet` | `unauthorized` | 403 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 237,
+      "tag": "TODO",
+      "text": "| `thresholdNotMet` | `unauthorized` | 403 | ❌ TODO |",
+      "contextBefore": "| `invalidDocument` | `invalidRequest` | 400 | ❌ TODO |",
+      "contextAfter": "| `internalError` | `internalError` | 500 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 238,
+      "tag": "TODO",
+      "text": "| `internalError` | `internalError` | 500 | ❌ TODO |",
+      "contextBefore": "| `thresholdNotMet` | `unauthorized` | 403 | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 246,
+      "tag": "TODO",
+      "text": "| **Request Parsing** | HTTP request handling | HTTP request handling | ❌ TODO |",
+      "contextBefore": "|---------------|----------------|------------------|--------|",
+      "contextAfter": "| **Response Mapping** | Format conversion | Format conversion | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 247,
+      "tag": "TODO",
+      "text": "| **Response Mapping** | Format conversion | Format conversion | ❌ TODO |",
+      "contextBefore": "| **Request Parsing** | HTTP request handling | HTTP request handling | ❌ TODO |",
+      "contextAfter": "| **Error Handling** | Error scenarios | Error scenarios | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 248,
+      "tag": "TODO",
+      "text": "| **Error Handling** | Error scenarios | Error scenarios | ❌ TODO |",
+      "contextBefore": "| **Response Mapping** | Format conversion | Format conversion | ❌ TODO |",
+      "contextAfter": "| **Validation** | Input validation | Input validation | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 249,
+      "tag": "TODO",
+      "text": "| **Validation** | Input validation | Input validation | ❌ TODO |",
+      "contextBefore": "| **Error Handling** | Error scenarios | Error scenarios | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 255,
+      "tag": "TODO",
+      "text": "| **End-to-End** | Universal → Driver → Core → Driver → Universal | ❌ TODO |",
+      "contextBefore": "|-----------|-------------|--------|",
+      "contextAfter": "| **Error Propagation** | Error handling through full stack | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 256,
+      "tag": "TODO",
+      "text": "| **Error Propagation** | Error handling through full stack | ❌ TODO |",
+      "contextBefore": "| **End-to-End** | Universal → Driver → Core → Driver → Universal | ❌ TODO |",
+      "contextAfter": "| **Performance** | Latency and throughput | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 257,
+      "tag": "TODO",
+      "text": "| **Performance** | Latency and throughput | ❌ TODO |",
+      "contextBefore": "| **Error Propagation** | Error handling through full stack | ❌ TODO |",
+      "contextAfter": "| **Compatibility** | Universal framework tests | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 258,
+      "tag": "TODO",
+      "text": "| **Compatibility** | Universal framework tests | ❌ TODO |",
+      "contextBefore": "| **Performance** | Latency and throughput | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 264,
+      "tag": "TODO",
+      "text": "| **Basic Resolution** | Resolve test DID | Windows (PS1) | ❌ TODO |",
+      "contextBefore": "|------|-------------|----------|--------|",
+      "contextAfter": "| **Basic Resolution** | Resolve test DID | Unix (SH) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 265,
+      "tag": "TODO",
+      "text": "| **Basic Resolution** | Resolve test DID | Unix (SH) | ❌ TODO |",
+      "contextBefore": "| **Basic Resolution** | Resolve test DID | Windows (PS1) | ❌ TODO |",
+      "contextAfter": "| **Create Operation** | Create test DID | Windows (PS1) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 266,
+      "tag": "TODO",
+      "text": "| **Create Operation** | Create test DID | Windows (PS1) | ❌ TODO |",
+      "contextBefore": "| **Basic Resolution** | Resolve test DID | Unix (SH) | ❌ TODO |",
+      "contextAfter": "| **Create Operation** | Create test DID | Unix (SH) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 267,
+      "tag": "TODO",
+      "text": "| **Create Operation** | Create test DID | Unix (SH) | ❌ TODO |",
+      "contextBefore": "| **Create Operation** | Create test DID | Windows (PS1) | ❌ TODO |",
+      "contextAfter": "| **Docker Health** | Container health checks | Both | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 268,
+      "tag": "TODO",
+      "text": "| **Docker Health** | Container health checks | Both | ❌ TODO |",
+      "contextBefore": "| **Create Operation** | Create test DID | Unix (SH) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 276,
+      "tag": "TODO",
+      "text": "| **Request Count** | HTTP requests/sec | ❌ TODO | Prometheus format |",
+      "contextBefore": "|--------|-------------------|----------------------|-------|",
+      "contextAfter": "| **Response Time** | Latency percentiles | ❌ TODO | Histogram |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 277,
+      "tag": "TODO",
+      "text": "| **Response Time** | Latency percentiles | ❌ TODO | Histogram |",
+      "contextBefore": "| **Request Count** | HTTP requests/sec | ❌ TODO | Prometheus format |",
+      "contextAfter": "| **Error Rate** | Error percentage | ❌ TODO | By error type |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 278,
+      "tag": "TODO",
+      "text": "| **Error Rate** | Error percentage | ❌ TODO | By error type |",
+      "contextBefore": "| **Response Time** | Latency percentiles | ❌ TODO | Histogram |",
+      "contextAfter": "| **Core Service Calls** | Upstream calls | ❌ TODO | Dependency tracking |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 279,
+      "tag": "TODO",
+      "text": "| **Core Service Calls** | Upstream calls | ❌ TODO | Dependency tracking |",
+      "contextBefore": "| **Error Rate** | Error percentage | ❌ TODO | By error type |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 285,
+      "tag": "TODO",
+      "text": "| **Driver Health** | /health endpoint | ❌ TODO | Driver status |",
+      "contextBefore": "|-------|-------------------|----------------------|-------|",
+      "contextAfter": "| **Core Service Health** | Upstream health | ❌ TODO | Dependency check |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 286,
+      "tag": "TODO",
+      "text": "| **Core Service Health** | Upstream health | ❌ TODO | Dependency check |",
+      "contextBefore": "| **Driver Health** | /health endpoint | ❌ TODO | Driver status |",
+      "contextAfter": "| **Docker Health** | Container health | ❌ TODO | Docker integration |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 287,
+      "tag": "TODO",
+      "text": "| **Docker Health** | Container health | ❌ TODO | Docker integration |",
+      "contextBefore": "| **Core Service Health** | Upstream health | ❌ TODO | Dependency check |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 295,
+      "tag": "TODO",
+      "text": "| **Driver README** | Setup instructions | ❌ TODO | How to run |",
+      "contextBefore": "|----------|-------------|--------|-------|",
+      "contextAfter": "| **Configuration** | Environment variables | ❌ TODO | All options |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 296,
+      "tag": "TODO",
+      "text": "| **Configuration** | Environment variables | ❌ TODO | All options |",
+      "contextBefore": "| **Driver README** | Setup instructions | ❌ TODO | How to run |",
+      "contextAfter": "| **API Examples** | Sample requests/responses | ❌ TODO | Working examples |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 297,
+      "tag": "TODO",
+      "text": "| **API Examples** | Sample requests/responses | ❌ TODO | Working examples |",
+      "contextBefore": "| **Configuration** | Environment variables | ❌ TODO | All options |",
+      "contextAfter": "| **Troubleshooting** | Common issues | ❌ TODO | Debug guide |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 298,
+      "tag": "TODO",
+      "text": "| **Troubleshooting** | Common issues | ❌ TODO | Debug guide |",
+      "contextBefore": "| **API Examples** | Sample requests/responses | ❌ TODO | Working examples |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 304,
+      "tag": "TODO",
+      "text": "| **Driver README** | Setup instructions | ❌ TODO | How to run |",
+      "contextBefore": "|----------|-------------|--------|-------|",
+      "contextAfter": "| **Configuration** | Environment variables | ❌ TODO | All options |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 305,
+      "tag": "TODO",
+      "text": "| **Configuration** | Environment variables | ❌ TODO | All options |",
+      "contextBefore": "| **Driver README** | Setup instructions | ❌ TODO | How to run |",
+      "contextAfter": "| **API Examples** | Sample requests/responses | ❌ TODO | Working examples |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 306,
+      "tag": "TODO",
+      "text": "| **API Examples** | Sample requests/responses | ❌ TODO | Working examples |",
+      "contextBefore": "| **Configuration** | Environment variables | ❌ TODO | All options |",
+      "contextAfter": "| **Auth Guide** | Secret/credential format | ❌ TODO | Authentication |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 307,
+      "tag": "TODO",
+      "text": "| **Auth Guide** | Secret/credential format | ❌ TODO | Authentication |",
+      "contextBefore": "| **API Examples** | Sample requests/responses | ❌ TODO | Working examples |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 315,
+      "tag": "TODO",
+      "text": "| **Resolve** | \u003c500ms | \u003c300ms (including core) | ❌ TODO |",
+      "contextBefore": "|-----------|-------------------|--------|-------------------|",
+      "contextAfter": "| **Create** | \u003c2s | \u003c1s (including core) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 316,
+      "tag": "TODO",
+      "text": "| **Create** | \u003c2s | \u003c1s (including core) | ❌ TODO |",
+      "contextBefore": "| **Resolve** | \u003c500ms | \u003c300ms (including core) | ❌ TODO |",
+      "contextAfter": "| **Update** | \u003c2s | \u003c1s (including core) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 317,
+      "tag": "TODO",
+      "text": "| **Update** | \u003c2s | \u003c1s (including core) | ❌ TODO |",
+      "contextBefore": "| **Create** | \u003c2s | \u003c1s (including core) | ❌ TODO |",
+      "contextAfter": "| **Deactivate** | \u003c2s | \u003c1s (including core) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 318,
+      "tag": "TODO",
+      "text": "| **Deactivate** | \u003c2s | \u003c1s (including core) | ❌ TODO |",
+      "contextBefore": "| **Update** | \u003c2s | \u003c1s (including core) | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 324,
+      "tag": "TODO",
+      "text": "| **Concurrent Requests** | 100 req/s | 100 req/s | ❌ TODO |",
+      "contextBefore": "|--------|-------------------|--------|-------------------|",
+      "contextAfter": "| **Memory Usage** | \u003c100MB | \u003c50MB | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 325,
+      "tag": "TODO",
+      "text": "| **Memory Usage** | \u003c100MB | \u003c50MB | ❌ TODO |",
+      "contextBefore": "| **Concurrent Requests** | 100 req/s | 100 req/s | ❌ TODO |",
+      "contextAfter": "| **CPU Usage** | \u003c50% | \u003c25% | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 326,
+      "tag": "TODO",
+      "text": "| **CPU Usage** | \u003c50% | \u003c25% | ❌ TODO |",
+      "contextBefore": "| **Memory Usage** | \u003c100MB | \u003c50MB | ❌ TODO |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 334,
+      "tag": "TODO",
+      "text": "| **Input Validation** | ❌ TODO | Validate all inputs | Prevent injection |",
+      "contextBefore": "|-------------|--------|----------------|-------|",
+      "contextAfter": "| **Rate Limiting** | ❌ TODO | Implement rate limits | DoS protection |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 335,
+      "tag": "TODO",
+      "text": "| **Rate Limiting** | ❌ TODO | Implement rate limits | DoS protection |",
+      "contextBefore": "| **Input Validation** | ❌ TODO | Validate all inputs | Prevent injection |",
+      "contextAfter": "| **CORS Headers** | ❌ TODO | Proper CORS setup | Browser security |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 336,
+      "tag": "TODO",
+      "text": "| **CORS Headers** | ❌ TODO | Proper CORS setup | Browser security |",
+      "contextBefore": "| **Rate Limiting** | ❌ TODO | Implement rate limits | DoS protection |",
+      "contextAfter": "| **Security Headers** | ❌ TODO | Standard headers | HTTP security |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 337,
+      "tag": "TODO",
+      "text": "| **Security Headers** | ❌ TODO | Standard headers | HTTP security |",
+      "contextBefore": "| **CORS Headers** | ❌ TODO | Proper CORS setup | Browser security |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 343,
+      "tag": "TODO",
+      "text": "| **Non-root User** | ❌ TODO | Run as non-root | Privilege escalation |",
+      "contextBefore": "|-------------|--------|----------------|-------|",
+      "contextAfter": "| **Minimal Base** | ❌ TODO | Distroless/Alpine | Attack surface |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 344,
+      "tag": "TODO",
+      "text": "| **Minimal Base** | ❌ TODO | Distroless/Alpine | Attack surface |",
+      "contextBefore": "| **Non-root User** | ❌ TODO | Run as non-root | Privilege escalation |",
+      "contextAfter": "| **Vulnerability Scan** | ❌ TODO | Container scanning | CVE detection |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 345,
+      "tag": "TODO",
+      "text": "| **Vulnerability Scan** | ❌ TODO | Container scanning | CVE detection |",
+      "contextBefore": "| **Minimal Base** | ❌ TODO | Distroless/Alpine | Attack surface |",
+      "contextAfter": "| **Secret Management** | ❌ TODO | External secrets | No hardcoded secrets |"
+    },
+    {
+      "path": "spec\\PARITY-UNI-DRIVERS.md",
+      "line": 346,
+      "tag": "TODO",
+      "text": "| **Secret Management** | ❌ TODO | External secrets | No hardcoded secrets |",
+      "contextBefore": "| **Vulnerability Scan** | ❌ TODO | Container scanning | CVE detection |"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 18,
+      "tag": "TODO",
+      "text": "// TodoItem represents a single TODO/FIXME/etc finding",
+      "contextAfter": "type TodoItem struct {"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 18,
+      "tag": "FIXME",
+      "text": "// TodoItem represents a single TODO/FIXME/etc finding",
+      "contextAfter": "type TodoItem struct {"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 47,
+      "tag": "TODO",
+      "text": "// TODO patterns to search for (case-insensitive)",
+      "contextBefore": "var (",
+      "contextAfter": "todoPatterns = []string{"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 49,
+      "tag": "TODO",
+      "text": "`(?i)\\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\\b`,",
+      "contextBefore": "todoPatterns = []string{",
+      "contextAfter": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 49,
+      "tag": "FIXME",
+      "text": "`(?i)\\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\\b`,",
+      "contextBefore": "todoPatterns = []string{",
+      "contextAfter": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 49,
+      "tag": "XXX",
+      "text": "`(?i)\\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\\b`,",
+      "contextBefore": "todoPatterns = []string{",
+      "contextAfter": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 49,
+      "tag": "HACK",
+      "text": "`(?i)\\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\\b`,",
+      "contextBefore": "todoPatterns = []string{",
+      "contextAfter": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 49,
+      "tag": "STUB",
+      "text": "`(?i)\\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\\b`,",
+      "contextBefore": "todoPatterns = []string{",
+      "contextAfter": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 49,
+      "tag": "TBA",
+      "text": "`(?i)\\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\\b`,",
+      "contextBefore": "todoPatterns = []string{",
+      "contextAfter": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 49,
+      "tag": "TBD",
+      "text": "`(?i)\\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\\b`,",
+      "contextBefore": "todoPatterns = []string{",
+      "contextAfter": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 49,
+      "tag": "NOTIMPLEMENTED",
+      "text": "`(?i)\\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\\b`,",
+      "contextBefore": "todoPatterns = []string{",
+      "contextAfter": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 49,
+      "tag": "NOTIMPLEMENTED",
+      "text": "`(?i)\\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\\b`,",
+      "contextBefore": "todoPatterns = []string{",
+      "contextAfter": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 50,
+      "tag": "TODO",
+      "text": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,",
+      "contextBefore": "`(?i)\\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\\b`,",
+      "contextAfter": "`(?i)@deprecated`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 51,
+      "tag": "DEPRECATED",
+      "text": "`(?i)@deprecated`,",
+      "contextBefore": "`(?i)PANIC\\s*\\(\\s*[\"']TODO`,",
+      "contextAfter": "`(?i)\\bDEPRECATE\\b`,"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 166,
+      "tag": "TODO",
+      "text": "// Scan file for TODO items",
+      "contextAfter": "fileItems, err := scanFile(path)"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 275,
+      "tag": "TODO",
+      "text": "if strings.Contains(match, \"TODO\") {",
+      "contextAfter": "return \"TODO\""
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 276,
+      "tag": "TODO",
+      "text": "return \"TODO\"",
+      "contextBefore": "if strings.Contains(match, \"TODO\") {",
+      "contextAfter": "}"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 278,
+      "tag": "FIXME",
+      "text": "if strings.Contains(match, \"FIXME\") {",
+      "contextBefore": "}",
+      "contextAfter": "return \"FIXME\""
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 279,
+      "tag": "FIXME",
+      "text": "return \"FIXME\"",
+      "contextBefore": "if strings.Contains(match, \"FIXME\") {",
+      "contextAfter": "}"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 281,
+      "tag": "XXX",
+      "text": "if strings.Contains(match, \"XXX\") {",
+      "contextBefore": "}",
+      "contextAfter": "return \"XXX\""
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 282,
+      "tag": "XXX",
+      "text": "return \"XXX\"",
+      "contextBefore": "if strings.Contains(match, \"XXX\") {",
+      "contextAfter": "}"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 284,
+      "tag": "HACK",
+      "text": "if strings.Contains(match, \"HACK\") {",
+      "contextBefore": "}",
+      "contextAfter": "return \"HACK\""
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 285,
+      "tag": "HACK",
+      "text": "return \"HACK\"",
+      "contextBefore": "if strings.Contains(match, \"HACK\") {",
+      "contextAfter": "}"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 287,
+      "tag": "STUB",
+      "text": "if strings.Contains(match, \"STUB\") {",
+      "contextBefore": "}",
+      "contextAfter": "return \"STUB\""
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 288,
+      "tag": "STUB",
+      "text": "return \"STUB\"",
+      "contextBefore": "if strings.Contains(match, \"STUB\") {",
+      "contextAfter": "}"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 290,
+      "tag": "TBA",
+      "text": "if strings.Contains(match, \"TBA\") {",
+      "contextBefore": "}",
+      "contextAfter": "return \"TBA\""
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 291,
+      "tag": "TBA",
+      "text": "return \"TBA\"",
+      "contextBefore": "if strings.Contains(match, \"TBA\") {",
+      "contextAfter": "}"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 293,
+      "tag": "TBD",
+      "text": "if strings.Contains(match, \"TBD\") {",
+      "contextBefore": "}",
+      "contextAfter": "return \"TBD\""
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 294,
+      "tag": "TBD",
+      "text": "return \"TBD\"",
+      "contextBefore": "if strings.Contains(match, \"TBD\") {",
+      "contextAfter": "}"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 296,
+      "tag": "NOTIMPLEMENTED",
+      "text": "if strings.Contains(match, \"NOTIMPL\") {",
+      "contextBefore": "}",
+      "contextAfter": "return \"NOTIMPLEMENTED\""
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 297,
+      "tag": "NOTIMPLEMENTED",
+      "text": "return \"NOTIMPLEMENTED\"",
+      "contextBefore": "if strings.Contains(match, \"NOTIMPL\") {",
+      "contextAfter": "}"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 300,
+      "tag": "TODO",
+      "text": "return \"PANIC-TODO\"",
+      "contextBefore": "if strings.Contains(match, \"PANIC\") {",
+      "contextAfter": "}"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 305,
+      "tag": "DEPRECATED",
+      "text": "if strings.Contains(match, \"DEPRECATE\") {",
+      "contextBefore": "}",
+      "contextAfter": "return \"DEPRECATED\""
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 346,
+      "tag": "TODO",
+      "text": "file, err := os.Create(\"reports/todo-report.json\")",
+      "contextBefore": "func generateJSONReport(report TodoReport) error {",
+      "contextAfter": "if err != nil {"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 358,
+      "tag": "TODO",
+      "text": "file, err := os.Create(\"reports/todo-report.md\")",
+      "contextBefore": "func generateMarkdownReport(report TodoReport) error {",
+      "contextAfter": "if err != nil {"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 364,
+      "tag": "TODO",
+      "text": "fmt.Fprintf(file, \"# TODO Scan Report\\n\\n\")",
+      "contextAfter": "fmt.Fprintf(file, \"**Generated:** %s\\n\", report.GeneratedAt.Format(time.RFC3339))"
+    },
+    {
+      "path": "tools\\todoscan\\main.go",
+      "line": 478,
+      "tag": "TODO",
+      "text": "file, err := os.Create(\"reports/todo-report.csv\")",
+      "contextBefore": "func generateCSVReport(report TodoReport) error {",
+      "contextAfter": "if err != nil {"
+    }
+  ],
+  "totalCount": 576
+}
