@@ -9,6 +9,11 @@ type MockClient struct {
 	SubmitWriteDataFn   func(dataAccountURL string, payload *ops.Envelope) (string, error)
 	UpdateKeyPageFn     func(keyPageURL string, operations []KeyPageOperation) (string, error)
 	GetKeyPageStateFn   func(keyPageURL string) (*KeyPageState, error)
+
+	// Recorded values for test inspection
+	LastWriteData  []byte
+	LastEnvelope   *ops.Envelope
+	LastAccountURL string
 }
 
 var _ Submitter = (*MockClient)(nil)
@@ -28,6 +33,10 @@ func (m *MockClient) CreateDataAccount(adiURL, dataAccountLabel string) (string,
 }
 
 func (m *MockClient) WriteDataEntry(dataAccountURL string, data []byte) (string, error) {
+	// record for tests
+	m.LastAccountURL = dataAccountURL
+	m.LastWriteData = data
+
 	if m.WriteDataEntryFn != nil {
 		return m.WriteDataEntryFn(dataAccountURL, data)
 	}
@@ -35,6 +44,10 @@ func (m *MockClient) WriteDataEntry(dataAccountURL string, data []byte) (string,
 }
 
 func (m *MockClient) SubmitWriteData(dataAccountURL string, payload *ops.Envelope) (string, error) {
+	// record for tests
+	m.LastAccountURL = dataAccountURL
+	m.LastEnvelope = payload
+
 	if m.SubmitWriteDataFn != nil {
 		return m.SubmitWriteDataFn(dataAccountURL, payload)
 	}

@@ -7,56 +7,106 @@ import (
 	"gitlab.com/accumulatenetwork/accumulate/pkg/url"
 )
 
-type mockClient struct {
+// MockClient implements acc.Client and records inputs/outputs for tests.
+type MockClient struct {
+	// Optional function hooks to override behavior
 	GetLatestDIDEntryFn   func(adi string) (acc.Envelope, error)
 	GetEntryAtTimeFn      func(adi string, t time.Time) (acc.Envelope, error)
 	GetKeyPageStateFn     func(url string) (acc.KeyPageState, error)
 	GetDataAccountEntryFn func(dataAccountURL *url.URL) ([]byte, error)
+
+	// Recorded values for assertions in tests
+	LastADI            string
+	LastAtTime         time.Time
+	LastKeyPageURL     string
+	LastDataAccountURL *url.URL
+
+	LastEnvelope acc.Envelope
+	LastBytes    []byte
+
+	// Simple call counters (handy in tests)
+	CallsGetLatestDIDEntry   int
+	CallsGetEntryAtTime      int
+	CallsGetKeyPageState     int
+	CallsGetDataAccountEntry int
 }
 
-var _ acc.Client = (*mockClient)(nil)
+var _ acc.Client = (*MockClient)(nil)
 
-func (m *mockClient) GetLatestDIDEntry(adi string) (acc.Envelope, error) {
+func (m *MockClient) GetLatestDIDEntry(adi string) (acc.Envelope, error) {
+	m.CallsGetLatestDIDEntry++
+	m.LastADI = adi
+
 	if m.GetLatestDIDEntryFn != nil {
-		return m.GetLatestDIDEntryFn(adi)
+		env, err := m.GetLatestDIDEntryFn(adi)
+		m.LastEnvelope = env
+		return env, err
 	}
+	// default: empty envelope
+	m.LastEnvelope = acc.Envelope{}
 	return acc.Envelope{}, nil
 }
 
-func (m *mockClient) GetEntryAtTime(adi string, t time.Time) (acc.Envelope, error) {
+func (m *MockClient) GetEntryAtTime(adi string, t time.Time) (acc.Envelope, error) {
+	m.CallsGetEntryAtTime++
+	m.LastADI = adi
+	m.LastAtTime = t
+
 	if m.GetEntryAtTimeFn != nil {
-		return m.GetEntryAtTimeFn(adi, t)
+		env, err := m.GetEntryAtTimeFn(adi, t)
+		m.LastEnvelope = env
+		return env, err
 	}
+	// default: empty envelope
+	m.LastEnvelope = acc.Envelope{}
 	return acc.Envelope{}, nil
 }
 
-func (m *mockClient) GetKeyPageState(url string) (acc.KeyPageState, error) {
+func (m *MockClient) GetKeyPageState(u string) (acc.KeyPageState, error) {
+	m.CallsGetKeyPageState++
+	m.LastKeyPageURL = u
+
 	if m.GetKeyPageStateFn != nil {
-		return m.GetKeyPageStateFn(url)
+		return m.GetKeyPageStateFn(u)
 	}
+	// default: zero value
 	return acc.KeyPageState{}, nil
 }
 
-func (m *mockClient) GetDataAccountEntry(dataAccountURL *url.URL) ([]byte, error) {
+func (m *MockClient) GetDataAccountEntry(dataAccountURL *url.URL) ([]byte, error) {
+	m.CallsGetDataAccountEntry++
+	m.LastDataAccountURL = dataAccountURL
+
 	if m.GetDataAccountEntryFn != nil {
-		return m.GetDataAccountEntryFn(dataAccountURL)
+		b, err := m.GetDataAccountEntryFn(dataAccountURL)
+		m.LastBytes = b
+		return b, err
 	}
-	// Return mock deactivated DID
-	if dataAccountURL.Authority == "deactivated" {
-		return []byte(`{"@context":["https://www.w3.org/ns/did/v1"],"id":"did:acc:deactivated","deactivated":true}`), nil
+
+	// Defaults for convenient tests:
+	// If authority == "deactivated", return a deactivated DID; otherwise a basic DID doc
+	if dataAccountURL != nil && dataAccountURL.Authority == "deactivated" {
+		doc := []byte(`{"@context":["https://www.w3.org/ns/did/v1"],"id":"did:acc:deactivated","deactivated":true}`)
+		m.LastBytes = doc
+		return doc, nil
 	}
-	// Return mock DID document
-	return []byte(`{"@context":["https://www.w3.org/ns/did/v1"],"id":"did:acc:mock"}`), nil
+
+	doc := []byte(`{"@context":["https://www.w3.org/ns/did/v1"],"id":"did:acc:mock"}`)
+	m.LastBytes = doc
+	return doc, nil
 }
 
-func NewMockClient() *mockClient {
-	return &mockClient{}
+// Constructors
+
+func NewMockClient() *MockClient {
+	return &MockClient{}
 }
 
-func NewMockDeactivatedClient() *mockClient {
-	return &mockClient{
+func NewMockDeactivatedClient() *MockClient {
+	return &MockClient{
 		GetDataAccountEntryFn: func(dataAccountURL *url.URL) ([]byte, error) {
-			return []byte(`{"@context":["https://www.w3.org/ns/did/v1"],"id":"did:acc:deactivated","deactivated":true}`), nil
+			doc := []byte(`{"@context":["https://www.w3.org/ns/did/v1"],"id":"did:acc:deactivated","deactivated":true}`)
+			return doc, nil
 		},
 	}
 }
