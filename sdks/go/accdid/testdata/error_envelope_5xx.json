@@ -1,0 +1,9 @@
+{
+  "code": "internalError",
+  "error": "Internal Server Error",
+  "message": "Accumulate node connection failed",
+  "details": {
+    "cause": "connection timeout",
+    "retryAfter": 30
+  }
+}

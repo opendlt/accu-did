@@ -1,0 +1,18 @@
+{
+  "didDocument": {
+    "@context": ["https://www.w3.org/ns/did/v1"],
+    "id": "did:acc:deactivated",
+    "deactivated": true,
+    "deactivatedAt": "2024-01-01T00:00:00Z"
+  },
+  "resolutionMetadata": {
+    "contentType": "application/did+ld+json",
+    "retrieved": "2024-01-01T12:00:00Z",
+    "deactivated": true
+  },
+  "didDocumentMetadata": {
+    "created": "2023-12-01T10:00:00Z",
+    "deactivated": "2024-01-01T00:00:00Z",
+    "versionId": "2"
+  }
+}

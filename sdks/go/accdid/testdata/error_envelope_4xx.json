@@ -1,0 +1,9 @@
+{
+  "code": "badRequest",
+  "error": "Bad Request",
+  "message": "Invalid DID format: missing 'did:acc:' prefix",
+  "details": {
+    "field": "did",
+    "value": "invalid:format"
+  }
+}

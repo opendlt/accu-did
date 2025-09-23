@@ -1,0 +1,24 @@
+{
+  "didDocument": {
+    "@context": ["https://www.w3.org/ns/did/v1"],
+    "id": "did:acc:alice",
+    "verificationMethod": [{
+      "id": "did:acc:alice#key1",
+      "type": "Ed25519VerificationKey2020",
+      "controller": "did:acc:alice",
+      "publicKeyMultibase": "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
+    }],
+    "authentication": ["did:acc:alice#key1"],
+    "assertionMethod": ["did:acc:alice#key1"]
+  },
+  "resolutionMetadata": {
+    "contentType": "application/did+ld+json",
+    "retrieved": "2024-01-01T12:00:00Z",
+    "sequenceNumber": 1
+  },
+  "didDocumentMetadata": {
+    "created": "2024-01-01T10:00:00Z",
+    "updated": "2024-01-01T12:00:00Z",
+    "versionId": "1"
+  }
+}

@@ -1,0 +1,147 @@
+# SDK Behavior Contract for Accumulate DID implementations
+# This file defines the expected behavior for all SDK implementations
+# regardless of language or generation method
+
+sdkVersionSource: "../../VERSION"
+
+defaults:
+  timeoutMs: 10000
+  retries:
+    max: 3
+    backoff: exponential
+    baseMs: 250
+    maxMs: 4000
+    jitter: true
+  headers:
+    requestId: "X-Request-Id"
+    apiKey: "X-API-Key"
+    idempotencyKey: "Idempotency-Key"
+
+errors:
+  # HTTP status codes that should trigger automatic retries
+  retryableStatus: [429, 502, 503, 504]
+
+  # Status code for deactivated DIDs (canonical tombstone response)
+  deactivatedStatus: 410
+
+  # Status code for not found resources
+  notFoundStatus: 404
+
+  # Error mapping for consistent SDK behavior
+  mapping:
+    404: "notFound"
+    410: "goneDeactivated"
+    400: "badRequest"
+    401: "badRequest"
+    403: "badRequest"
+    422: "badRequest"
+    429: "badRequest"
+    500: "serverError"
+    502: "serverError"
+    503: "serverError"
+    504: "serverError"
+
+idempotency:
+  # Header name for idempotency keys
+  header: "Idempotency-Key"
+
+  # Hint for cache duration in seconds (600 = 10 minutes)
+  cacheHintMinSec: 600
+
+resolution:
+  # Deterministic ordering for consistent resolution results
+  # When multiple entries exist, order by:
+  ordering: ["sequence", "timestamp", "sha256"]
+
+  # Field indicating deactivation in DID documents
+  tombstoneField: "deactivated"
+
+  # Value indicating deactivation
+  tombstoneValue: true
+
+validation:
+  # DID method this SDK supports
+  method: "acc"
+
+  # Required prefix for all DIDs
+  requiredPrefix: "did:acc:"
+
+  # Forbidden characters in DID identifiers
+  forbiddenChars: [" ", "\t", "\n", "\r"]
+
+  # Patterns that indicate invalid DIDs
+  invalidPatterns:
+    - "^did:acc:/$"      # Empty identifier
+    - "^did:acc:/.*"     # Starting with slash
+    - "^did:acc:\\.$"    # Starting with dot
+    - ".*/$"             # Ending with slash
+    - ".*\\.$"           # Ending with dot
+
+endpoints:
+  resolver:
+    base: "/resolve"
+    universal: "/1.0/identifiers/{did}"
+    health: "/healthz"
+
+  registrar:
+    native:
+      register: "/register"
+      update: "/native/update"
+      deactivate: "/native/deactivate"
+    universal:
+      create: "/1.0/create"
+      update: "/1.0/update"
+      deactivate: "/1.0/deactivate"
+    health: "/healthz"
+
+# Expected response formats for canonical behaviors
+responses:
+  # Canonical deactivation tombstone
+  deactivationTombstone:
+    example:
+      "@context": ["https://www.w3.org/ns/did/v1"]
+      id: "did:acc:example"
+      deactivated: true
+      deactivatedAt: "2024-01-01T00:00:00Z"
+
+  # Standard resolution result structure
+  resolutionResult:
+    fields:
+      - didDocument        # The resolved DID document (required)
+      - resolutionMetadata # Resolution metadata (optional)
+      - didDocumentMetadata # Document metadata (optional)
+
+  # Standard registrar response structure
+  registrarResponse:
+    fields:
+      - transactionId      # Accumulate transaction ID (required)
+      - jobId             # Processing job ID (optional)
+
+# Testing requirements for SDK implementations
+testing:
+  # Required test categories
+  required:
+    - unit               # Unit tests for all public methods
+    - integration        # Integration tests with mock services
+    - error_handling     # Error mapping and retry logic
+    - validation         # DID validation and parsing
+    - headers            # Header injection and request ID generation
+
+  # Test data requirements
+  testData:
+    - validDIDs: ["did:acc:alice", "did:acc:beastmode.acme", "did:acc:alice/documents"]
+    - invalidDIDs: ["", "invalid", "did:web:example.com", "did:acc:", "did:acc:/invalid"]
+    - retryableErrors: [429, 502, 503, 504]
+    - nonRetryableErrors: [400, 401, 403, 404, 410, 422]
+
+# Documentation requirements
+documentation:
+  # Required sections in SDK documentation
+  sections:
+    - quickstart         # Getting started guide
+    - examples           # Working code examples
+    - errorHandling      # Error types and handling patterns
+    - retryLogic         # Retry behavior and configuration
+    - headers           # Header management and authentication
+    - credits           # Accumulate credits explanation
+    - modes             # FAKE vs REAL mode differences
