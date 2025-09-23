@@ -43,8 +43,11 @@ func main() {
 
 	// 3. Create lite account for funding
 	fmt.Println("\n3. Creating lite account for funding...")
-	liteAccount := protocol.LiteTokenAddress(publicKey, protocol.ACME)
-	liteAccountURL := fmt.Sprintf("acc://%x", liteAccount[:])
+	liteAccount, err := protocol.LiteTokenAddress(publicKey, "ACME", protocol.SignatureTypeED25519)
+	if err != nil {
+		log.Fatalf("Failed to create lite account: %v", err)
+	}
+	liteAccountURL := liteAccount.String()
 	fmt.Printf("   Lite Account: %s\n", liteAccountURL)
 
 	// 4. Fund the lite account using faucet
