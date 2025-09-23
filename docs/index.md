@@ -1,5 +1,7 @@
 # Accumulate DID Method
 
+> **📖 For complete project information, quick start guide, and development workflow, see the [main README](../README.md) in the repository root.**
+
 The `did:acc` method enables decentralized identifiers on the Accumulate blockchain protocol, providing secure, scalable, and interoperable digital identity solutions.
 
 ## Overview

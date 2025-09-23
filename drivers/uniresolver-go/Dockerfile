@@ -1,5 +1,8 @@
 # Build stage
-FROM golang:1.21-alpine AS builder
+FROM golang:1.25.1-alpine AS builder
+
+# Version can be set at build time
+ARG VERSION=dev
 
 # Install build dependencies
 RUN apk add --no-cache git
@@ -16,8 +19,8 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build the binary
-RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o driver cmd/driver/main.go
+# Build the binary with embedded version
+RUN CGO_ENABLED=0 GOOS=linux go build -trimpath -ldflags="-s -w -X main.version=${VERSION}" -o driver cmd/driver/main.go
 
 # Final stage
 FROM alpine:latest

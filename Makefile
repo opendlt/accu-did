@@ -97,7 +97,7 @@ ci:
 # Container-based development targets (RECOMMENDED)
 # ========================================================================
 
-.PHONY: dev-shell test-all ci-local dev-up dev-down check-imports conformance perf help lint test-race vet qa
+.PHONY: dev-shell test-all ci-local dev-up dev-down check-imports conformance perf help lint test-race vet qa dist-clean binaries-local images-local sbom-local scan-local docs-archive release-local sdk-test sdk-merge-spec example-sdk
 
 dev-shell:
 	@echo "🐳 Starting development container shell..."
@@ -161,6 +161,69 @@ qa:
 	$(MAKE) lint
 	$(MAKE) test-race
 
+# ========================================================================
+# Release workflow targets (LOCAL BUILDS)
+# ========================================================================
+
+dist-clean:
+	@echo "🧹 Cleaning dist directory..."
+	@rm -rf dist/*
+	@mkdir -p dist/bin dist/images dist/docs dist/sbom dist/scan
+	@touch dist/.gitkeep
+
+binaries-local:
+	@echo "🔨 Building cross-platform binaries..."
+	@chmod +x scripts/build-binaries.sh 2>/dev/null || true
+	@./scripts/build-binaries.sh
+
+images-local:
+	@echo "🐳 Building multi-arch Docker images..."
+	@chmod +x scripts/build-images.sh 2>/dev/null || true
+	@./scripts/build-images.sh
+
+sbom-local:
+	@echo "📋 Generating Software Bill of Materials..."
+	@chmod +x scripts/sbom.local.sh 2>/dev/null || true
+	@./scripts/sbom.local.sh
+
+scan-local:
+	@echo "🔐 Running vulnerability scans..."
+	@chmod +x scripts/scan.local.sh 2>/dev/null || true
+	@./scripts/scan.local.sh
+
+docs-archive:
+	@echo "📚 Packaging documentation..."
+	@chmod +x scripts/docs-archive.sh 2>/dev/null || true
+	@./scripts/docs-archive.sh
+
+release-local:
+	@echo "🚀 Creating complete local release..."
+	$(MAKE) qa
+	$(MAKE) binaries-local
+	$(MAKE) images-local
+	$(MAKE) docs-archive
+	$(MAKE) sbom-local
+	$(MAKE) scan-local
+	@chmod +x scripts/release.local.sh 2>/dev/null || true
+	@./scripts/release.local.sh
+
+# ========================================================================
+# SDK targets
+# ========================================================================
+
+sdk-test:
+	@echo "🧪 Running SDK tests..."
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "cd sdks/go/accdid && go mod init github.com/opendlt/accu-did/sdks/go/accdid 2>/dev/null || true && go test ./... -count=1 -v"'
+
+sdk-merge-spec:
+	@echo "🔄 Merging OpenAPI specifications..."
+	@chmod +x scripts/sdk-openapi-merge.sh 2>/dev/null || true
+	@./scripts/sdk-openapi-merge.sh
+
+example-sdk:
+	@echo "🚀 Running SDK example..."
+	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "cd sdks/go/accdid/examples/basic && go mod init example 2>/dev/null || true && go mod edit -replace github.com/opendlt/accu-did/sdks/go/accdid=../.. && go mod tidy && go run main.go"'
+
 help:
 	@echo "📖 Accumulate DID Development Guide"
 	@echo ""
@@ -174,6 +237,20 @@ help:
 	@echo "  check-imports   - Verify no forbidden imports"
 	@echo "  conformance     - Run conformance tests"
 	@echo "  perf           - Run performance tests"
+	@echo ""
+	@echo "🚀 Release workflow (LOCAL BUILDS):"
+	@echo "  release-local   - Complete local release (QA + build + package + tag)"
+	@echo "  binaries-local  - Cross-compile binaries for all platforms"
+	@echo "  images-local    - Build multi-arch Docker images"
+	@echo "  docs-archive    - Package documentation for distribution"
+	@echo "  sbom-local      - Generate Software Bill of Materials"
+	@echo "  scan-local      - Run vulnerability scans"
+	@echo "  dist-clean      - Clean distribution directory"
+	@echo ""
+	@echo "📦 SDK development:"
+	@echo "  sdk-test        - Run Go SDK tests in container"
+	@echo "  sdk-merge-spec  - Merge OpenAPI specs for SDK generation"
+	@echo "  example-sdk     - Run SDK example in container"
 	@echo ""
 	@echo "🔍 Static analysis (requires local tools):"
 	@echo "  lint           - Run golangci-lint"
@@ -191,3 +268,4 @@ help:
 	@echo ""
 	@echo "💡 Quick start: 'make dev-shell' for interactive development"
 	@echo "💡 CI/CD ready: 'make ci-local' for complete validation"
+	@echo "💡 Release ready: 'make release-local' for complete local release"

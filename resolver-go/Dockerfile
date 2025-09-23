@@ -1,6 +1,9 @@
 # syntax=docker/dockerfile:1
 FROM golang:1.25.1-alpine AS build
 
+# Version can be set at build time
+ARG VERSION=dev
+
 WORKDIR /app
 
 # Install git for modules
@@ -13,9 +16,9 @@ RUN go mod download
 # Copy source code
 COPY . .
 
-# Build binary
+# Build binary with embedded version
 ENV CGO_ENABLED=0
-RUN go build -trimpath -ldflags="-s -w" -o /out/resolver ./cmd/resolver
+RUN go build -trimpath -ldflags="-s -w -X main.version=${VERSION}" -o /out/resolver ./cmd/resolver
 
 # Final stage - using alpine for curl health checks
 FROM alpine:3.20

@@ -1,204 +1,16 @@
-# Go Development Quickstart
+# Go SDK Quick Start
 
-Get started developing with the Accumulate DID Go SDK and services.
+Get started with the Accumulate DID Go SDK in minutes.
 
-## Prerequisites
-
-- Go 1.21+
-- Docker (for local testing)
-- Git
-
-## Setup
-
-### 1. Clone Repository
+## Installation
 
 ```bash
-git clone https://github.com/opendlt/accu-did.git
-cd accu-did
+go get github.com/opendlt/accu-did/sdks/go/accdid
 ```
 
-### 2. Initialize Go Workspace
+## Basic Usage
 
-```bash
-go work sync
-```
-
-This synchronizes all modules in the workspace:
-- `resolver-go`
-- `registrar-go`
-- `drivers/uniresolver-go`
-- `drivers/uniregistrar-go`
-
-### 3. Install Dependencies
-
-```bash
-go mod download
-```
-
-## Running Services
-
-### Option 1: Go Run (Development)
-
-=== "Resolver"
-
-    ```bash
-    cd resolver-go
-    go run cmd/server/main.go
-    ```
-
-    Service available at: `http://localhost:8080`
-
-=== "Registrar"
-
-    ```bash
-    cd registrar-go
-    go run cmd/server/main.go
-    ```
-
-    Service available at: `http://localhost:8082`
-
-=== "Universal Drivers"
-
-    ```bash
-    # Resolver Driver
-    cd drivers/uniresolver-go
-    go run cmd/driver/main.go
-
-    # Registrar Driver
-    cd drivers/uniregistrar-go
-    go run cmd/driver/main.go
-    ```
-
-### Option 2: Docker Compose (Production-like)
-
-```bash
-docker compose up --build
-```
-
-## Testing the Setup
-
-### 1. Health Checks
-
-```bash
-# Resolver health
-curl http://localhost:8080/health
-
-# Registrar health
-curl http://localhost:8082/health
-```
-
-Expected response:
-```json
-{
-  "status": "healthy",
-  "service": "accu-did-resolver"
-}
-```
-
-### 2. DID Resolution
-
-```bash
-curl "http://localhost:8080/resolve?did=did:acc:beastmode.acme" | jq .
-```
-
-Expected response structure:
-```json
-{
-  "didDocument": {
-    "@context": ["https://www.w3.org/ns/did/v1"],
-    "id": "did:acc:beastmode.acme",
-    "verificationMethod": [...],
-    "authentication": [...],
-    "assertionMethod": [...]
-  },
-  "didDocumentMetadata": {
-    "created": "2024-01-01T12:00:00Z",
-    "versionId": "...",
-    "contentHash": "..."
-  }
-}
-```
-
-### 3. DID Registration
-
-```bash
-curl -X POST "http://localhost:8082/create" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "did": "did:acc:test123",
-       "didDocument": {
-         "@context": ["https://www.w3.org/ns/did/v1"],
-         "id": "did:acc:test123",
-         "verificationMethod": [
-           {
-             "id": "did:acc:test123#key-1",
-             "type": "AccumulateKeyPage",
-             "controller": "did:acc:test123",
-             "keyPageUrl": "acc://test123/book/1",
-             "threshold": 1
-           }
-         ]
-       }
-     }' | jq .
-```
-
-## Development Workflow
-
-### 1. Code Organization
-
-```
-accu-did/
-├── resolver-go/          # DID Resolution service
-│   ├── cmd/server/       # Main server entry point
-│   ├── handlers/         # HTTP request handlers
-│   ├── internal/         # Internal packages
-│   └── tests/           # Integration tests
-├── registrar-go/         # DID Registration service
-│   ├── cmd/server/       # Main server entry point
-│   ├── handlers/         # HTTP request handlers
-│   ├── internal/         # Internal packages
-│   └── tests/           # Integration tests
-└── drivers/             # Universal drivers
-    ├── uniresolver-go/  # Universal Resolver driver
-    └── uniregistrar-go/ # Universal Registrar driver
-```
-
-### 2. Running Tests
-
-```bash
-# Test resolver
-cd resolver-go
-go test ./...
-
-# Test registrar
-cd registrar-go
-go test ./...
-
-# Test with race detection
-go test -race ./...
-
-# Test with coverage
-go test -cover ./...
-```
-
-### 3. Building Binaries
-
-```bash
-# Build resolver
-cd resolver-go
-go build -o bin/resolver cmd/server/main.go
-
-# Build registrar
-cd registrar-go
-go build -o bin/registrar cmd/server/main.go
-
-# Cross-compile for Linux
-GOOS=linux GOARCH=amd64 go build -o bin/resolver-linux cmd/server/main.go
-```
-
-## SDK Usage Examples
-
-### Basic Resolution
+### Resolve a DID
 
 ```go
 package main
@@ -207,123 +19,206 @@ import (
     "context"
     "fmt"
     "log"
+    "errors"
 
-    "github.com/opendlt/accu-did/resolver-go/client"
+    "github.com/opendlt/accu-did/sdks/go/accdid"
 )
 
 func main() {
     // Create resolver client
-    resolver := client.New("http://localhost:8080")
-
-    // Resolve DID
-    doc, err := resolver.Resolve(context.Background(), "did:acc:beastmode.acme")
+    resolver, err := accdid.NewResolverClient(accdid.ClientOptions{
+        BaseURL: "http://localhost:8080",
+    })
     if err != nil {
         log.Fatal(err)
     }
 
-    fmt.Printf("Resolved DID: %s\n", doc.ID)
-    fmt.Printf("Verification Methods: %d\n", len(doc.VerificationMethod))
+    // Resolve a DID
+    result, err := resolver.Resolve(context.Background(), "did:acc:alice")
+    if err != nil {
+        if errors.Is(err, accdid.ErrNotFound) {
+            fmt.Println("DID not found")
+        } else if errors.Is(err, accdid.ErrGoneDeactivated) {
+            fmt.Println("DID has been deactivated (410 Gone)")
+        } else {
+            log.Fatal(err)
+        }
+        return
+    }
+
+    fmt.Printf("DID Document: %+v\n", result.DIDDocument)
 }
 ```
 
-### DID Registration
+### Handle 410 Deactivated DIDs
+
+The SDK automatically handles deactivated DIDs that return HTTP 410 Gone:
 
 ```go
-package main
+result, err := resolver.Resolve(ctx, "did:acc:deactivated")
+if err != nil {
+    if errors.Is(err, accdid.ErrGoneDeactivated) {
+        fmt.Println("This DID has been deactivated")
 
-import (
-    "context"
-    "log"
-
-    "github.com/opendlt/accu-did/registrar-go/client"
-    "github.com/opendlt/accu-did/registrar-go/types"
-)
-
-func main() {
-    // Create registrar client
-    registrar := client.New("http://localhost:8082")
-
-    // Create DID document
-    doc := &types.DIDDocument{
-        Context: []string{"https://www.w3.org/ns/did/v1"},
-        ID:      "did:acc:example",
-        VerificationMethod: []types.VerificationMethod{
-            {
-                ID:         "did:acc:example#key-1",
-                Type:       "AccumulateKeyPage",
-                Controller: "did:acc:example",
-                KeyPageURL: "acc://example/book/1",
-                Threshold:  1,
-            },
-        },
+        // You might still get metadata about the deactivation
+        if result != nil && result.DIDDocument != nil {
+            fmt.Println("Deactivation tombstone:", result.DIDDocument)
+        }
+        return
     }
-
-    // Register DID
-    result, err := registrar.Create(context.Background(), "did:acc:example", doc)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    fmt.Printf("Created DID: %s\n", result.DIDState.DID)
-    fmt.Printf("Transaction ID: %s\n", result.DIDRegistrationMetadata.TxID)
+    // Handle other errors...
 }
 ```
 
-## Debugging
+The canonical deactivation tombstone format is:
 
-### Enable Debug Logging
-
-```bash
-export LOG_LEVEL=debug
-go run cmd/server/main.go
+```json
+{
+  "@context": ["https://www.w3.org/ns/did/v1"],
+  "id": "did:acc:example",
+  "deactivated": true,
+  "deactivatedAt": "2024-01-01T00:00:00Z"
+}
 ```
 
-### Profile Performance
+### Register a New DID
 
-```bash
-go run -pprof=:6060 cmd/server/main.go
+```go
+// Create registrar client
+registrar, err := accdid.NewRegistrarClient(accdid.ClientOptions{
+    BaseURL: "http://localhost:8081",
+    IdempotencyKey: "unique-request-123", // Prevent duplicate registrations
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+// Create DID document
+doc := json.RawMessage(`{
+    "@context": ["https://www.w3.org/ns/did/v1"],
+    "id": "did:acc:mycompany",
+    "verificationMethod": [{
+        "id": "did:acc:mycompany#key1",
+        "type": "Ed25519VerificationKey2020",
+        "controller": "did:acc:mycompany",
+        "publicKeyMultibase": "z6MkhaXgBZDvotDkL5257faiztiGiC2QtKLGpbnnEGta2doK"
+    }]
+}`)
+
+// Register the DID
+txID, err := registrar.Register(context.Background(), accdid.NativeRegisterRequest{
+    DID:         "did:acc:mycompany",
+    DIDDocument: doc,
+})
+if err != nil {
+    log.Fatal(err)
+}
+
+fmt.Printf("Registration successful, Transaction ID: %s\n", txID)
 ```
 
-Access profiler at: `http://localhost:6060/debug/pprof/`
+## Error Handling
 
-### Mock Accumulate Network
+The SDK provides structured error handling:
 
-For testing without a real Accumulate network:
+```go
+result, err := resolver.Resolve(ctx, did)
+if err != nil {
+    switch {
+    case errors.Is(err, accdid.ErrNotFound):
+        // 404 - DID not found
+        fmt.Println("DID does not exist")
+
+    case errors.Is(err, accdid.ErrGoneDeactivated):
+        // 410 - DID has been deactivated
+        fmt.Println("DID has been deactivated")
+
+    case errors.Is(err, accdid.ErrBadRequest):
+        // 4xx - Client error (invalid DID format, etc.)
+        fmt.Printf("Invalid request: %v\n", err)
+
+    case errors.Is(err, accdid.ErrServer):
+        // 5xx - Server error
+        fmt.Printf("Server error: %v\n", err)
+
+    case errors.Is(err, accdid.ErrTimeout):
+        // Request timeout
+        fmt.Printf("Request timeout: %v\n", err)
+
+    case errors.Is(err, accdid.ErrNetwork):
+        // Network connectivity issue
+        fmt.Printf("Network error: %v\n", err)
+
+    default:
+        fmt.Printf("Unknown error: %v\n", err)
+    }
+}
+```
+
+## Configuration
+
+### Timeouts and Retries
+
+```go
+client, err := accdid.NewResolverClient(accdid.ClientOptions{
+    BaseURL: "http://localhost:8080",
+    Timeout: 30 * time.Second,
+    Retries: accdid.RetryPolicy{
+        Max:       5,
+        BaseDelay: 500 * time.Millisecond,
+        MaxDelay:  10 * time.Second,
+        Jitter:    true,
+    },
+})
+```
+
+### API Key Authentication
+
+```go
+client, err := accdid.NewResolverClient(accdid.ClientOptions{
+    BaseURL: "http://localhost:8080",
+    APIKey:  "your-api-key-here",
+})
+```
+
+### Custom HTTP Client
+
+```go
+httpClient := &http.Client{
+    Transport: &http.Transport{
+        MaxIdleConns:    100,
+        IdleConnTimeout: 90 * time.Second,
+    },
+}
+
+client, err := accdid.NewResolverClient(accdid.ClientOptions{
+    BaseURL: "http://localhost:8080",
+    HTTP:    httpClient,
+})
+```
+
+## Complete Example
+
+See [`examples/basic/main.go`](../sdks/go/accdid/examples/basic/main.go) for a complete working example that demonstrates:
+
+- Service health checks
+- DID resolution with error handling
+- Complete DID lifecycle (register → update → deactivate)
+- 410 Gone handling for deactivated DIDs
+- Environment variable configuration
+
+## Testing
 
 ```bash
-export ACCUMULATE_URL=mock
-go run cmd/server/main.go
+# Run all SDK tests
+make sdk-test
+
+# Run example
+make example-sdk
 ```
 
 ## Next Steps
 
-- [API Reference](resolver.md) - Detailed API documentation
-- [Universal Drivers](universal.md) - Standards-compliant interfaces
-- [Interoperability](interop/didcomm.md) - DIDComm, SD-JWT, and BBS+ integration
-
-## Troubleshooting
-
-### Common Issues
-
-#### Port Already in Use
-```bash
-# Kill process using port 8080
-lsof -ti:8080 | xargs kill -9
-```
-
-#### Module Download Fails
-```bash
-# Clean module cache
-go clean -modcache
-go mod download
-```
-
-#### Build Fails
-```bash
-# Ensure Go workspace is synced
-go work sync
-
-# Update dependencies
-go get -u ./...
-go mod tidy
-```
+- Read the [complete SDK documentation](../sdks/go/accdid/README.md)
+- Explore [Universal Resolver compatibility](universal.md)
+- Learn about [credit requirements](ops/OPERATIONS.md#credits-required)

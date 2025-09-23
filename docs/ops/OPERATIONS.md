@@ -551,69 +551,292 @@ make ci            # Run local CI checks
 make clean-all     # Clean all artifacts
 ```
 
-## 7. Releases (Local)
+## 7. Release Workflow (Complete Local Pipeline)
 
-### Version Management
+### Overview
 
-```powershell
-# Windows PowerShell - Bump version
-.\scripts\bump-version.ps1 patch   # 0.1.0 → 0.1.1
-.\scripts\bump-version.ps1 minor   # 0.1.0 → 0.2.0
-.\scripts\bump-version.ps1 major   # 0.1.0 → 1.0.0
-```
+The accu-did project provides a complete local release workflow that eliminates dependency on remote CI/CD systems. The workflow includes:
 
+- **Quality Assurance**: Static analysis, race testing, imports checking
+- **Cross-platform Builds**: Binaries for linux/amd64, linux/arm64, windows/amd64, darwin/arm64
+- **Container Images**: Multi-arch Docker images with embedded version info
+- **Security Scanning**: Vulnerability scans with trivy and SBOM generation with syft
+- **Documentation Packaging**: Complete docs archive for distribution
+- **Version Management**: Git tagging with consistency checks across OpenAPI specs
+
+### Prerequisites
+
+**Required Tools for Complete Workflow:**
+- Docker with buildx (multi-arch support)
+- Git (version tagging)
+- zip/7z/tar (documentation packaging)
+
+**Optional Security Tools:**
+- `syft` for SBOM generation: https://github.com/anchore/syft/releases
+- `trivy` for vulnerability scanning: https://github.com/aquasecurity/trivy/releases
+
+**Tool Installation (Optional):**
 ```bash
-# Unix/Mac - Bump version
-bash scripts/bump-version.sh patch   # 0.1.0 → 0.1.1
-bash scripts/bump-version.sh minor   # 0.1.0 → 0.2.0
-bash scripts/bump-version.sh major   # 0.1.0 → 1.0.0
+# Install syft (SBOM generation)
+curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin
+
+# Install trivy (vulnerability scanning)
+curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
 ```
 
-### Release Process
+### Complete Release Pipeline
 
-```powershell
-# Windows PowerShell - Complete release
-.\scripts\release.ps1
-
-# This will:
-# - Build documentation (docs/site/)
-# - Build Docker images tagged with vX.Y.Z + latest
-# - Create git tag vX.Y.Z
-# - Print manual push commands
-```
-
+**Single Command Release:**
 ```bash
-# Unix/Mac - Complete release
-bash scripts/release.sh
-
-# This will:
-# - Build documentation (docs/site/)
-# - Build Docker images tagged with vX.Y.Z + latest
-# - Create git tag vX.Y.Z
-# - Print manual push commands
+# Complete local release (all steps)
+make release-local
 ```
 
-### Manual Push Commands
+This runs the full pipeline:
+1. **QA Checks** (`make qa`) - imports, vet, lint, race tests
+2. **Binary Compilation** (`make binaries-local`) - cross-platform binaries
+3. **Image Building** (`make images-local`) - multi-arch Docker images
+4. **Documentation** (`make docs-archive`) - packaged docs archive
+5. **Security Scanning** (`make sbom-local scan-local`) - SBOM + vulnerability scans
+6. **Version Tagging** (`scripts/release.local.sh`) - git tag with metadata
 
-After release script completes:
+### Individual Components
+
+**Quality Assurance:**
 ```bash
-# Push to git
+# Run all QA checks
+make qa
+
+# Individual checks
+make lint           # golangci-lint static analysis
+make test-race      # race condition testing
+make vet           # go vet analysis
+./scripts/check-imports.sh  # forbidden imports check
+```
+
+**Cross-Platform Binaries:**
+```bash
+# Build all platform binaries
+make binaries-local
+
+# Outputs to:
+# dist/bin/linux-amd64/resolver, dist/bin/linux-amd64/registrar
+# dist/bin/linux-arm64/resolver, dist/bin/linux-arm64/registrar
+# dist/bin/windows-amd64/resolver.exe, dist/bin/windows-amd64/registrar.exe
+# dist/bin/darwin-arm64/resolver, dist/bin/darwin-arm64/registrar
+```
+
+**Multi-Arch Docker Images:**
+```bash
+# Build Docker images for linux/amd64,linux/arm64
+make images-local
+
+# Creates images:
+# accu-did/resolver:v<version>, accu-did/resolver:latest
+# accu-did/registrar:v<version>, accu-did/registrar:latest
+```
+
+**Documentation Archive:**
+```bash
+# Package documentation for distribution
+make docs-archive
+
+# Creates: dist/docs/docs-<version>.zip
+# Contains: API docs, OpenAPI specs, method specs, README
+```
+
+**Security Scanning:**
+```bash
+# Generate Software Bill of Materials
+make sbom-local
+
+# Run vulnerability scans
+make scan-local
+
+# Outputs:
+# dist/sbom/ - SBOM files in JSON, SPDX, and table formats
+# dist/scan/ - Vulnerability reports and critical findings
+```
+
+**Version Management:**
+```bash
+# Create git tag with version consistency checks
+./scripts/release.local.sh   # Unix/Linux
+./scripts/release.local.ps1  # Windows PowerShell
+
+# Checks:
+# - Working tree is clean
+# - VERSION file exists
+# - OpenAPI spec versions match VERSION
+# - Tag doesn't already exist
+# Creates annotated tag with release metadata
+```
+
+### Version Lifecycle
+
+**Update Version:**
+```bash
+# Edit VERSION file manually
+echo "0.2.0" > VERSION
+
+# Update OpenAPI spec versions to match
+# docs/spec/openapi/resolver.yaml
+# docs/spec/openapi/registrar.yaml
+```
+
+**Create Release:**
+```bash
+# Commit version change
+git add VERSION docs/spec/openapi/*.yaml
+git commit -m "bump: release version 0.2.0"
+
+# Run release pipeline
+make release-local
+
+# Optionally push to remote (manual step)
 git push origin main
-git push origin v0.1.0
-
-# Push Docker images (optional)
-docker push accu-did/resolver:v0.1.0
-docker push accu-did/resolver:latest
-docker push accu-did/registrar:v0.1.0
-docker push accu-did/registrar:latest
+git push origin v0.2.0
 ```
 
-### Changelog Updates
+### Distribution Artifacts
 
-1. Edit `CHANGELOG.md` before release
-2. Add entries under `## [Unreleased]`
-3. Release script will commit VERSION and CHANGELOG
-4. Manually update links at bottom of CHANGELOG
+After `make release-local` completes, these artifacts are available:
+
+**Binaries (`dist/bin/`):**
+```
+linux-amd64/resolver, linux-amd64/registrar
+linux-arm64/resolver, linux-arm64/registrar
+windows-amd64/resolver.exe, windows-amd64/registrar.exe
+darwin-arm64/resolver, darwin-arm64/registrar
+```
+
+**Docker Images:**
+```
+accu-did/resolver:v<version>, accu-did/resolver:latest
+accu-did/registrar:v<version>, accu-did/registrar:latest
+```
+
+**Documentation (`dist/docs/`):**
+```
+docs-<version>.zip - Complete documentation archive
+docs-<version>.zip.sha256 - Checksum file
+```
+
+**Security Reports (`dist/sbom/`, `dist/scan/`):**
+```
+source-<version>.{syft.json,spdx.json,txt} - Source code SBOM
+resolver-latest.{syft.json,spdx.json,txt} - Resolver image SBOM
+registrar-latest.{syft.json,spdx.json,txt} - Registrar image SBOM
+resolver-latest.{trivy.json,txt} - Resolver vulnerability scan
+registrar-latest.{trivy.json,txt} - Registrar vulnerability scan
+filesystem.{trivy.json,txt} - Source code vulnerability scan
+*-critical.txt - Critical vulnerability reports (if any)
+```
+
+**Git Tag:**
+```
+v<version> - Annotated tag with release metadata
+```
+
+### Clean-up and Maintenance
+
+**Clean Distribution Directory:**
+```bash
+# Remove all distribution artifacts
+make dist-clean
+
+# Rebuilds dist/ structure:
+# dist/bin/, dist/images/, dist/docs/, dist/sbom/, dist/scan/
+```
+
+**Debugging Failed Releases:**
+
+**QA Failures:**
+```bash
+# Check specific failure
+make lint 2>&1 | head -20
+make test-race 2>&1 | head -20
+
+# Fix issues and re-run
+make qa
+```
+
+**Docker Build Failures:**
+```bash
+# Check Docker buildx availability
+docker buildx version
+
+# Enable buildx if needed
+docker buildx create --name mybuilder --use
+```
+
+**Missing Security Tools:**
+```bash
+# Skip SBOM/scanning if tools unavailable
+# Scripts automatically create placeholder files when tools missing
+
+# Check tool availability
+command -v syft && echo "syft available" || echo "syft missing"
+command -v trivy && echo "trivy available" || echo "trivy missing"
+```
+
+### Continuous Integration Integration
+
+**Local CI Validation:**
+```bash
+# Full CI pipeline in container (RECOMMENDED)
+make ci-local
+
+# Equivalent to running complete pipeline in standardized environment
+```
+
+**Pre-Release Checklist:**
+1. ✅ All tests pass (`make test-all`)
+2. ✅ QA checks pass (`make qa`)
+3. ✅ Services start cleanly (`make dev-up`)
+4. ✅ Health checks succeed (`curl localhost:8080/health`)
+5. ✅ Smoke tests pass (basic create/resolve/update/deactivate)
+6. ✅ VERSION file updated
+7. ✅ OpenAPI spec versions updated
+8. ✅ CHANGELOG.md entries added
+9. ✅ Working tree clean for tagging
+
+**Post-Release Actions (Optional):**
+```bash
+# Push to git remote
+git push origin main
+git push origin v<version>
+
+# Push Docker images to registry
+docker push accu-did/resolver:v<version>
+docker push accu-did/resolver:latest
+docker push accu-did/registrar:v<version>
+docker push accu-did/registrar:latest
+
+# Upload documentation and security reports to release assets
+# (Manual upload to GitHub releases, internal artifact storage, etc.)
+```
+
+### Legacy Version Management (Deprecated)
+
+The following scripts exist for compatibility but are **deprecated** in favor of the complete release workflow:
+
+```powershell
+# Windows PowerShell (DEPRECATED)
+.\scripts\bump-version.ps1 patch   # Use VERSION file instead
+.\scripts\release.ps1              # Use make release-local instead
+```
+
+```bash
+# Unix/Mac (DEPRECATED)
+bash scripts/bump-version.sh patch   # Use VERSION file instead
+bash scripts/release.sh              # Use make release-local instead
+```
+
+**Migration:** Replace legacy scripts with:
+1. Manual VERSION file editing
+2. `make release-local` for complete pipeline
+3. `git push` commands for remote distribution (optional)
 
 ## 8. Troubleshooting
 
