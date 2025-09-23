@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -674,18 +675,35 @@ func (c *RealSubmitter) GetKeyPageState(keyPageURL string) (*KeyPageState, error
 
 // convertToMessagingEnvelope converts ops.Envelope to messaging.Envelope
 func (c *RealSubmitter) convertToMessagingEnvelope(opsEnv *ops.Envelope, accountURL *url.URL) (*messaging.Envelope, error) {
-	// This is a placeholder implementation
-	// The actual conversion would depend on the structure of ops.Envelope and
-	// how it maps to the messaging.Envelope type
+	// Marshal the DID document from the envelope
+	dataBytes, err := json.Marshal(opsEnv.Document)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal document: %w", err)
+	}
 
-	// TODO: Implement proper conversion based on:
-	// 1. ops.Envelope structure
-	// 2. messaging.Envelope requirements
-	// 3. The specific transaction type (WriteData)
+	// Find an ADI to get the key page for signing
+	// In a complete implementation, this should extract the key page from envelope metadata
+	// For now, use a simplified approach similar to WriteDataEntry
+	adiURL := &url.URL{Authority: accountURL.Authority}
+	keyPageURL := adiURL.JoinPath("book", "1")
 
-	envelope := &messaging.Envelope{
-		// Transaction: writeDataTx,
-		// Signatures: signatures,
+	// Get private key for signing (using the signer hook like other methods)
+	privateKey, err := c.signerHook.GetPrivateKey(keyPageURL.String())
+	if err != nil {
+		return nil, fmt.Errorf("failed to get private key: %w", err)
+	}
+
+	// Build the WriteData transaction using the build package (same pattern as WriteDataEntry)
+	envelope, err := build.Transaction().
+		For(accountURL).
+		WriteData(dataBytes).
+		SignWith(keyPageURL).
+		Version(1).
+		Timestamp(build.UnixTimeNow()).
+		PrivateKey(privateKey).
+		Done()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build WriteData transaction: %w", err)
 	}
 
 	return envelope, nil
