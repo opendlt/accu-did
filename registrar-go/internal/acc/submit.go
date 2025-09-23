@@ -342,6 +342,7 @@ func (s *DefaultSignerHook) GetPublicKey(keyPageURL string) ([]byte, error) {
 }
 
 // CreateIdentity creates a new ADI using Accumulate API
+// Credit cost: approximately 10 credits per ADI creation (variable based on network conditions)
 func (c *RealSubmitter) CreateIdentity(adiLabel string, keyPageURL string) (string, error) {
 	// Parse URLs
 	keyPageParsed, err := url.Parse(keyPageURL)
@@ -402,7 +403,7 @@ func (c *RealSubmitter) CreateIdentity(adiLabel string, keyPageURL string) (stri
 
 	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
 	if err != nil {
-		return "", fmt.Errorf("failed to submit CreateIdentity transaction: %w", err)
+		return "", fmt.Errorf("failed to submit CreateIdentity transaction to Accumulate network (check ACC_NODE_URL and network connectivity): %w", err)
 	}
 
 	if len(submissions) == 0 {
@@ -410,7 +411,7 @@ func (c *RealSubmitter) CreateIdentity(adiLabel string, keyPageURL string) (stri
 	}
 
 	if !submissions[0].Success {
-		return "", fmt.Errorf("CreateIdentity submission failed: %v", submissions[0].Message)
+		return "", fmt.Errorf("CreateIdentity submission failed (may be due to insufficient credits): %v", submissions[0].Message)
 	}
 
 	// Extract transaction ID from envelope
@@ -419,6 +420,7 @@ func (c *RealSubmitter) CreateIdentity(adiLabel string, keyPageURL string) (stri
 }
 
 // CreateDataAccount creates a new data account using Accumulate API
+// Credit cost: approximately 5 credits per data account creation
 func (c *RealSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (string, error) {
 	// Parse the ADI URL
 	adiParsed, err := url.Parse(adiURL)
@@ -461,7 +463,7 @@ func (c *RealSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (stri
 
 	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
 	if err != nil {
-		return "", fmt.Errorf("failed to submit CreateDataAccount transaction: %w", err)
+		return "", fmt.Errorf("failed to submit CreateDataAccount transaction to Accumulate network (check ACC_NODE_URL and network connectivity): %w", err)
 	}
 
 	if len(submissions) == 0 {
@@ -469,7 +471,7 @@ func (c *RealSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (stri
 	}
 
 	if !submissions[0].Success {
-		return "", fmt.Errorf("CreateDataAccount submission failed: %v", submissions[0].Message)
+		return "", fmt.Errorf("CreateDataAccount submission failed (may be due to insufficient credits): %v", submissions[0].Message)
 	}
 
 	// Extract transaction ID from envelope
@@ -478,6 +480,7 @@ func (c *RealSubmitter) CreateDataAccount(adiURL, dataAccountLabel string) (stri
 }
 
 // WriteDataEntry writes data to a data account using Accumulate API
+// Credit cost: approximately 2-5 credits per write operation depending on data size
 func (c *RealSubmitter) WriteDataEntry(dataAccountURL string, data []byte) (string, error) {
 	// Parse the data account URL
 	dataAccountParsed, err := url.Parse(dataAccountURL)
@@ -519,7 +522,7 @@ func (c *RealSubmitter) WriteDataEntry(dataAccountURL string, data []byte) (stri
 
 	submissions, err := c.client.Submit(ctx, envelope, api.SubmitOptions{})
 	if err != nil {
-		return "", fmt.Errorf("failed to submit WriteData transaction: %w", err)
+		return "", fmt.Errorf("failed to submit WriteData transaction to Accumulate network (check ACC_NODE_URL and network connectivity): %w", err)
 	}
 
 	if len(submissions) == 0 {
@@ -527,7 +530,7 @@ func (c *RealSubmitter) WriteDataEntry(dataAccountURL string, data []byte) (stri
 	}
 
 	if !submissions[0].Success {
-		return "", fmt.Errorf("WriteData submission failed: %v", submissions[0].Message)
+		return "", fmt.Errorf("WriteData submission failed (may be due to insufficient credits): %v", submissions[0].Message)
 	}
 
 	// Extract transaction ID from envelope
