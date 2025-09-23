@@ -23,6 +23,68 @@ Complete implementation of the `did:acc` method for Accumulate Protocol, providi
 
 ## ⚡ Quick Start
 
+### 🌐 ONE-COMMAND DEV EXPERIENCE (NEW!)
+
+**Complete DID lifecycle on live blockchain in one command:**
+
+```bash
+# Clone and enter repository
+git clone https://github.com/opendlt/accu-did.git
+cd accu-did
+
+# Start devnet + services + run SDK example (all-in-one)
+make services-up && make sdk-example
+
+# Clean up when done
+make services-down && make devnet-down
+```
+
+**What this does:**
+1. **Starts local Accumulate devnet** with faucet on `http://127.0.0.1:26656`
+2. **Starts DID resolver** on `:8080` connected to devnet in REAL mode
+3. **Starts DID registrar** on `:8081` connected to devnet in REAL mode
+4. **Runs SDK example** that creates a full DID on the live blockchain:
+   - Generates Ed25519 key pair
+   - Creates + funds lite account via faucet
+   - Creates ADI (`acc://hello.accu`)
+   - Creates data account (`acc://hello.accu/did`)
+   - Writes W3C-compliant DID document to blockchain
+   - Prints transaction IDs for verification
+
+**Example output:**
+```
+=== Accumulate DID Hello World ===
+
+1. Connecting to Accumulate node: http://127.0.0.1:26656
+4. Funding lite account from faucet...
+   ✅ Lite account funded successfully
+5a. Creating ADI: acc://hello.accu
+5c. Writing DID document to: acc://hello.accu/did
+
+=== SUCCESS ===
+DID: did:acc:hello.accu
+You can now resolve this DID using: did:acc:hello.accu
+```
+
+**Test resolution:**
+```bash
+# Test the resolver service
+curl "http://localhost:8080/resolve?did=did:acc:hello.accu"
+
+# Test the registrar service
+curl "http://localhost:8081/healthz"
+```
+
+**Manual step-by-step:**
+```bash
+make devnet-up                    # Start Accumulate devnet
+make devnet-status                # Check devnet health
+make services-up                  # Start resolver + registrar in REAL mode
+make sdk-example                  # Run SDK example
+make services-down                # Stop services
+make devnet-down                  # Stop devnet
+```
+
 ### FAKE vs REAL Modes
 
 **FAKE Mode (Default)** - Offline development with static fixtures:

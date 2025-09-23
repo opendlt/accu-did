@@ -1,12 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"crypto/ed25519"
 	"crypto/rand"
 	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"time"
 
@@ -39,15 +41,34 @@ func main() {
 	}
 	fmt.Printf("   Public Key: %x\n", publicKey)
 
-	// 3. Build and submit transactions
+	// 3. Create lite account for funding
+	fmt.Println("\n3. Creating lite account for funding...")
+	liteAccount := protocol.LiteTokenAddress(publicKey, protocol.ACME)
+	liteAccountURL := fmt.Sprintf("acc://%x", liteAccount[:])
+	fmt.Printf("   Lite Account: %s\n", liteAccountURL)
+
+	// 4. Fund the lite account using faucet
+	fmt.Println("\n4. Funding lite account from faucet...")
+	err = fundFromFaucet(nodeURL, liteAccountURL)
+	if err != nil {
+		log.Printf("   Warning: Faucet funding failed: %v", err)
+		log.Printf("   You may need to manually fund the lite account: %s", liteAccountURL)
+	} else {
+		fmt.Println("   ✅ Lite account funded successfully")
+	}
+
+	// Wait for funding to propagate
+	time.Sleep(3 * time.Second)
+
+	// 5. Build and submit transactions
 	ctx := context.Background()
 	adiLabel := "hello.accu"
 	adiURL := fmt.Sprintf("acc://%s", adiLabel)
 	keyPageURL := fmt.Sprintf("acc://%s/book/1", adiLabel)
 	dataAccountURL := fmt.Sprintf("acc://%s/did", adiLabel)
 
-	// Step 3a: Create Identity (ADI)
-	fmt.Printf("\n3a. Creating ADI: %s\n", adiURL)
+	// Step 5a: Create Identity (ADI)
+	fmt.Printf("\n5a. Creating ADI: %s\n", adiURL)
 
 	// Use the builder pattern with signing
 	envelope1, err := build.Transaction().
@@ -55,7 +76,7 @@ func main() {
 		CreateIdentity(adiURL).
 		WithKeyBook(keyPageURL).
 		WithKey(publicKey, protocol.SignatureTypeED25519).
-		SignWith(url.MustParse("acc://ACME")).  // Use faucet for funding
+		SignWith(url.MustParse(liteAccountURL)).  // Use funded lite account
 		Version(1).
 		Timestamp(build.UnixTimeNow()).
 		PrivateKey(privateKey).
@@ -77,8 +98,8 @@ func main() {
 	// Wait for transaction to process
 	time.Sleep(2 * time.Second)
 
-	// Step 3b: Create Data Account
-	fmt.Printf("\n3b. Creating data account: %s\n", dataAccountURL)
+	// Step 5b: Create Data Account
+	fmt.Printf("\n5b. Creating data account: %s\n", dataAccountURL)
 
 	envelope2, err := build.Transaction().
 		For(url.MustParse(adiURL)).
@@ -105,8 +126,8 @@ func main() {
 	// Wait for transaction to process
 	time.Sleep(2 * time.Second)
 
-	// Step 3c: Write DID Document
-	fmt.Printf("\n3c. Writing DID document to: %s\n", dataAccountURL)
+	// Step 5c: Write DID Document
+	fmt.Printf("\n5c. Writing DID document to: %s\n", dataAccountURL)
 
 	// Create minimal DID document
 	didDocument := map[string]interface{}{
@@ -155,17 +176,19 @@ func main() {
 	}
 	fmt.Printf("   Transaction ID: %s\n", extractTxID(envelope3))
 
-	// 4. Print results
+	// 6. Print results
 	fmt.Printf("\n=== SUCCESS ===\n")
 	fmt.Printf("DID: did:acc:%s\n", adiLabel)
 	fmt.Printf("ADI URL: %s\n", adiURL)
 	fmt.Printf("Data Account: %s\n", dataAccountURL)
 	fmt.Printf("Key Page: %s\n", keyPageURL)
+	fmt.Printf("Lite Account: %s\n", liteAccountURL)
 	fmt.Printf("\nTransaction IDs:\n")
 	fmt.Printf("  Create Identity: %s\n", extractTxID(envelope1))
 	fmt.Printf("  Create Data Account: %s\n", extractTxID(envelope2))
 	fmt.Printf("  Write DID Document: %s\n", extractTxID(envelope3))
 	fmt.Printf("\nDID Document written to Accumulate blockchain!\n")
+	fmt.Printf("You can now resolve this DID using: did:acc:%s\n", adiLabel)
 }
 
 
@@ -175,4 +198,41 @@ func extractTxID(envelope *messaging.Envelope) string {
 		return fmt.Sprintf("%x", envelope.Transaction[0].GetHash())
 	}
 	return "unknown"
+}
+
+// fundFromFaucet attempts to fund the lite account using the devnet faucet
+func fundFromFaucet(nodeURL, liteAccountURL string) error {
+	// Try different faucet endpoints that might be available
+	faucetEndpoints := []string{
+		nodeURL + "/faucet",           // Direct faucet endpoint
+		"http://127.0.0.1:26659",     // Faucet on separate port (common devnet setup)
+		"http://127.0.0.1:8080/faucet", // Alternative faucet port
+	}
+
+	requestBody := map[string]string{
+		"url": liteAccountURL,
+	}
+	reqData, err := json.Marshal(requestBody)
+	if err != nil {
+		return fmt.Errorf("failed to marshal faucet request: %v", err)
+	}
+
+	for _, endpoint := range faucetEndpoints {
+		fmt.Printf("   Trying faucet endpoint: %s\n", endpoint)
+
+		resp, err := http.Post(endpoint, "application/json", bytes.NewBuffer(reqData))
+		if err != nil {
+			fmt.Printf("   Failed to connect to %s: %v\n", endpoint, err)
+			continue
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode == 200 || resp.StatusCode == 201 {
+			fmt.Printf("   Faucet request successful via %s\n", endpoint)
+			return nil
+		}
+		fmt.Printf("   Faucet endpoint %s returned status: %d\n", endpoint, resp.StatusCode)
+	}
+
+	return fmt.Errorf("all faucet endpoints failed")
 }

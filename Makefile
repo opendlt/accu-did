@@ -225,6 +225,46 @@ example-sdk:
 	@docker compose -f docker-compose.dev.yml run --rm dev 'bash -lc "cd sdks/go/accdid/examples/basic && go mod init example 2>/dev/null || true && go mod edit -replace github.com/opendlt/accu-did/sdks/go/accdid=../.. && go mod tidy && go run main.go"'
 
 # ========================================================================
+# Devnet Management (Local Accumulate Development Network)
+# ========================================================================
+
+devnet-up:
+	@echo "🚀 Starting local Accumulate devnet..."
+	@pwsh -File scripts/devnet.ps1 up
+
+devnet-down:
+	@echo "🛑 Stopping local Accumulate devnet..."
+	@pwsh -File scripts/devnet.ps1 down
+
+devnet-status:
+	@echo "📊 Checking devnet status..."
+	@pwsh -File scripts/devnet.ps1 status
+
+services-up: devnet-up
+	@echo "🚀 Starting DID services against devnet..."
+	@echo "Waiting for devnet to be ready..."
+	@sleep 3
+	@echo "Starting resolver on :8080..."
+	@cd resolver-go && ACC_NODE_URL=http://127.0.0.1:26656 go run cmd/resolver/main.go --addr :8080 --real &
+	@echo "Starting registrar on :8081..."
+	@cd registrar-go && ACC_NODE_URL=http://127.0.0.1:26656 go run cmd/registrar/main.go --addr :8081 --real &
+	@echo "✅ Services started. Use 'make services-down' to stop."
+	@echo "   Resolver: http://localhost:8080/healthz"
+	@echo "   Registrar: http://localhost:8081/healthz"
+	@echo "   Devnet RPC: http://127.0.0.1:26656"
+
+services-down:
+	@echo "🛑 Stopping DID services..."
+	@pkill -f "resolver.*--real" || true
+	@pkill -f "registrar.*--real" || true
+	@echo "✅ Services stopped."
+
+sdk-example:
+	@echo "🚀 Running SDK example against live devnet..."
+	@echo "Prerequisites: Run 'make devnet-up' first"
+	@cd examples/hello_accu && go run main.go
+
+# ========================================================================
 # TODO Scanner
 # ========================================================================
 
@@ -277,6 +317,14 @@ help:
 	@echo "  sdk-test        - Run Go SDK tests in container"
 	@echo "  sdk-merge-spec  - Merge OpenAPI specs for SDK generation"
 	@echo "  example-sdk     - Run SDK example in container"
+	@echo ""
+	@echo "🌐 Local devnet (Live Accumulate blockchain):"
+	@echo "  devnet-up       - Start local Accumulate devnet"
+	@echo "  devnet-down     - Stop local Accumulate devnet"
+	@echo "  devnet-status   - Check devnet health and endpoints"
+	@echo "  services-up     - Start devnet + resolver + registrar in REAL mode"
+	@echo "  services-down   - Stop all services"
+	@echo "  sdk-example     - Run SDK example against live devnet"
 	@echo ""
 	@echo "🔍 Code analysis:"
 	@echo "  todo-scan       - Scan repository for TODO/FIXME/XXX markers"
