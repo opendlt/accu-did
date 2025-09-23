@@ -29,21 +29,88 @@ Complete operator's guide for running and managing the Accumulate DID resolver a
   - Local devnet: `http://127.0.0.1:26660`
   - MainNet: `https://mainnet.accumulate.defidevs.io/v2`
 
-### Credit Requirements (REAL Mode)
+### Fees & Credits
 
 **⚠️ IMPORTANT:** DID operations on Accumulate require credits for blockchain transactions.
 
-**Credit Costs:**
-- **ADI Creation:** ~10 credits per ADI (one-time for each unique `did:acc:<adi>` namespace)
-- **Data Account Creation:** ~5 credits per data account
-- **DID Document Write:** ~2-5 credits per write operation (create/update/deactivate)
-- **Total for new DID:** ~17-20 credits for complete `did:acc:<adi>/<path>` setup
+Accumulate uses a fixed, stable credit system for transaction fees. Credits provide predictable costs independent of token price volatility. USD values shown are estimates for illustration; credits are the unit of account.
+
+#### Base Fee Table
+
+The following table shows transaction costs in credits with approximate USD values:
+
+| Transaction Type | Credits | USD (Approx) |
+|------------------|---------|--------------|
+| Add Credits¹ | 0.00 | $0.0000 |
+| Burn Credits¹ | 0.00 | $0.0000 |
+| Transfer Credits | 0.01 | $0.0001 |
+| Send Tokens | 3.00 | $0.0300 |
+| Issue Tokens | 3.00 | $0.0300 |
+| Burn Tokens | 0.10 | $0.0000 |
+| Create ADI² | 500.00 | $5.0000 |
+| Create Token Account | 25.00 | $0.2500 |
+| Create ADI Data Account | 25.00 | $0.2500 |
+| Create Lite Data Account³ | 0.10 | $0.0010 |
+| Create Token | 5000.00 | $50.0000 |
+| Write Data³ | 0.10 | $0.0010 |
+| Write Scratch Data³ | 0.01 | $0.0001 |
+| Create Key Page | 100.00 | $1.0000 |
+| Create Key Book | 100.00 | $1.0000 |
+| Update Key Page | 3.00 | $0.0300 |
+| Sign Transaction | 0.01 | $0.0001 |
+
+**Footnotes:**
+1. Adding and burning credits have minimum amounts instead of a fee. Adding or burning less than 1 credit is prohibited.
+2. Create ADI is 500 credits for names of 8+ bytes; shorter names follow the sliding schedule below.
+3. Lite Data Accounts: creating and writing always 0.10 credits. ADI Data Account writes: 0.10 credits normally, 0.01 if marked scratch. Lite Data Accounts do not support scratch data.
+
+#### Per-Item Adders
+
+- **SendTokens / IssueTokens:** +1.00 credit per output after the first (1 output=3; 2 outputs=4; 3 outputs=5; …)
+- **UpdateKeyPage / UpdateAccountAuth:** +1.00 credit per operation after the first (1 op=3; 2 ops=4; …)
+- **CreateKeyPage:** +1.00 credit per key after the first (1 key=100; 2 keys=101; …)
+- **Delegation:** +0.01 credit per delegation layer (basic signature=0.01; delegated=0.02; double-delegated=0.03; …)
+
+#### Sliding Fee Schedule for Short ADIs
+
+ADI name length is computed in UTF-8 bytes (excluding ".acme"):
+
+| Length (bytes) | Credits |
+|----------------|---------|
+| 1 | 4,800,000 |
+| 2 | 1,200,000 |
+| 3 | 350,000 |
+| 4 | 90,000 |
+| 5 | 25,000 |
+| 6 | 7,000 |
+| 7 | 1,800 |
+| 8+ | 500 |
+
+Note: Length is computed in UTF-8 bytes, so 屋.acme and abc.acme are both 3 bytes.
+
+#### Sizing & Refunds
+
+**Size-based surcharges (transactions & signatures):**
+- All transactions: +0.1 credit per every 256 bytes over a 256-byte base; if the transaction is scratch, the increment is 0.01 (not 0.1)
+- Signatures: +0.01 credit per every 256 bytes over a 256-byte base
+
+**Refund behavior:**
+- Except for send tokens, failed transactions paying >1 credit are refunded minus 1 credit (fees ≤1 credit are not refunded)
+- For send token transactions, each failed output refunds 1 credit
+
+#### DID Operation Costs
+
+For Accumulate DID operations specifically:
+- **ADI Creation:** 500 credits (for standard 8+ byte names)
+- **Data Account Creation:** 25 credits per data account
+- **DID Document Write:** 0.10 credits per write operation
+- **Complete DID Setup:** ~525 credits total (ADI + data account + initial write)
 
 **Credit Management:**
 - Credits must be pre-funded to the signer's lite account before operations
 - Monitor credit balance: insufficient credits will cause transaction failures
 - Each service operation may require multiple blockchain transactions
-- Budget approximately 20-50 credits per DID for full lifecycle testing
+- Budget appropriately based on the fee schedule above
 
 **Funding Commands:**
 ```bash
@@ -57,7 +124,9 @@ accumulate credits <lite-account-url> <amount>
 **Development Recommendations:**
 - Use FAKE mode for development to avoid credit consumption
 - For REAL mode testing, start with a funded devnet lite account
-- Consider credit costs when designing production deployment strategies
+- Consider actual credit costs from the fee table for production deployment
+
+**Last verified:** 2025-09-23 | [Official Accumulate Fees Documentation](https://docs.accumulatenetwork.io/accumulate/getting-started/fees)
 
 ### Accumulate Credits Quickstart
 

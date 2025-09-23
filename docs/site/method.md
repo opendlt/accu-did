@@ -271,7 +271,26 @@ Registrar implementations SHOULD validate all inputs and reject malformed DID Do
 
 **Note:** Test vectors will be updated as CI fixtures evolve with the implementation.
 
-## 10. IANA & Registry Considerations
+## 10. Fees & Credits
+
+Accumulate uses a fixed, stable credit system for transaction fees. The following are the key costs for DID operations:
+
+| DID Operation | Credits | USD (Approx) |
+|---------------|---------|--------------|
+| Create ADI (8+ chars) | 500.00 | $5.0000 |
+| Create Data Account | 25.00 | $0.2500 |
+| Write DID Document | 0.10 | $0.0010 |
+| **Complete DID Setup** | **~525.10** | **~$5.25** |
+
+**Important Notes:**
+- USD values shown are estimates for illustration; credits are the unit of account
+- Short ADI names (1-7 characters) cost significantly more following a sliding scale
+- Size-based surcharges may apply for large transactions
+- Failed transactions may be partially refunded
+
+👉 **[Complete fee schedule and operational details](../ops/OPERATIONS.md#fees--credits)**
+
+## 11. IANA & Registry Considerations
 
 **IANA Action:** None required for this specification.
 
@@ -314,6 +333,6 @@ sequenceDiagram
 
 ---
 
-**Document Version:** Draft v1.0
-**Last Updated:** 2024-01-21
+**Document Version:** Draft v1.1
+**Last Updated:** 2025-09-23
 **Next Review:** TBD based on implementation feedback

@@ -68,17 +68,22 @@ make dev-down
 - Repository mounted at `/workspace` with proper permissions
 - Host Docker integration for image builds
 
-## 💰 Credits on Accumulate
+## 💰 Fees at a Glance
 
 **⚠️ REAL Mode Credit Requirements:**
 
-DID operations on Accumulate require credits for blockchain transactions:
+DID operations on Accumulate require credits for blockchain transactions. USD values shown are estimates for illustration; credits are the unit of account.
 
-**Credit Costs:**
-- **ADI Creation:** ~10 credits (one-time per `did:acc:<adi>` namespace)
-- **Data Account Creation:** ~5 credits per data account
-- **DID Document Operations:** ~2-5 credits per write (create/update/deactivate)
-- **Complete DID Lifecycle:** ~17-20 credits total
+| DID Operation | Credits | USD (Approx) |
+|---------------|---------|--------------|
+| Create ADI (8+ chars) | 500.00 | $5.0000 |
+| Create Data Account | 25.00 | $0.2500 |
+| Write DID Document | 0.10 | $0.0010 |
+| **Complete DID Setup** | **~525.10** | **~$5.25** |
+
+**Short ADI Names Cost More:** 1-char names cost 4.8M credits, 7-char names cost 1,800 credits.
+
+👉 **[Complete fee schedule and details](docs/ops/OPERATIONS.md#fees--credits)**
 
 **Credit Management:**
 
