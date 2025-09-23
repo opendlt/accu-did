@@ -24,7 +24,7 @@ param(
     [string]$IdempotencyKey = "",
 
     [Parameter()]
-    [switch]$Verbose = $false
+    [switch]$VerboseOutput = $false
 )
 
 function Write-Message($Text, $Type = "Info") {
@@ -106,7 +106,7 @@ try {
     # Build test command
     $testCmd = @("go", "test")
 
-    if ($Verbose) {
+    if ($VerboseOutput) {
         $testCmd += "-v"
     }
 

@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -369,7 +368,6 @@ func TestAccuIdempotency(t *testing.T) {
 	ctx := context.Background()
 
 	// Environment setup
-	resolverURL := getEnvWithDefault("RESOLVER_URL", "http://127.0.0.1:8080")
 	registrarURL := getEnvWithDefault("REGISTRAR_URL", "http://127.0.0.1:8081")
 
 	// Check if ACC_NODE_URL is set (indicates REAL mode)
