@@ -329,23 +329,46 @@ func (c *RealClient) GetDataAccountEntry(dataAccountURL *url.URL) ([]byte, error
 
 // recordToEnvelope converts an API record to our Envelope format
 func (c *RealClient) recordToEnvelope(record api.Record) (Envelope, error) {
-	// This is a simplified conversion. In practice, we would need to:
-	// 1. Extract the DID document from the record
-	// 2. Extract metadata like version ID, timestamp, etc.
-	// 3. Build the proper envelope structure
+	// Extract the DID document data from the record
+	var document map[string]interface{}
 
-	// For now, return a basic envelope structure
-	// TODO: Implement proper record to envelope conversion based on actual API types
+	// Try to get data from the record - the exact field depends on the record type
+	// For data entries, we expect the record to have data that can be unmarshaled as JSON
+	recordData := record.GetData()
+	if recordData != nil {
+		if err := json.Unmarshal(recordData, &document); err != nil {
+			return Envelope{}, fmt.Errorf("failed to unmarshal record data as JSON: %w", err)
+		}
+	} else {
+		// Fallback to empty document
+		document = make(map[string]interface{})
+	}
+
+	// Extract metadata from the record
+	versionID := ""
+	timestamp := time.Now().UTC()
+	txID := ""
+
+	// Get transaction hash if available
+	if hash := record.GetHash(); hash != nil {
+		txID = fmt.Sprintf("%x", hash)
+	}
+
+	// Generate version ID from timestamp if not available
+	if versionID == "" {
+		versionID = fmt.Sprintf("%d", timestamp.Unix())
+	}
+
 	envelope := Envelope{
 		ContentType: "application/did+json",
-		Document:    make(map[string]interface{}),
+		Document:    document,
 		Meta: EnvelopeMeta{
-			VersionID:     fmt.Sprintf("%d", time.Now().Unix()),
-			Timestamp:     time.Now().UTC(),
-			AuthorKeyPage: "", // Extract from record
+			VersionID:     versionID,
+			Timestamp:     timestamp,
+			AuthorKeyPage: "", // This would need to be extracted from transaction metadata
 			Proof: Proof{
-				TxID:        "", // Extract from record
-				ContentHash: "",
+				TxID:        txID,
+				ContentHash: "", // This would be computed from the document
 			},
 		},
 	}
