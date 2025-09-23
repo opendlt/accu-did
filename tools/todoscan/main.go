@@ -17,36 +17,40 @@ import (
 
 // TodoItem represents a single TODO/FIXME/etc finding
 type TodoItem struct {
-	Path           string `json:"path"`
-	Line           int    `json:"line"`
-	Tag            string `json:"tag"`
-	Text           string `json:"text"`
-	ContextBefore  string `json:"contextBefore,omitempty"`
-	ContextAfter   string `json:"contextAfter,omitempty"`
-	GitSHAShort    string `json:"gitShaShort,omitempty"`
+	Path          string `json:"path"`
+	Line          int    `json:"line"`
+	Tag           string `json:"tag"`
+	Text          string `json:"text"`
+	ContextBefore string `json:"contextBefore,omitempty"`
+	ContextAfter  string `json:"contextAfter,omitempty"`
+	GitSHAShort   string `json:"gitShaShort,omitempty"`
 }
 
 // TodoSummary represents aggregated statistics
 type TodoSummary struct {
-	CountsByTag map[string]int `json:"countsByTag"`
-	CountsByDir map[string]int `json:"countsByDir"`
+	CountsByTag  map[string]int `json:"countsByTag"`
+	CountsByDir  map[string]int `json:"countsByDir"`
 	CountsByFile map[string]int `json:"countsByFile"`
 }
 
 // TodoReport represents the complete scan report
 type TodoReport struct {
-	GeneratedAt  time.Time    `json:"generatedAt"`
-	RepoPath     string       `json:"repoPath"`
-	GitSHAShort  string       `json:"gitShaShort,omitempty"`
-	Summary      TodoSummary  `json:"summary"`
-	Items        []TodoItem   `json:"items"`
-	TotalCount   int          `json:"totalCount"`
+	GeneratedAt time.Time   `json:"generatedAt"`
+	RepoPath    string      `json:"repoPath"`
+	GitSHAShort string      `json:"gitShaShort,omitempty"`
+	Summary     TodoSummary `json:"summary"`
+	Items       []TodoItem  `json:"items"`
+	TotalCount  int         `json:"totalCount"`
 }
 
 var (
-	// TODO patterns to search for (case-insensitive)
+	// TODO patterns to search for - focus on comment-led markers, not prose
 	todoPatterns = []string{
-		`(?i)\b(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\b`,
+		// Comment-led markers (various comment styles)
+		`(?i)(^|\s)(//|#|/\*|\*|--)\s*(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\b`,
+		// Line-leading markers (start of line)
+		`(?i)^\s*(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\b`,
+		// PANIC("TODO") special case
 		`(?i)PANIC\s*\(\s*["']TODO`,
 	}
 
@@ -63,6 +67,21 @@ var (
 	// Directories to exclude
 	excludeDirs = []string{
 		".git", "dist", "node_modules", "bin", "vendor", ".idea", ".vscode",
+		"reports", // prevent scanning its own generated reports
+	}
+
+	// Files to exclude (case-insensitive matching on base name and path suffix)
+	excludeFiles = []string{
+		"CLAUDE.md",
+		"README.md",
+		"PORTING.md",
+		filepath.Join("sdks", "go", "accdid", "README.md"),
+		"todo-report.json",
+		"todo-report.md",
+		"todo-report.csv",
+		filepath.Join("reports", "todo-report.json"),
+		filepath.Join("reports", "todo-report.md"),
+		filepath.Join("reports", "todo-report.csv"),
 	}
 
 	// File extensions to exclude
@@ -176,6 +195,16 @@ func scanRepository(repoPath string) ([]TodoItem, error) {
 }
 
 func shouldIncludeFile(path, filename string) bool {
+	// Exclude specific files (case-insensitive matching)
+	for _, exclude := range excludeFiles {
+		// Match either by exact base name or relative path fragment (case-insensitive)
+		if strings.EqualFold(filename, exclude) ||
+		   strings.EqualFold(filename, filepath.Base(exclude)) ||
+		   strings.HasSuffix(strings.ToLower(path), strings.ToLower(exclude)) {
+			return false
+		}
+	}
+
 	// Check special files first
 	for _, special := range includeSpecialFiles {
 		if filename == special || strings.HasPrefix(filename, special) {
