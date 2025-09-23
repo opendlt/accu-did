@@ -72,7 +72,7 @@ func TestUpdateHandler_Update(t *testing.T) {
 		assert.NotEmpty(t, response.DIDRegistrationMetadata.TxID)
 
 		// Verify versionId was injected into document
-		mockClient := accClient.(*acc.MockClient)
+		mockClient := accClient
 		require.NotNil(t, mockClient.LastWriteData)
 
 		var doc map[string]interface{}

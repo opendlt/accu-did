@@ -52,7 +52,7 @@ func TestDeactivateHandler_Deactivate(t *testing.T) {
 		assert.NotEmpty(t, response.DIDRegistrationMetadata.TxID)
 
 		// Verify canonical tombstone structure was created
-		mockClient := accClient.(*acc.MockClient)
+		mockClient := accClient
 		require.NotNil(t, mockClient.LastWriteData)
 
 		var tombstone map[string]interface{}
