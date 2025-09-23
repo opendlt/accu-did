@@ -44,7 +44,7 @@ type TodoReport struct {
 }
 
 var (
-	// TODO patterns to search for - focus on comment-led markers, not prose
+	// Patterns to search for technical debt markers - focus on actionable items
 	todoPatterns = []string{
 		// Comment-led markers (various comment styles)
 		`(?i)(^|\s)(//|#|/\*|\*|--)\s*(TODO|FIXME|XXX|HACK|STUB|TBA|TBD|NOTIMPL|NOTIMPLEMENTED)\b`,
@@ -272,6 +272,11 @@ func scanFile(path string) ([]TodoItem, error) {
 			for _, match := range matches {
 				tag := extractTag(match[0])
 
+				// Skip scanner self-references and documentation about scanning
+				if isScannerSelfReference(strings.TrimSpace(line), path) {
+					continue
+				}
+
 				item := TodoItem{
 					Path: path,
 					Line: lineNum,
@@ -328,6 +333,47 @@ func extractTag(match string) string {
 	}
 
 	return "OTHER"
+}
+
+// isScannerSelfReference checks if a line is a scanner self-reference that should be excluded
+func isScannerSelfReference(line, path string) bool {
+	lineUpper := strings.ToUpper(line)
+
+	// Exclude scanner-related documentation and self-references
+	scannerKeywords := []string{
+		"TODO SCANNER",
+		"TODO PATTERNS",
+		"TODO MARKERS",
+		"PANIC(\"TODO\")",
+		"-SCAN:",
+		"SCANNER -",
+		"TODO/FIXME/XXX",
+		"# TODO Scanner",
+		"// TODO patterns",
+		"PANIC(\"TODO\") special case",
+	}
+
+	for _, keyword := range scannerKeywords {
+		if strings.Contains(lineUpper, strings.ToUpper(keyword)) {
+			return true
+		}
+	}
+
+	// Exclude Makefile targets and section headers
+	if strings.Contains(path, "Makefile") || strings.HasSuffix(path, ".mk") {
+		if strings.Contains(lineUpper, "TODO-SCAN:") ||
+		   strings.Contains(lineUpper, "# TODO SCANNER") ||
+		   (strings.HasPrefix(strings.TrimSpace(lineUpper), "TODO-SCAN:")) {
+			return true
+		}
+	}
+
+	// Exclude documentation table entries
+	if strings.Contains(lineUpper, "|") && strings.Contains(lineUpper, "TODO") {
+		return true
+	}
+
+	return false
 }
 
 func generateSummary(items []TodoItem) TodoSummary {
