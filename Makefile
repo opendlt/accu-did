@@ -264,6 +264,22 @@ sdk-example:
 	@echo "Prerequisites: Run 'make devnet-up' first"
 	@cd examples/hello_accu && go run main.go
 
+test-int:
+	@echo "🧪 Running integration tests against live devnet..."
+	@echo "Prerequisites: Run 'make devnet-up && make services-up' first"
+	@export RESOLVER_URL=$${RESOLVER_URL:-http://127.0.0.1:8080}; \
+	export REGISTRAR_URL=$${REGISTRAR_URL:-http://127.0.0.1:8081}; \
+	export ACC_NODE_URL=$${ACC_NODE_URL:-http://127.0.0.1:26656}; \
+	cd sdks/go/accdid && go test -run TestAccuEndToEnd -tags=integration ./integration
+
+test-int-verbose:
+	@echo "🧪 Running integration tests (verbose) against live devnet..."
+	@echo "Prerequisites: Run 'make devnet-up && make services-up' first"
+	@export RESOLVER_URL=$${RESOLVER_URL:-http://127.0.0.1:8080}; \
+	export REGISTRAR_URL=$${REGISTRAR_URL:-http://127.0.0.1:8081}; \
+	export ACC_NODE_URL=$${ACC_NODE_URL:-http://127.0.0.1:26656}; \
+	cd sdks/go/accdid && go test -v -run TestAccuEndToEnd -tags=integration ./integration
+
 # ========================================================================
 # TODO Scanner
 # ========================================================================
@@ -325,6 +341,8 @@ help:
 	@echo "  services-up     - Start devnet + resolver + registrar in REAL mode"
 	@echo "  services-down   - Stop all services"
 	@echo "  sdk-example     - Run SDK example against live devnet"
+	@echo "  test-int        - Run integration tests against live devnet"
+	@echo "  test-int-verbose - Run integration tests (verbose output)"
 	@echo ""
 	@echo "🔍 Code analysis:"
 	@echo "  todo-scan       - Scan repository for TODO/FIXME/XXX markers"
